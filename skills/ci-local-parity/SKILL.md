@@ -70,6 +70,10 @@ existing one:
       `node:22-slim@sha256:<digest>` (or your registry's equivalent) for
       a build that genuinely doesn't drift, and document the process for
       bumping it deliberately.
+- [ ] **Are third-party GitHub Actions pinned to a commit SHA, not a
+      version tag?** `actions/checkout@v6` can be repointed after the
+      fact; `actions/checkout@<full-sha>` can't. Same principle as the
+      image-digest bullet above, applied to the CI supply chain.
 - [ ] **Does secret scanning (gitleaks or similar) also have a CI
       backstop, not just a `pre-commit` hook?** A `pre-commit` hook is
       bypassable and never scans a commit from outside that checkout —
@@ -203,10 +207,20 @@ check itself.
 
 ### Gitleaks in CI: two options, choose based on repo visibility
 
-**Public repo → `gitleaks/gitleaks-action@v2`, no hand-built diff-range
+**Public repo → `gitleaks/gitleaks-action@v3` (verify the current major at
+[github.com/gitleaks/gitleaks-action/releases](https://github.com/gitleaks/gitleaks-action/releases)
+before pinning — this one has moved before), no hand-built diff-range
 logic.** Reads the push/PR event context and automatically scans the
 right commit range — needs `fetch-depth: 0`, free for public repos,
 requires a `GITLEAKS_LICENSE` for private ones.
+
+**Pin third-party GitHub Actions to a commit SHA, not a floating version
+tag** (`uses: actions/checkout@<full-sha>  # v6.0.1`, not
+`actions/checkout@v6`) — a version tag can be moved to point at different
+code after the fact, a commit SHA can't. This applies to every action in
+the pipeline, not just gitleaks — it's the same "pin, don't float"
+principle as the container-image-digest bullet above, applied to the
+supply chain instead of the runtime image.
 
 **Private repo without `GITLEAKS_LICENSE` → the CLI itself with
 `--log-opts`.** Vendor-neutral, same diff-scoping, plus the zero-SHA

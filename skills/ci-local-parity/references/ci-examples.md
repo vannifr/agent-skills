@@ -34,14 +34,16 @@ test:
 
 ## Gitleaks in CI: two options, choose based on repo visibility
 
-**Public repo → `gitleaks/gitleaks-action@v2`, no hand-built diff-range
-logic.** That action reads the push/PR event context and automatically
-scans the right commit range — that's exactly the "diff-scoped in CI"
-principle from the main skill, ready-made. It does require
-`actions/checkout@v4` with `fetch-depth: 0` (it needs the full history to
-determine the range). Free for public repositories, but requires a
-`GITLEAKS_LICENSE` for private repositories — check visibility **before**
-adding it, or the step fails on a license error instead of a found secret.
+**Public repo → `gitleaks/gitleaks-action@v3` (check
+[the releases page](https://github.com/gitleaks/gitleaks-action/releases)
+for the current major before pinning), no hand-built diff-range logic.**
+That action reads the push/PR event context and automatically scans the
+right commit range — that's exactly the "diff-scoped in CI" principle
+from the main skill, ready-made. It does require `actions/checkout` with
+`fetch-depth: 0` (it needs the full history to determine the range).
+Free for public repositories, but requires a `GITLEAKS_LICENSE` for
+private repositories — check visibility **before** adding it, or the
+step fails on a license error instead of a found secret.
 
 **Private repo without `GITLEAKS_LICENSE` → the CLI itself with
 `--log-opts`.** This isn't a workaround, it's the vendor-neutral variant
@@ -66,7 +68,7 @@ that covers just as much. Key points:
 
 ```yaml
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@<full-commit-sha>  # v6.0.1 — pin by SHA, not tag
     with:
       fetch-depth: 0
 

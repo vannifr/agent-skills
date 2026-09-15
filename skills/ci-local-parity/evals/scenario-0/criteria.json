@@ -43,13 +43,13 @@
       "max_score": 8
     },
     {
-      "name": "CI image digest-pinned",
-      "description": "The CI workflow container or runner image is pinned with a `@sha256:` digest (e.g. `node:22@sha256:<hash>`) not just a floating tag",
+      "name": "Third-party actions pinned to commit SHA",
+      "description": "Marketplace actions used in the workflow (e.g. `actions/checkout`, `actions/setup-node`, the gitleaks action) are pinned to a full commit SHA, not a floating version tag like `@v4`",
       "max_score": 8
     },
     {
       "name": "gitleaks action version",
-      "description": "CI uses `gitleaks/gitleaks-action@v2` for secret scanning (not a manually downloaded CLI binary or a different action)",
+      "description": "CI uses the gitleaks GitHub Action (`gitleaks/gitleaks-action`, current major version at the time — check its releases page) for secret scanning, not a manually downloaded CLI binary or a different tool",
       "max_score": 7
     },
     {
