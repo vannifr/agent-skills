@@ -25,7 +25,8 @@ jobs:
     steps:
       - name: Note (no token — expected on a fork PR)
         if: ${{ !secrets.TESSL_TOKEN }}
-        run: echo "tessl review skipped: no TESSL_TOKEN available on this run (expected on a fork PR — structure-lint above still ran and gates the PR)."
+        run: |
+          echo "tessl review skipped: no TESSL_TOKEN available on this run (expected on a fork PR — structure-lint above still ran and gates the PR)."
 
       - uses: actions/checkout@v4
         if: ${{ secrets.TESSL_TOKEN }}
