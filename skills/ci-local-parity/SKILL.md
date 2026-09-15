@@ -63,11 +63,7 @@ existing one:
       the rest of this checklist, just about documentation instead of
       commands — and is therefore easy to miss in a pure CI audit.
 - [ ] **Does the CI container run the same binaries as the local dev
-      environment?** A minimal/`slim` image (e.g. `node:22-slim`) often
-      lacks tools that are trivially present locally (`git`, `curl`, ...)
-      but that a test fixture actually needs. A locally green `pnpm
-      verify` then proves nothing about the CI container. See "Local
-      green ≠ CI-container green" below.
+      environment?** See "Local green ≠ CI-container green" below.
 - [ ] **Is the CI image pinned by digest, not just by tag?** A tag like
       `node:22-slim` can silently change underneath you even while the
       binary list looks the same today — pin
@@ -75,18 +71,10 @@ existing one:
       a build that genuinely doesn't drift, and document the process for
       bumping it deliberately.
 - [ ] **Does secret scanning (gitleaks or similar) also have a CI
-      backstop, not just a `pre-commit` hook?** This is the mirror image
-      of every other bullet above: those ask "does local also do what CI
-      does," this asks "does CI also do what local does." A `pre-commit`
-      hook is bypassable (`--no-verify`, or the tool simply isn't
-      installed — see the graceful-degradation bullet above) and never
-      scans a commit that originated outside that one checkout (a merge,
-      a commit from another device). Without a diff-scoped scan in CI
-      itself, a leaked secret simply reaches the build/deploy. See
-      "Gitleaks in CI" below for the two concrete options, and make sure
-      the scan job is actually wired to build/deploy via
-      `needs:`/`depends_on` — a scan that runs but blocks nothing is
-      cosmetic.
+      backstop, not just a `pre-commit` hook?** A `pre-commit` hook is
+      bypassable and never scans a commit from outside that checkout —
+      see "Gitleaks in CI" below, and confirm the scan job actually
+      blocks build/deploy via `needs:`/`depends_on`.
 
 ## Git hooks: the pattern
 
@@ -176,18 +164,7 @@ One big `verify` block in CI hides *which* step failed. Separate, named
 steps — each calling the same underlying script as local — give direct
 visibility without losing the "one source of truth" guarantee:
 
-Woodpecker form:
-```yaml
-steps:
-  - name: lint
-    commands: [pnpm lint]
-  - name: test
-    commands: [pnpm test:coverage]
-  - name: <external-check>
-    commands: [<external-scanner> ...]
-```
-
-GitHub Actions equivalent (same principle, different syntax):
+GitHub Actions form:
 ```yaml
 steps:
   - name: Lint
@@ -198,17 +175,8 @@ steps:
     run: <external-scanner> ...
 ```
 
-GitLab CI equivalent (same principle again):
-```yaml
-lint:
-  script: pnpm lint
-
-test:
-  script: pnpm test:coverage
-
-<external-check>:
-  script: <external-scanner> ...
-```
+Same principle, different syntax, for Woodpecker and GitLab CI:
+[ci-examples.md](references/ci-examples.md).
 
 Add a security baseline where relevant (e.g. `gitleaks` for secret
 scanning on this push's commits, plus a `.env` guard as

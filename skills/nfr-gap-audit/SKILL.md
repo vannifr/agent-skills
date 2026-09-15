@@ -72,11 +72,23 @@ Three rules that always apply here:
 ## Phase 2 — Baseline measurement
 
 Run build, tests, lint, CSS/HTML validation, link check, Lighthouse,
-axe/visual tests and security audit (`npm audit`/equivalent) — **skip
-metrics for domains marked ❌ for this project type** in
+axe/visual tests and security audit — **skip metrics for domains marked
+❌ for this project type** in
 [project-type-reference.md](references/project-type-reference.md) (e.g. no
-Lighthouse a11y/SEO run against a pure backend API). Document a baseline
-table (metric / current / target / status ✅⚠️❌) before anything changes.
+Lighthouse a11y/SEO run against a pure backend API). Concrete commands per
+stack (swap for the project's actual tools):
+
+- **Node/JS**: `npx lighthouse <url> --output json`, `npx axe <url>`, `npm audit`
+- **Python**: `pip-audit`, `pytest --cov`
+- **Rust**: `cargo audit`, `cargo test`
+
+Document a baseline table before anything changes, e.g.:
+
+| Metric | Current | Target | Status |
+|---|---|---|---|
+| Lighthouse Performance | 62 | ≥90 | ⚠️ |
+| `npm audit` (high+) | 3 | 0 | ❌ |
+| Test coverage | 41% | ≥80% | ⚠️ |
 
 ## Phase 3 — GAP analysis
 

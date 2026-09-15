@@ -1,7 +1,36 @@
 # CI implementation examples
 
-Supporting detail for [../SKILL.md](../SKILL.md) — the two Gitleaks CI
-options, and the exact command to reproduce a CI container image locally.
+Supporting detail for [../SKILL.md](../SKILL.md) — named-step CI syntax
+for Woodpecker/GitLab, the two Gitleaks CI options, and the exact command
+to reproduce a CI container image locally.
+
+## Named steps: Woodpecker and GitLab CI
+
+Same "each named step calls the same underlying script as local"
+principle as the GitHub Actions example in SKILL.md, different syntax:
+
+Woodpecker:
+```yaml
+steps:
+  - name: lint
+    commands: [pnpm lint]
+  - name: test
+    commands: [pnpm test:coverage]
+  - name: <external-check>
+    commands: [<external-scanner> ...]
+```
+
+GitLab CI:
+```yaml
+lint:
+  script: pnpm lint
+
+test:
+  script: pnpm test:coverage
+
+<external-check>:
+  script: <external-scanner> ...
+```
 
 ## Gitleaks in CI: two options, choose based on repo visibility
 
