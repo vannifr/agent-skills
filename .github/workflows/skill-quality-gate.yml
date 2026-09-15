@@ -6,6 +6,7 @@ on:
     paths: ["skills/**"]
   pull_request:
     paths: ["skills/**"]
+  workflow_dispatch: {}
 
 jobs:
   structure-lint:
