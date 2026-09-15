@@ -22,7 +22,7 @@ jobs:
           node-version: "22"
 
       - name: Run structure lint tests
-        run: node --test scripts/
+        run: node --test scripts/*.test.mjs
 
       - name: Run structure lint
         run: node scripts/structure-lint.mjs
