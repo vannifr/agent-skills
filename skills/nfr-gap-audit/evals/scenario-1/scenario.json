@@ -1,0 +1,4 @@
+{
+  "description": "Dual-source skill discovery for a Next.js SSR project",
+  "include": ["./inputs"]
+}

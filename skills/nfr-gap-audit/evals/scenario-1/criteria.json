@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent follows the dual-source skill discovery workflow: searching both the Tessl registry and the VoltAgent awesome-agent-skills list, classifying findings in a correctly structured table, handling an unreachable Tessl registry gracefully, stating expected install count before batch-installing, scanning non-Tessl skills before installing, and documenting open actions for missed sources.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Both sources attempted",
+      "description": "The report shows that the agent attempted BOTH the Tessl registry AND the VoltAgent awesome-agent-skills source (evidence: separate sections, notes, or headings for each source, even if one was unavailable)",
+      "max_score": 15
+    },
+    {
+      "name": "VoltAgent raw URL fetched",
+      "description": "The report shows or references fetching from https://raw.githubusercontent.com/VoltAgent/awesome-agent-skills/main/README.md (the raw URL, not the GitHub web page)",
+      "max_score": 10
+    },
+    {
+      "name": "Five-column classification table",
+      "description": "The classification table in the report has exactly these five columns: category, skill, source, relevance, and install command (all five present, in any order)",
+      "max_score": 15
+    },
+    {
+      "name": "Tessl unavailable noted as open action",
+      "description": "The report explicitly states that Tessl was unavailable or unreachable AND lists the missed Tessl search domains as open actions (not just a passing mention — must be in an open actions or follow-up section)",
+      "max_score": 10
+    },
+    {
+      "name": "Pre-install content review",
+      "description": "The report mentions reading or scanning the content of at least one non-Tessl (e.g. VoltAgent / GitHub) skill before deciding to install it",
+      "max_score": 10
+    },
+    {
+      "name": "Expected install count stated",
+      "description": "The report states an expected number of skills to install (e.g. 'planning to install N skills') before listing the install commands — not after",
+      "max_score": 10
+    },
+    {
+      "name": "High and Medium relevance targeted",
+      "description": "The report installs (or attempts to install) all skills classified as High or Medium relevance, and does NOT skip High/Medium skills without explanation",
+      "max_score": 10
+    },
+    {
+      "name": "Low relevance skipped",
+      "description": "Skills classified as Low relevance are NOT included in the install list",
+      "max_score": 5
+    },
+    {
+      "name": "Already-installed check",
+      "description": "The report mentions checking whether skills are already installed before running install commands (e.g. 'skipping already-installed' or 'none installed yet')",
+      "max_score": 5
+    },
+    {
+      "name": "Open actions section",
+      "description": "The report contains a dedicated open actions or follow-up section that lists at least one item (e.g. missed Tessl domains, a skill to revisit, or a source that was unavailable)",
+      "max_score": 10
+    }
+  ]
+}

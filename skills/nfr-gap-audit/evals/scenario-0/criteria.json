@@ -1,0 +1,66 @@
+{
+  "context": "Tests whether the agent produces a correct NFR gap audit report for a minimal static website, including proper use of project-type classification to skip irrelevant domains, a baseline measurement table, per-domain GAP analysis with severity classification, special marking of privacy/GDPR issues, inline code examples for fixable GAPs, Critical-first ordering in the improvement plan, and the report written to the required path.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Report file location",
+      "description": "The final audit report is written to docs/skill-audit-report.md (not any other path)",
+      "max_score": 5
+    },
+    {
+      "name": "Baseline measurement table",
+      "description": "The report contains a baseline table with at least three columns (Metric, Current, Target or Status) documented before any changes are described",
+      "max_score": 10
+    },
+    {
+      "name": "Severity labels present",
+      "description": "Every GAP finding in the report is labelled with exactly one of: Critical, High, Medium, or Low (no other severity labels used)",
+      "max_score": 10
+    },
+    {
+      "name": "Privacy/GDPR GAPs flagged",
+      "description": "At least one GAP related to privacy, GDPR, or legal risk is visually distinguished from other GAPs (e.g. separate section, emoji flag, bold label, or note that it requires stakeholder sign-off)",
+      "max_score": 10
+    },
+    {
+      "name": "Code examples in findings",
+      "description": "At least two GAP findings that have a concrete fix include a short code snippet (inline code block) directly within the finding entry, not just a description",
+      "max_score": 10
+    },
+    {
+      "name": "Critical GAPs ordered first",
+      "description": "In the improvement plan section, all Critical-severity GAPs appear before any High, Medium, or Low severity GAPs, regardless of domain",
+      "max_score": 10
+    },
+    {
+      "name": "Irrelevant domains skipped",
+      "description": "The report does NOT include baseline metrics or GAP analysis for domains that are not relevant to a static website (e.g. backend API metrics), and explicitly notes at least one domain as not relevant or skipped",
+      "max_score": 10
+    },
+    {
+      "name": "Executive summary present",
+      "description": "The report contains an executive summary section (a heading containing 'executive summary' or 'summary', case-insensitive)",
+      "max_score": 8
+    },
+    {
+      "name": "GAP analysis per domain",
+      "description": "The report organises GAPs by domain (e.g. Performance, Accessibility, Security, SEO, Privacy) with at least three distinct domains represented",
+      "max_score": 8
+    },
+    {
+      "name": "Improvement plan section",
+      "description": "The report contains a section titled 'improvement plan' (or similar) that lists actionable steps derived from the GAPs found",
+      "max_score": 5
+    },
+    {
+      "name": "Open non-code actions",
+      "description": "The report includes an 'open actions' or 'non-code actions' section listing at least one item that cannot be resolved with a code change alone (e.g. legal sign-off, stakeholder approval, or unreachable source)",
+      "max_score": 7
+    },
+    {
+      "name": "Recommendations section",
+      "description": "The report contains a recommendations section with forward-looking suggestions beyond the GAPs identified",
+      "max_score": 7
+    }
+  ]
+}

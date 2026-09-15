@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent correctly orders a GAP backlog with a Critical-severity item first, applies the default improvement ordering for remaining GAPs, uses conventional commit format with domain scope, handles a Privacy/GDPR GAP as a stakeholder sign-off exception rather than a normal implementation item, describes the 6-step per-phase implementation loop, includes a retrospective template, documents recurring audit phase scoping, and notes AGENTS.md/CLAUDE.md updates for architectural changes.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Critical GAP listed first",
+      "description": "The Critical severity finding (HTTPS redirect, G1) appears as the first item or first phase in the implementation plan in docs/implementation-plan.md, before any High or Medium severity items",
+      "max_score": 10
+    },
+    {
+      "name": "Security before performance",
+      "description": "After the Critical GAP phase, the High severity Security finding (CSP header, G2) is placed in an earlier phase than the Medium Performance finding (WebP images, G3) in docs/implementation-plan.md",
+      "max_score": 10
+    },
+    {
+      "name": "Performance before testing",
+      "description": "The Performance finding (WebP images, G3) is placed in an earlier phase than the Testing finding (test coverage, G4) in docs/implementation-plan.md",
+      "max_score": 10
+    },
+    {
+      "name": "Design system ordered last",
+      "description": "The Design System finding (dark mode, G6) is placed in a later phase than the Performance (G3) and Testing (G4) findings in docs/implementation-plan.md",
+      "max_score": 10
+    },
+    {
+      "name": "Commit type prefix",
+      "description": "At least one example commit message in docs/implementation-plan.md uses a valid conventional commit type prefix — one of: feat, fix, docs, test, security, perf, or refactor",
+      "max_score": 10
+    },
+    {
+      "name": "Commit domain scope",
+      "description": "At least one example commit message in docs/implementation-plan.md includes a parenthetical domain scope directly after the type prefix, in the format type(domain): description",
+      "max_score": 10
+    },
+    {
+      "name": "GDPR stakeholder sign-off required",
+      "description": "The Privacy/GDPR finding (cookie consent, G5) is explicitly called out as requiring stakeholder or legal sign-off BEFORE any technical implementation begins, and is NOT simply placed in the normal phased implementation queue alongside other findings",
+      "max_score": 15
+    },
+    {
+      "name": "6-step implementation loop",
+      "description": "The plan describes a per-phase implementation loop containing all six of: (1) make the smallest possible change, (2) run tests, (3) verify the build, (4) check scores against a baseline with no regression allowed, (5) commit and push, (6) verify CI",
+      "max_score": 10
+    },
+    {
+      "name": "Retrospective template",
+      "description": "The plan includes a retrospective template or section (per-phase or a reusable blank template) that covers at minimum: what was done, what worked well or could be improved, and scores before/after",
+      "max_score": 5
+    },
+    {
+      "name": "Recurring audit phase scope",
+      "description": "The re-audit guidance section in docs/implementation-plan.md explicitly states that the next quarterly audit should skip Phase 0 (discovery) and Phase 1 (skill installation), and only re-run Phase 2 (baseline) and Phase 3 (GAP analysis)",
+      "max_score": 5
+    },
+    {
+      "name": "AGENTS.md architectural update note",
+      "description": "The plan notes that the security middleware architectural change should include an update to AGENTS.md or CLAUDE.md in the same commit as the architectural change",
+      "max_score": 5
+    }
+  ]
+}
