@@ -24,27 +24,38 @@ jobs:
   skill-quality-gate:
     runs-on: ubuntu-latest
     steps:
+      - name: Check for TESSL_TOKEN
+        id: check-token
+        env:
+          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
+        run: |
+          if [ -n "$TESSL_TOKEN" ]; then
+            echo "has-token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-token=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Note (no token — expected on a fork PR)
-        if: ${{ !secrets.TESSL_TOKEN }}
+        if: steps.check-token.outputs.has-token == 'false'
         run: |
           echo "tessl review skipped: no TESSL_TOKEN available on this run (expected on a fork PR — structure-lint above still ran and gates the PR)."
 
       - uses: actions/checkout@v4
-        if: ${{ secrets.TESSL_TOKEN }}
+        if: steps.check-token.outputs.has-token == 'true'
         with:
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
-        if: ${{ secrets.TESSL_TOKEN }}
+        if: steps.check-token.outputs.has-token == 'true'
         with:
           node-version: "22"
 
       - name: Install Tessl CLI
-        if: ${{ secrets.TESSL_TOKEN }}
+        if: steps.check-token.outputs.has-token == 'true'
         run: npm install -g @tessl/cli@0.109.0
 
       - name: Review changed skills only
-        if: ${{ secrets.TESSL_TOKEN }}
+        if: steps.check-token.outputs.has-token == 'true'
         env:
           TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
           BEFORE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
