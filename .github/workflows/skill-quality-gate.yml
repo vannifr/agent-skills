@@ -72,16 +72,15 @@ jobs:
             echo "New branch or first push — reviewing every skill directory."
             CHANGED=$(find skills -mindepth 1 -maxdepth 1 -type d)
           else
+            if ! git merge-base --is-ancestor "$BEFORE_SHA" "$HEAD_SHA" 2>/dev/null; then
+              echo "ERROR: $BEFORE_SHA is not an ancestor of $HEAD_SHA — history was rewritten (e.g. a force-push), so a plain diff can't be trusted. Investigate before assuming this is a no-op."
+              exit 1
+            fi
             CHANGED=$(git diff --name-only "$BEFORE_SHA..$HEAD_SHA" -- skills/ | sed -E 's#^(skills/[^/]+)/.*#\1#' | sort -u)
           fi
           if [ -z "$CHANGED" ]; then
-            if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-              echo "No skill directories changed in this push — nothing to review."
-              exit 0
-            else
-              echo "ERROR: no skill directories detected as changed, but this push/PR matched the skills/** path filter — the diff computation likely failed (e.g. after a force-push). Investigate before assuming this is a real no-op."
-              exit 1
-            fi
+            echo "No skill directories changed in this push/PR (only scripts/ or workflow files, most likely) — nothing to review."
+            exit 0
           fi
           fail=0
           for d in $CHANGED; do
