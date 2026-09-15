@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent correctly adds a SonarQube integration script following the three-step graceful-degradation pattern (credential check → reachability check → real scan), updates the pre-push hook and CI pipeline in the right order, avoids the '&& A || B' shell anti-pattern, and documents the CI/local gap in CLAUDE.md.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Credential/tool check",
+      "description": "scripts/sonarqube.sh checks that SONAR_TOKEN (or equivalent credential env var) AND the sonar-scanner tool are both present before attempting analysis",
+      "max_score": 10
+    },
+    {
+      "name": "Reachability check with short timeout",
+      "description": "scripts/sonarqube.sh uses curl (or equivalent) with a short timeout (--max-time 2 or a value ≤ 5s) to verify the SonarQube host is reachable before running the scanner",
+      "max_score": 10
+    },
+    {
+      "name": "Graceful exit: missing credentials",
+      "description": "When SONAR_TOKEN or sonar-scanner is absent, scripts/sonarqube.sh prints a visible warning message and exits with code 0 (does not block)",
+      "max_score": 10
+    },
+    {
+      "name": "Graceful exit: unreachable host",
+      "description": "When the SonarQube server cannot be reached, scripts/sonarqube.sh prints a visible warning message and exits with code 0 (does not block)",
+      "max_score": 10
+    },
+    {
+      "name": "No && || antipattern",
+      "description": "scripts/sonarqube.sh does NOT use '[ ... ] && A || B' or 'test ... && A || B' for conditional logic; each conditional branch uses an explicit if/then/else block instead",
+      "max_score": 10
+    },
+    {
+      "name": "Pre-push hook ordering",
+      "description": ".githooks/pre-push runs pnpm verify (or the equivalent local command) BEFORE calling the sonarqube script — verify comes first",
+      "max_score": 10
+    },
+    {
+      "name": "CI calls same script",
+      "description": "The SonarQube step in .github/workflows/ci.yml invokes scripts/sonarqube.sh directly (same script as the local one), rather than calling sonar-scanner inline or duplicating the logic",
+      "max_score": 10
+    },
+    {
+      "name": "CI step is separate and named",
+      "description": ".github/workflows/ci.yml has a distinctly named step for SonarQube (not bundled inside the Lint or Test step)",
+      "max_score": 10
+    },
+    {
+      "name": "Coverage generated before SonarQube in CI",
+      "description": "In .github/workflows/ci.yml, the step that runs test:coverage (generating the coverage report) appears before the SonarQube step",
+      "max_score": 10
+    },
+    {
+      "name": "Gap documented in CLAUDE.md",
+      "description": "CLAUDE.md explains that SonarQube requires credentials (SONAR_TOKEN or similar) and network access to the server, and that the check is skipped gracefully when these are unavailable locally",
+      "max_score": 10
+    }
+  ]
+}

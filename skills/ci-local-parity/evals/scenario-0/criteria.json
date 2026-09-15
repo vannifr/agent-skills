@@ -1,0 +1,76 @@
+{
+  "context": "Tests whether the agent follows skill instructions for CI/local parity: a single verify command, native git hooks in the correct directory with a hooks:install script, CI steps that mirror local scripts with digest-pinned images, and gitleaks configured correctly (in pre-commit not pre-push, using the public-repo action, with fetch-depth: 0, and blocking the build via needs:).",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "verify script",
+      "description": "package.json contains a `verify` script (or equivalent single command) that runs both lint and test:coverage — not just one of them",
+      "max_score": 8
+    },
+    {
+      "name": "hooks:install script",
+      "description": "package.json contains a script (e.g. `hooks:install`) that runs `git config core.hooksPath .githooks` to activate the hooks directory",
+      "max_score": 8
+    },
+    {
+      "name": "pre-commit hook file",
+      "description": "A file `.githooks/pre-commit` exists in the workspace",
+      "max_score": 5
+    },
+    {
+      "name": "pre-push hook file",
+      "description": "A file `.githooks/pre-push` exists in the workspace",
+      "max_score": 5
+    },
+    {
+      "name": "pre-commit network-free",
+      "description": "`.githooks/pre-commit` does NOT contain calls to external network services (no SonarQube, Codecov, remote APIs, or any `curl`/`wget` to external hosts)",
+      "max_score": 7
+    },
+    {
+      "name": "no Husky/lint-staged",
+      "description": "package.json does NOT list `husky` or `lint-staged` in dependencies or devDependencies",
+      "max_score": 7
+    },
+    {
+      "name": "CI mirrors local scripts",
+      "description": "Each CI workflow step that runs checks calls one of the same scripts defined in package.json (e.g. `pnpm lint`, `pnpm test:coverage`, `pnpm verify`) — not separately defined inline logic",
+      "max_score": 8
+    },
+    {
+      "name": "CI has named separate steps",
+      "description": "The CI workflow has at least 2 separately named steps for running checks (lint and test are separate named steps, not bundled into a single step)",
+      "max_score": 8
+    },
+    {
+      "name": "CI image digest-pinned",
+      "description": "The CI workflow container or runner image is pinned with a `@sha256:` digest (e.g. `node:22@sha256:<hash>`) not just a floating tag",
+      "max_score": 8
+    },
+    {
+      "name": "gitleaks action version",
+      "description": "CI uses `gitleaks/gitleaks-action@v2` for secret scanning (not a manually downloaded CLI binary or a different action)",
+      "max_score": 7
+    },
+    {
+      "name": "gitleaks fetch-depth",
+      "description": "The checkout step in the gitleaks CI job sets `fetch-depth: 0`",
+      "max_score": 8
+    },
+    {
+      "name": "gitleaks blocks build",
+      "description": "At least one other CI job (build, test, deploy, or similar) declares `needs:` referencing the gitleaks scan job, so a secret finding actually blocks the build",
+      "max_score": 8
+    },
+    {
+      "name": "gitleaks not in pre-push",
+      "description": "`.githooks/pre-push` does NOT contain a `gitleaks protect --staged` call or any other gitleaks invocation",
+      "max_score": 7
+    },
+    {
+      "name": "gitleaks in pre-commit",
+      "description": "`.githooks/pre-commit` contains a gitleaks invocation (e.g. `gitleaks protect --staged`) for local secret scanning",
+      "max_score": 6
+    }
+  ]
+}

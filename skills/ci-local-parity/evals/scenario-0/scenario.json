@@ -1,0 +1,1 @@
+{ "description": "CI/local parity pipeline setup with git hooks and secret scanning", "include": ["./inputs"] }

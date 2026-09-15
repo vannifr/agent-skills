@@ -1,0 +1,4 @@
+{
+  "description": "Gitleaks CI integration for private repo",
+  "include": ["./inputs"]
+}

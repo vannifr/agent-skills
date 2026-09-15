@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent correctly integrates gitleaks secret scanning into a private GitHub repository that lacks a GITLEAKS_LICENSE. Covers hook placement (pre-commit not pre-push), the CLI-based CI approach with proper diff-scoping, safe SHA handling, zero-SHA edge cases, and ensuring the scan actually gates the build and deploy jobs.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Gitleaks in pre-commit",
+      "description": "`.githooks/pre-commit` contains a `gitleaks protect --staged` invocation (or equivalent staged-only scan)",
+      "max_score": 12
+    },
+    {
+      "name": "Gitleaks absent from pre-push",
+      "description": "`.githooks/pre-push` does NOT contain any `gitleaks` invocation",
+      "max_score": 10
+    },
+    {
+      "name": "CI uses CLI not action",
+      "description": "`.github/workflows/ci.yml` does NOT use `gitleaks/gitleaks-action`; instead downloads and runs the gitleaks CLI binary directly",
+      "max_score": 10
+    },
+    {
+      "name": "Full history checkout",
+      "description": "The CI checkout step in the gitleaks scan job uses `fetch-depth: 0`",
+      "max_score": 8
+    },
+    {
+      "name": "SHAs via env block",
+      "description": "The CI scan step passes `github.event.before` and `github.sha` (or equivalent SHAs) via the `env:` block — these values do NOT appear as `${{ }}` interpolations directly inside the `run:` script body",
+      "max_score": 10
+    },
+    {
+      "name": "Zero-SHA fallback",
+      "description": "The CI scan step explicitly checks whether the before-SHA is all zeros (or empty) and falls back to scanning only the last commit in that case",
+      "max_score": 10
+    },
+    {
+      "name": "Diff-scoped CI scan",
+      "description": "The CI scan uses a commit range (`--log-opts` with a SHA range such as `BEFORE..HEAD`) rather than a full-history bare scan (e.g., `gitleaks git .` with no scope restriction)",
+      "max_score": 10
+    },
+    {
+      "name": "Scan gates build and deploy",
+      "description": "Both the `build` job and the `deploy` job in `.github/workflows/ci.yml` declare a `needs:` dependency on the gitleaks scan job",
+      "max_score": 12
+    },
+    {
+      "name": "Baseline path in SCANNING.md",
+      "description": "`SCANNING.md` mentions the `--baseline-path` flag and explains its role in suppressing confirmed-innocuous findings from a first-time full-history scan",
+      "max_score": 8
+    },
+    {
+      "name": "Hook placement rationale",
+      "description": "`SCANNING.md` explains why gitleaks belongs in `pre-commit` rather than `pre-push`",
+      "max_score": 5
+    },
+    {
+      "name": "Versioned download URL",
+      "description": "The CI step that downloads gitleaks uses a specific version number in the URL (e.g., `v8.30.1` or another pinned version), not an unversioned or `latest` URL",
+      "max_score": 5
+    }
+  ]
+}

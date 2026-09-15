@@ -1,0 +1,4 @@
+{
+  "description": "Gracefully-degrading external quality check integration",
+  "include": ["./inputs"]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "my-private-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "lint": "eslint .",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "verify": "pnpm lint && pnpm test:coverage && pnpm build",
+    "hooks:install": "git config core.hooksPath .githooks"
+  }
+}

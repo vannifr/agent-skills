@@ -1,0 +1,17 @@
+{
+  "name": "acme-core-lib",
+  "version": "2.3.1",
+  "description": "Core utilities library",
+  "type": "module",
+  "scripts": {
+    "verify": "pnpm lint && pnpm test:coverage",
+    "lint": "eslint src/",
+    "test": "node --test src/**/*.test.js",
+    "test:coverage": "c8 node --test src/**/*.test.js",
+    "hooks:install": "git config core.hooksPath .githooks"
+  },
+  "devDependencies": {
+    "c8": "^10.1.2",
+    "eslint": "^9.0.0"
+  }
+}
