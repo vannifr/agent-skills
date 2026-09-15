@@ -110,14 +110,14 @@ lazy loading."
 
 ## Phase 4 — Improvement plan
 
-Group GAPs into phases from smallest to largest risk — the default order
-(quick wins → security hardening → performance → testing →
-analytics/monitoring → design system → content/marketing) and the
-corresponding action templates are in
+**Order every GAP by severity first, across all domains: Critical > High >
+Medium > Low.** Within one severity tier, break ties using the default
+domain order (quick wins → security hardening → performance → testing →
+analytics/monitoring → design system → content/marketing) — a High-severity
+Security GAP goes before a Medium-severity Performance GAP even though
+"security" and "performance" are adjacent in that list, because severity
+outranks domain. The corresponding action templates are in
 [improvement-plan-template.md](references/improvement-plan-template.md).
-**Every Critical-severity GAP goes first, regardless of which domain it
-falls in** — the default order only applies after the Critical GAPs, and
-only among GAPs of equal severity.
 
 ## Phase 5 — Implementation & verification
 
