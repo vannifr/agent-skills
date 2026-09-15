@@ -115,23 +115,35 @@ pnpm verify
 node scripts/<external-check-name>.mjs
 ```
 
-The external check itself (e.g. for SonarQube) must:
-1. Check whether the required credentials/tools are present (env var,
-   binary on PATH) — if not: warn and `exit 0` (don't block on missing
-   infrastructure).
-2. Check whether the external service is actually reachable (short
-   timeout, e.g. 2s) — if not: warn and `exit 0`.
-3. Only then run the real check, and pass through its exit result (`exit
-   1` on a real failure, not on unreachability).
+The external check itself (e.g. `scripts/<external-check-name>.mjs` for
+SonarQube) follows this shape — credentials/tool present, then service
+reachable, only then the real check:
+
+```sh
+#!/bin/sh
+set -e
+
+# 1. Credentials/tool present? Not "installed", "usable right now".
+if [ -z "$SONAR_TOKEN" ] || ! command -v sonar-scanner >/dev/null 2>&1; then
+  echo "WARN: SonarQube credentials/tool missing — skipping (not blocking)."
+  exit 0
+fi
+
+# 2. Service actually reachable? Short timeout — don't hang CI on a dead host.
+if ! curl -sf --max-time 2 "$SONAR_HOST_URL/api/system/status" >/dev/null; then
+  echo "WARN: SonarQube unreachable — skipping (not blocking)."
+  exit 0
+fi
+
+# 3. Only now run the real check, and pass through ITS exit code
+#    (exit 1 on a real failure, not on unreachability).
+sonar-scanner
+```
 
 **Never `test -n "$X" && A || B` for this kind of conditional logic.** If
-`A` fails for an unrelated reason (not because something was found, but
-e.g. a transient tool error), fallback `B` still triggers — and `B`'s exit
-code determines the final result, which can mask `A`'s real failure.
-Encountered empirically: this pattern was in a "proven, already used
-elsewhere" pipeline and got copied into multiple projects before it was
-recognized as a bug. Always use an explicit `if [ -n "$X" ]; then A; else
-B; fi`.
+`A` fails for an unrelated reason (a transient tool error, not "nothing
+found"), fallback `B` still triggers and its exit code masks `A`'s real
+failure. Always use an explicit `if [ -n "$X" ]; then A; else B; fi`.
 
 Activate with: `git config core.hooksPath .githooks`, preferably via a
 `pnpm hooks:install` script so it doesn't stay a manual, easily-forgotten
@@ -224,83 +236,27 @@ check itself.
 ### Gitleaks in CI: two options, choose based on repo visibility
 
 **Public repo → `gitleaks/gitleaks-action@v2`, no hand-built diff-range
-logic.** That action reads the push/PR event context and automatically
-scans the right commit range — that's exactly the "diff-scoped in CI"
-above, ready-made. It does require `actions/checkout@v4` with
-`fetch-depth: 0` (it needs the full history to determine the range).
-Free for public repositories, but requires a `GITLEAKS_LICENSE` for
-private repositories — check visibility **before** adding it, or the
-step fails on a license error instead of a found secret.
+logic.** Reads the push/PR event context and automatically scans the
+right commit range — needs `fetch-depth: 0`, free for public repos,
+requires a `GITLEAKS_LICENSE` for private ones.
 
 **Private repo without `GITLEAKS_LICENSE` → the CLI itself with
-`--log-opts`.** This isn't a workaround, it's the vendor-neutral variant
-that covers just as much. Key points:
-- `fetch-depth: 0`, same as with the action — without full history the
-  range doesn't exist to scan against.
-- Verify the release asset name via the GitHub Releases API before
-  hardcoding a download URL (`gh api
-  repos/gitleaks/gitleaks/releases/tags/vX.Y.Z` or the `curl
-  .../releases/tags/...` equivalent) — the naming convention has already
-  changed between major versions once, and a wrongly guessed filename
-  only fails during the CI run, not while writing it.
-- The zero-SHA fallback (new branch, first push — `github.event.before`
-  is then 40 zeros) must be explicitly coded, not silently skipped: in
-  that case scan only the last commit.
-- Pass SHAs through `env:`, don't interpolate them directly into the
-  `run:` script with `${{ }}`. `github.sha`/`github.event.before` aren't
-  free text an attacker sends, but `env:` is the generic, always-safe
-  habit for any value from a GitHub Actions event context: never put
-  `${{ ... }}` directly in a `run:` body, even for fields that look
-  harmless.
+`--log-opts`.** Vendor-neutral, same diff-scoping, plus the zero-SHA
+first-push fallback and SHAs passed via `env:` (never interpolated
+directly into `run:` with `${{ }}`).
 
-```yaml
-steps:
-  - uses: actions/checkout@v4
-    with:
-      fetch-depth: 0
-
-  - name: Install gitleaks
-    # Unpacked into the workspace and invoked via ./gitleaks, no
-    # sudo/system change: the runner is disposable anyway, and this
-    # avoids the root-privilege step an automated security review would
-    # otherwise flag as a risk.
-    run: |
-      curl -sSL -o gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
-      tar -xzf gitleaks.tar.gz gitleaks
-      rm gitleaks.tar.gz
-
-  - name: Scan commits pushed in this run
-    env:
-      BEFORE_SHA: ${{ github.event.before }}
-      HEAD_SHA: ${{ github.sha }}
-    run: |
-      if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
-        echo "New branch or first push — scanning only the last commit."
-        ./gitleaks detect --source . --log-opts="-1 $HEAD_SHA" -v --redact
-      else
-        ./gitleaks detect --source . --log-opts="$BEFORE_SHA..$HEAD_SHA" -v --redact
-      fi
-```
-
-Then actually make build and/or deploy wait on this job (`needs:
-secret-scan` on every job that would otherwise proceed without the scan)
-— otherwise CI does scan, but blocks nothing on a finding.
-
-For CI-runner-specific quirks (e.g. how a self-hosted Woodpecker instance
-validates secrets, shallow-clone behavior, or other platform-specific
-lessons) — see the shared, cross-project playbook for that specific
-stack, not this skill: this one deliberately stays CI-system-agnostic.
+Full YAML for both options, and why each key point matters:
+[ci-examples.md](references/ci-examples.md).
 
 ## Local green ≠ CI-container green: image parity is parity too
 
-**The core rule (repeated, specific to this case):** "local green" only
-covers what actually runs locally. A minimal CI image (e.g.
-`node:22-slim`) often lacks tools that are trivially present locally
-(`git`, `curl`, ...) — a test fixture that calls such a binary (e.g. via
-`execFileSync`) then passes locally and in the `pre-push` hook, but
-silently fails in the real CI container, with no local check ever able
-to catch that difference. Image parity is just as much "CI/local parity"
-as coverage reporting or secret scanning.
+**"Local green" only covers what actually runs locally.** A minimal CI
+image (e.g. `node:22-slim`) often lacks tools that are trivially present
+locally (`git`, `curl`, ...) — a test fixture that calls such a binary
+(e.g. via `execFileSync`) then passes locally and in the `pre-push` hook,
+but silently fails in the real CI container, with no local check ever
+able to catch that difference. Image parity is just as much "CI/local
+parity" as coverage reporting or secret scanning.
 
 **How to catch this going forward:**
 1. **After every push to a gate-guarded branch: query the real CI
@@ -310,22 +266,8 @@ as coverage reporting or secret scanning.
 2. **When a new test file calls an external binary** (`git`, `curl`, a
    CLI tool): explicitly check whether the CI image contains that
    binary, don't assume "it's there locally" is enough. When in doubt,
-   reproduce locally in the exact same image:
-   ```sh
-   docker run --rm --user "$(id -u):$(id -g)" -v "$(pwd)":/repo -w /repo node:22-slim sh -c '
-     apt-get update -qq && apt-get install -y --no-install-recommends git -qq
-     corepack enable && pnpm test:coverage
-   '
-   ```
-   **Always `--user "$(id -u):$(id -g)"` on a mount like this** — without
-   that flag the container runs as root and writes root-owned files back
-   into the mounted directory (e.g.
-   `node_modules/.pnpm-workspace-state-v1.json`), which then makes local
-   `pnpm` commands fail with `EACCES` afterward. Fix it with a targeted
-   `rm -f` on the specific file (owning the containing directory is
-   enough for `rm`, even if the file itself is root-owned) — not with
-   `sudo chown -R`, which asks for a password that doesn't exist in a
-   non-interactive sandbox.
+   reproduce locally in the exact same image — exact command and the
+   `--user` gotcha: [ci-examples.md](references/ci-examples.md).
 3. **The fix belongs in the CI step itself** (install the missing
    package, e.g. `apt-get install -y git` before the test step), not in
    the test code — the test code is right to use the binary directly,

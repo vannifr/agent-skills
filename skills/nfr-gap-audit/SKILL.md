@@ -48,8 +48,9 @@ everything with relevance High and Medium (skip what's already installed):
 
 - **Tessl registry**: a series of `tessl_search` queries across
   performance, a11y, SEO, testing, security, design system, CI, analytics,
-  copywriting, CRO, GDPR, i18n, error tracking, visual regression — full
-  query set in [skill-discovery-searches.md](references/skill-discovery-searches.md).
+  copywriting, CRO, GDPR, i18n, error tracking, visual regression — e.g.
+  `tessl_search "accessibility WCAG"`, full query set in
+  [skill-discovery-searches.md](references/skill-discovery-searches.md).
 - **VoltAgent awesome-agent-skills**: fetch and grep
   `https://raw.githubusercontent.com/VoltAgent/awesome-agent-skills/main/README.md`
   for the same domain terms — the exact grep pattern is in the same
@@ -75,8 +76,7 @@ axe/visual tests and security audit (`npm audit`/equivalent) — **skip
 metrics for domains marked ❌ for this project type** in
 [project-type-reference.md](references/project-type-reference.md) (e.g. no
 Lighthouse a11y/SEO run against a pure backend API). Document a baseline
-table (metric / current / target / status ✅⚠️❌) before anything changes —
-without a baseline you can't check Phase 5 against "no regression."
+table (metric / current / target / status ✅⚠️❌) before anything changes.
 
 ## Phase 3 — GAP analysis
 
@@ -123,22 +123,20 @@ not follow this mechanical loop — it requires explicit stakeholder sign-off
 first (legal basis, retention period, processor question) before step 1,
 even if the technical fix itself is small.
 
-## Recheck mode
-
-For a recurring audit on a project already covered by a prior full run:
-rerun only Phase 2 (baseline) and Phase 3 (GAP analysis) against the
-current state, skipping Phase 0 (discovery) and Phase 1 (skill
-installation) unless the tech stack or installed skills have materially
-changed. Compare the new baseline/GAP list against the prior report's
-"Baseline Scores" and "GAP Analysis" sections and report deltas. This
-keeps the skill usable as a lightweight pre-deploy/weekly/monthly recheck,
-not just a one-off.
-
-## Phase 6 — Retrospective
+## Phase 6 — Retrospective, and recheck mode
 
 After each phase, briefly document: what was done, what worked well, what
 could be better, which new GAPs were discovered, scores before/after.
 Template in [improvement-plan-template.md](references/improvement-plan-template.md).
+
+For a **recurring** audit on a project already covered by a prior full
+run: rerun only Phase 2 (baseline) and Phase 3 (GAP analysis) against the
+current state, skipping Phase 0 (discovery) and Phase 1 (skill
+installation) unless the tech stack or installed skills have materially
+changed. Compare the new baseline/GAP list against the prior report's
+"Baseline Scores" and "GAP Analysis" sections and report deltas — this
+keeps the skill usable as a lightweight pre-deploy/weekly/monthly recheck,
+not just a one-off.
 
 ## Output
 
