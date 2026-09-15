@@ -8,6 +8,11 @@
       "max_score": 12
     },
     {
+      "name": "Existing verify call preserved",
+      "description": "`.githooks/pre-commit` still contains the original `pnpm verify` call from inputs/ — the task says to extend the existing hooks, not replace them, so removing it (even while adding gitleaks) is a regression",
+      "max_score": 8
+    },
+    {
       "name": "Gitleaks absent from pre-push",
       "description": "`.githooks/pre-push` does NOT contain any `gitleaks` invocation",
       "max_score": 10
