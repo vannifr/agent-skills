@@ -23,6 +23,20 @@
    linked from the body.
 4. Run `node scripts/structure-lint.mjs` locally before opening a PR.
 
+## Updating an existing skill's behavior
+
+If a change is meant to alter how the agent behaves (not just wording), a
+matching `evals/` scenario is the way to actually verify it worked —
+a passing `structure-lint`/content review only says the skill reads well,
+not that it changes outcomes. Add or update a scenario under
+`skills/<name>/evals/`, run `tessl eval lint ./skills/<name>/evals/` to
+validate it, and — if you have Tessl credits available —
+`tessl eval run ./skills/<name>` to confirm the fix actually moves the
+score. Eval runs consume real credits (roughly 100/scenario to generate,
+tens of credits to run), so this step is encouraged, not required, for
+every PR; a maintainer may run it before merging a significant change if
+the contributor can't.
+
 ## Style
 
 - English only — code, docs, commit messages.

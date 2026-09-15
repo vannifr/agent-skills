@@ -31,6 +31,22 @@ tessl install vannifr/ci-local-parity
   this repo's `skills/` to a project's `skills.paths` in `opencode.jsonc`.
 - **qwen code**: symlink into `~/.qwen/skills/<name>`.
 
+## Evaluation
+
+Each skill's `evals/` directory holds scenario-based regression tests
+(`tessl scenario generate` + `tessl eval run`): a task brief plus a
+weighted checklist, run twice per scenario — once with the skill injected,
+once without — and scored by a judge model. This is a stronger signal than
+a static content review: it measures whether the skill actually changes
+agent behavior for the better, not just whether it reads well.
+
+```bash
+tessl eval lint ./skills/<name>/evals/   # validate scenario structure
+tessl eval run ./skills/<name>            # run the evals (consumes credits)
+```
+
+Results and methodology: [docs.tessl.io/improving-your-skills/evaluate-skill-quality-using-scenarios](https://docs.tessl.io/improving-your-skills/evaluate-skill-quality-using-scenarios).
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
