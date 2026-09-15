@@ -1,5 +1,7 @@
 # Project Type Quick Reference
 
+The "Focus Skills" column below lists external Tessl-registry skill identifiers to search for via Phase 1's `tessl_search` — they are not files present in this repo.
+
 | Type | Focus Skills | Key Metrics | NFRs |
 |------|-------------|-------------|------|
 | Static site (Eleventy/Hugo) | web-performance, web-accessibility-essentials, seo, aeo-geo-agent, playwright-testing | Lighthouse perf/a11y/SEO, axe coverage, CSS/JS size | SEO, accessibility, performance |

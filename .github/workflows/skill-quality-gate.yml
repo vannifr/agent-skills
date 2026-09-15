@@ -3,10 +3,13 @@ name: Skill quality gate
 on:
   push:
     branches: [main]
-    paths: ["skills/**"]
+    paths: ["skills/**", "scripts/**", ".github/workflows/**"]
   pull_request:
-    paths: ["skills/**"]
+    paths: ["skills/**", "scripts/**", ".github/workflows/**"]
   workflow_dispatch: {}
+
+permissions:
+  contents: read
 
 jobs:
   structure-lint:
@@ -17,6 +20,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+
+      - name: Run structure lint tests
+        run: node --test scripts/
 
       - name: Run structure lint
         run: node scripts/structure-lint.mjs
@@ -61,6 +67,7 @@ jobs:
           BEFORE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: |
+          set -o pipefail
           if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
             echo "New branch or first push — reviewing every skill directory."
             CHANGED=$(find skills -mindepth 1 -maxdepth 1 -type d)
@@ -68,8 +75,13 @@ jobs:
             CHANGED=$(git diff --name-only "$BEFORE_SHA..$HEAD_SHA" -- skills/ | sed -E 's#^(skills/[^/]+)/.*#\1#' | sort -u)
           fi
           if [ -z "$CHANGED" ]; then
-            echo "No skill directories changed in this push — nothing to review."
-            exit 0
+            if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+              echo "No skill directories changed in this push — nothing to review."
+              exit 0
+            else
+              echo "ERROR: no skill directories detected as changed, but this push/PR matched the skills/** path filter — the diff computation likely failed (e.g. after a force-push). Investigate before assuming this is a real no-op."
+              exit 1
+            fi
           fi
           fail=0
           for d in $CHANGED; do

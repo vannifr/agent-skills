@@ -93,7 +93,7 @@ those follow a different path in Phase 5 than a plain mechanical fix.
 
 Where a GAP has a concrete fix, include a short code example in the
 finding itself, not just the checklist item — a GAP recorded as "add
-`loading=\"lazy\"` to below-fold images" is more actionable than "improve
+`loading="lazy"` to below-fold images" is more actionable than "improve
 lazy loading."
 
 ## Phase 4 — Improvement plan
