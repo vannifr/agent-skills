@@ -1,0 +1,67 @@
+name: Skill quality gate
+
+on:
+  push:
+    branches: [main]
+    paths: ["skills/**"]
+  pull_request:
+    paths: ["skills/**"]
+
+jobs:
+  structure-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run structure lint
+        run: node scripts/structure-lint.mjs
+
+  skill-quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Note (no token — expected on a fork PR)
+        if: ${{ !secrets.TESSL_TOKEN }}
+        run: echo "tessl review skipped: no TESSL_TOKEN available on this run (expected on a fork PR — structure-lint above still ran and gates the PR)."
+
+      - uses: actions/checkout@v4
+        if: ${{ secrets.TESSL_TOKEN }}
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        if: ${{ secrets.TESSL_TOKEN }}
+        with:
+          node-version: "22"
+
+      - name: Install Tessl CLI
+        if: ${{ secrets.TESSL_TOKEN }}
+        run: npm install -g @tessl/cli@0.109.0
+
+      - name: Review changed skills only
+        if: ${{ secrets.TESSL_TOKEN }}
+        env:
+          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
+          BEFORE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "New branch or first push — reviewing every skill directory."
+            CHANGED=$(find skills -mindepth 1 -maxdepth 1 -type d)
+          else
+            CHANGED=$(git diff --name-only "$BEFORE_SHA..$HEAD_SHA" -- skills/ | sed -E 's#^(skills/[^/]+)/.*#\1#' | sort -u)
+          fi
+          if [ -z "$CHANGED" ]; then
+            echo "No skill directories changed in this push — nothing to review."
+            exit 0
+          fi
+          fail=0
+          for d in $CHANGED; do
+            [ -d "$d" ] || continue
+            echo "== $d =="
+            tessl review run quality --workspace vannifr --threshold 80 "$d" || fail=1
+          done
+          exit $fail
