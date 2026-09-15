@@ -1,0 +1,8 @@
+{
+  "name": "vannifr/ci-local-parity",
+  "description": "Use when setting up or auditing a project's CI/CD pipeline together with local verification — ensures pnpm/npm verify (or equivalent) actually covers everything CI checks, adds pre-commit/pre-push git hooks that enforce this locally, and keeps trunk-based development honest (small commits, frequent pushes, CI checked per push not per batch). Load before building a new .woodpecker.yml/.github/workflows, before adding SonarQube/coverage, or when \"it passed locally but failed in CI\" comes up.",
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}

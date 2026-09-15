@@ -1,0 +1,8 @@
+{
+  "name": "vannifr/nfr-gap-audit",
+  "description": "Use when running a systematic, self-directed skill-and-NFR audit on a website/web-app project — discovering skills from Tessl and VoltAgent, identifying non-functional-requirement gaps (performance, accessibility, security, SEO, testing, privacy, i18n, ...), and planning/implementing improvements in small, verified, committed phases. Trigger on \"skill audit\", \"NFR audit\", \"audit this project for skills/gaps\", \"what skills am I missing\", or before starting a multi-phase quality-improvement effort on a site.",
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}
