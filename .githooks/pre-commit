@@ -1,0 +1,11 @@
+#!/bin/sh
+# Snel, geen netwerk: gitleaks + structure lint tests.
+set -e
+
+if command -v gitleaks >/dev/null 2>&1; then
+    gitleaks protect --staged -v .
+else
+    echo "WARN: gitleaks niet geïnstalleerd -- secret scan overgeslagen (CI dekt dit)."
+fi
+
+node --test scripts/*.test.mjs

@@ -1,0 +1,6 @@
+#!/bin/sh
+# CI/lokaal-parity: structure lint + tests.
+set -e
+
+node --test scripts/*.test.mjs
+node scripts/structure-lint.mjs
