@@ -1,0 +1,51 @@
+{
+  "context": "Tests whether the agent correctly reconciles lab Lighthouse data against CrUX field data, correctly applies CWV thresholds per metric (not per page), diagnoses divergences using the specific provided context rather than generic advice, and avoids fabricating data or false-flagging the one page that actually passes in the field.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Comparison table present",
+      "description": "The report contains a table or equivalent structured comparison of lab vs field values per URL per metric",
+      "max_score": 15
+    },
+    {
+      "name": "Correct threshold application",
+      "description": "The 'Good' CWV thresholds (LCP < 2.5s, INP < 200ms, CLS < 0.1) are applied correctly and explicitly per metric",
+      "max_score": 10
+    },
+    {
+      "name": "No false positive on /events",
+      "description": "The report does NOT flag /events as failing any metric in the field (its field LCP 2.0s, INP 180ms, CLS 0.02 all pass)",
+      "max_score": 10
+    },
+    {
+      "name": "Correctly identifies the real divergences",
+      "description": "The report identifies that /events/summer-music-fest and /events/tech-conf-2027 pass in lab but fail field LCP and field INP",
+      "max_score": 15
+    },
+    {
+      "name": "Evidence-grounded diagnosis",
+      "description": "The diagnosis for each divergence references at least one specific piece of provided context (CDN edge distance/cache-miss rate, mobile-vs-desktop lab preset mismatch, or the third-party widget's cold-load behavior) rather than generic performance advice",
+      "max_score": 15
+    },
+    {
+      "name": "No fabricated data",
+      "description": "The report does not invent additional field data, RUM sources, or numbers beyond what was provided in the task",
+      "max_score": 10
+    },
+    {
+      "name": "Per-metric verdict, not per-page",
+      "description": "Each page's verdict is broken down per metric (LCP/INP/CLS individually), not collapsed into a single overall pass/fail label per page",
+      "max_score": 10
+    },
+    {
+      "name": "Actionable recommendation per divergence",
+      "description": "At least one specific, actionable recommendation is given for each genuinely diverging URL/metric pair",
+      "max_score": 10
+    },
+    {
+      "name": "Report structure",
+      "description": "The report is organized with clear headings/sections, not a single undifferentiated paragraph",
+      "max_score": 5
+    }
+  ]
+}

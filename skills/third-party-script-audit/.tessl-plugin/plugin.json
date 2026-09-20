@@ -1,0 +1,8 @@
+{
+  "name": "vannifr/third-party-script-audit",
+  "description": "Inventories every third-party script and resource a website loads (analytics, fonts, chat widgets, ads, embeds) and checks what each one can access, whether Subresource Integrity (SRI) is present and correct, and whether the site's CSP allowlist actually matches what's really loaded — no more, no less. Works on any website. Trigger on \"audit third-party scripts\", \"what data are we leaking to vendors\", \"check SRI\", \"review our CSP allowlist\", or before/after adding a new embedded widget or script. NOT a full penetration test or server-side dependency-vulnerability scan (use npm audit/pip-audit/a security-baseline skill for that — this is about what loads IN THE BROWSER from external origins, not server-side packages). NOT a standalone GDPR/consent-banner completeness check (pair with gdpr-test-patterns for the legal-basis/consent angle — this skill supplies the factual inventory a GDPR review needs, it doesn't make the legal judgment itself).",
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}

@@ -1,0 +1,46 @@
+{
+  "context": "Tests whether the agent correctly identifies a broken placeholder as the priority finding on that string, catches an untranslated leftover string, flags a length-risk button label given the layout context, notices a formality/tone inconsistency across strings, assigns proper severity labels, avoids a false positive on the one correct string, and includes the required first-pass disclaimer.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Missing placeholder flagged as top severity",
+      "description": "welcome_title's missing {{firstName}} placeholder is flagged as Critical or High, identified as the primary issue with that string (not just a tone note)",
+      "max_score": 20
+    },
+    {
+      "name": "Untranslated leftover identified",
+      "description": "step_one_body is flagged as an untranslated leftover string, still in English",
+      "max_score": 20
+    },
+    {
+      "name": "Length/layout risk identified",
+      "description": "cta_continue_button is flagged as a length/layout risk, referencing the fixed-width button context provided",
+      "max_score": 15
+    },
+    {
+      "name": "Formality/tone inconsistency identified",
+      "description": "The report notes the du/Sie formality inconsistency between step_two_title and error_generic as a terminology/tone-consistency finding",
+      "max_score": 10
+    },
+    {
+      "name": "Severity labels present",
+      "description": "Every flagged issue carries exactly one of: Critical, High, Medium, or Low",
+      "max_score": 10
+    },
+    {
+      "name": "No false positive on error_generic",
+      "description": "error_generic is not flagged as having a translation quality issue — it is a correct, natural translation",
+      "max_score": 10
+    },
+    {
+      "name": "First-pass disclaimer present",
+      "description": "The report explicitly states this is a model-assisted first pass, not a certified linguistic sign-off, and recommends native-speaker review for Critical/High findings",
+      "max_score": 10
+    },
+    {
+      "name": "Report structure",
+      "description": "Findings are organized per-string or per-severity, not as a single undifferentiated paragraph",
+      "max_score": 5
+    }
+  ]
+}

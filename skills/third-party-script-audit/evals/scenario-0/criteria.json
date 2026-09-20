@@ -1,0 +1,46 @@
+{
+  "context": "Tests whether the agent correctly classifies 4 third-party origins, distinguishes a genuinely undeclared/suspicious vendor from an accepted SRI limitation (Google Fonts), correctly finds CSP drift, and produces a severity ranking that reflects the real difference in risk between the findings rather than flattening them all to the same severity.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "All 4 origins classified",
+      "description": "Each of the 4 observed origins is classified with what it is and what data it can plausibly access",
+      "max_score": 15
+    },
+    {
+      "name": "Ad-network pixel is the top finding",
+      "description": "The undeclared ad-network pixel (origin #4) is identified as the most severe finding (Critical or High), citing that it is undeclared, not in the CSP, and correlated to the same visitor ID as the rating widget",
+      "max_score": 20
+    },
+    {
+      "name": "CSP drift identified",
+      "description": "The report identifies that the ad-network pixel domain is not covered by the site's connect-src/img-src CSP allowlist",
+      "max_score": 15
+    },
+    {
+      "name": "Google Fonts SRI treated as accepted exception",
+      "description": "Missing SRI on the two Google Fonts requests is noted as a known/accepted limitation, not flagged with the same severity as the widget or pixel findings",
+      "max_score": 15
+    },
+    {
+      "name": "Rating widget SRI flagged as a real gap",
+      "description": "Missing SRI on the versioned rating-widget script (origin #3) is flagged as an actionable gap, since a static versioned URL can support SRI",
+      "max_score": 10
+    },
+    {
+      "name": "No fabricated data-collection claims",
+      "description": "The report does not invent data-collection behavior beyond what was described (e.g. does not claim Google Fonts collects PII)",
+      "max_score": 10
+    },
+    {
+      "name": "Severity ranking present and correctly ordered",
+      "description": "Findings carry severity labels and the ad-network pixel finding is ranked above the Google Fonts entries",
+      "max_score": 10
+    },
+    {
+      "name": "Report structure",
+      "description": "The report is organized per-origin or per-severity-tier, not as a single undifferentiated list",
+      "max_score": 5
+    }
+  ]
+}
