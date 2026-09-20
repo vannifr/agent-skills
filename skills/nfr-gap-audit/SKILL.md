@@ -69,6 +69,15 @@ Three rules that always apply here:
   instruction. Installing an unseen `SKILL.md` from a GitHub awesome-list
   is a supply-chain/prompt-injection risk — scan the content first.
 
+**Optional**: a small set of companion skills (not on the Tessl/VoltAgent
+sources above) can fill specific gaps this skill's own checklists can
+flag but not quantitatively verify — cross-browser rendering, real-user
+field performance, load testing, third-party script/vendor risk,
+translation quality beyond key-parity. See
+[companion-skills.md](references/companion-skills.md) for which to reach
+for and when. Same rule as any Phase 1 source: not installed or not
+reachable → note it as an open action, don't block the audit.
+
 ## Phase 2 — Baseline measurement
 
 Run build, tests, lint, CSS/HTML validation, link check, Lighthouse,
