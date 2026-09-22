@@ -1,11 +1,6 @@
 # Woodpecker CI pipeline for agent-skills
 # Vervangt .github/workflows/skill-quality-gate.yml
 
-when:
-  - event: push
-    branch: main
-    paths: ["skills/**", "scripts/**"]
-
 steps:
   - name: gitleaks
     image: ghcr.io/gitleaks/gitleaks:v8.30.1
