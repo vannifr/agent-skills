@@ -1,6 +1,6 @@
 ---
 name: cross-browser-render-check
-description: Systematic multi-engine (Chromium/Firefox/WebKit) rendering comparison for a website — catches browser-specific CSS/layout/JS bugs that a single-engine review misses. Works on any website, any stack. Trigger on "check cross-browser", "does this work in Safari/Firefox", "browser compatibility review", or before shipping a CSS/JS change that uses a newer or engine-specific feature. NOT for viewport/breakpoint layout review (use responsive-visual-review — same engine, different widths, a different axis entirely), NOT for functional/interaction E2E testing across browsers (use playwright-testing — this skill is visual/rendering-only, no click-throughs), NOT for designing a polyfill/feature-detection fix (flag the gap with a suspected cause, don't architect the remedy).
+description: Use when you need to check browser-specific CSS/layout/JS rendering differences (Chromium/Firefox/WebKit) before shipping a CSS/JS change or investigating compatibility issues across engines. NOT for viewport/breakpoint layout review (use responsive-visual-review), NOT for functional/interaction E2E testing across browsers (use playwright-testing), NOT for designing a polyfill/feature-detection fix.
 ---
 
 # Cross-Browser Render Check

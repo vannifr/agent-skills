@@ -1,6 +1,6 @@
 ---
 name: production-cwv-review
-description: Compares real-user field performance data (Chrome UX Report / CrUX, GA4 Web Vitals, Cloudflare Web Analytics, or any RUM tool already in place) against lab data (Lighthouse) to find where they diverge — a page can score well in Lighthouse and still be slow for real users. Works on any public website with enough traffic for CrUX (free, no setup required), or any site with its own RUM/analytics tool already wired in. Trigger on "check real Core Web Vitals", "how is this actually performing for users", "field vs lab performance", or as a sanity check after a Lighthouse-only performance pass. NOT a replacement for the Lighthouse/lab baseline (e.g. nfr-gap-audit's Phase 2) — this is a follow-up cross-check against it. NOT for setting up RUM/analytics from scratch — that's implementation work; flag the absence as a finding and hand it off. NOT for synthetic load/stress testing (use load-test-bootstrap).
+description: Use when comparing real-user field performance data (CrUX/RUM) against lab Lighthouse data to find divergences where pages score well in the lab but are slow for real users. NOT a replacement for the Lighthouse/lab baseline, NOT for setting up RUM/analytics from scratch, NOT for synthetic load/stress testing.
 ---
 
 # Production Core Web Vitals Review

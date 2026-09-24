@@ -1,6 +1,6 @@
 ---
 name: translation-quality-review
-description: Reviews actual translation quality across a multi-language site's locales — not whether every key exists (most i18n setups already automate that) but whether the translation itself is correct, natural, and consistent — literal phrasing, broken placeholders, untranslated leftovers, terminology drift, and length-driven layout risk. Works on any multi-language website, any i18n mechanism (client-side JSON, per-locale pages, CMS). Trigger on "review our translations", "check the French/German/Dutch copy", "is this correct in language X", or after updating locale content. NOT a substitute for a professional translator or native-speaker sign-off on launch-critical copy — flag uncertainty rather than assert fluency the model doesn't have. NOT a key-parity check — confirm the project's own parity check is green first; this assumes every key exists and asks whether the translation is any good.
+description: Use when reviewing actual translation quality (correctness, naturalness, consistency) for multi-language sites — checking for literal phrasing, broken placeholders, untranslated leftovers, and terminology drift. NOT a substitute for professional translator sign-off on launch-critical copy, NOT a key-parity check.
 ---
 
 # Translation Quality Review

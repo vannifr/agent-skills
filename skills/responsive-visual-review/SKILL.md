@@ -1,6 +1,6 @@
 ---
 name: responsive-visual-review
-description: Baseline-free, Playwright-driven visual/layout review of a live or local website across breakpoints (mobile/tablet/desktop) — catches layout breaks, overflow, broken images, and inconsistent spacing without a hosted visual-regression service (Percy/Chromatic/Storybook) or an existing screenshot baseline. Works on any website, any stack. Trigger on "check responsiveness", "visual review", "does this look right on mobile", "review the layout across breakpoints", or before/after a CSS/template change that could shift layout. NOT for CRO/conversion/copy review (use landing-page-audit), new UI design work (use frontend-design), automated pixel-diff regression gating in CI (use Percy/Chromatic/Storybook-visual-regression skills, or the project's own Playwright toHaveScreenshot baseline if it has one), or accessibility/contrast auditing (use web-accessibility-essentials/axe).
+description: Use when you need a structural visual review of a website across breakpoints (mobile/tablet/desktop) to catch layout breaks, overflow, and spacing issues without a baseline or hosted regression service. NOT for CRO/conversion/copy review, NOT for new UI design work, NOT for automated pixel-diff regression gating in CI, NOT for accessibility/contrast auditing.
 ---
 
 # Responsive Visual Review
