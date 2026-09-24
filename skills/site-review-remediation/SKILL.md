@@ -1,6 +1,6 @@
 ---
 name: site-review-remediation
-description: Use when asked to review the whole codebase of a website or web app AND fix what is found, end to end — full-code review in resumable chunks, security/data-exposure findings first, fixes shipped as small green commits, every fix validated on the live production site, CI followed until green. Trigger on "review the whole site and fix everything", "full code review and remediation", "review de code van de ganse site", or when a /goal like "everything live validated" is set for a site. NOT for reviewing a single diff/PR (use a code-review skill), NOT for a skill/NFR gap inventory without fixing (use nfr-gap-audit), NOT for visual-only or conversion-only reviews (use responsive-visual-review / landing-page-audit).
+description: Use when asked to review the whole codebase of a website or web app AND fix what is found, end to end — full-code review in resumable chunks, security/data-exposure findings first, fixes shipped as small green commits, every fix validated on the live production site, CI followed until green. Works on any stack and hosting type (traditional web host, static host/CDN, app platform, containers). Trigger on "review the whole site and fix everything", "full code review and remediation", "audit and fix this website", or when the requested end state is "every fix validated live". NOT for reviewing a single diff/PR (use a code-review skill), NOT for a gap inventory without fixing (use an NFR/gap-audit skill), NOT for visual-only or conversion-only reviews (use a visual or landing-page review skill).
 ---
 
 # Site Review & Remediation
@@ -21,8 +21,8 @@ up front, in one message, so the run doesn't stop halfway:
 - **Production shell/cache**: SSH to the host, or the hosting panel's cache
   flush. A CDN/proxy cache can keep serving a file after you've blocked
   it at the origin.
-- **CI read access**: which CI actually runs this repo (GitHub Actions,
-  Woodpecker, ...). Don't assume; check the repo's workflow files.
+- **CI read access**: which CI actually runs this repo. Don't assume;
+  check the workflow/pipeline files in the repo.
 
 Where a permission is refused, don't work around it. Finish everything
 else, then hand the blocked step back with the exact command.
@@ -68,8 +68,9 @@ cookie policy is the owner's decision.
 - **One work item = one concern = one commit.** Keep content and code apart.
 - **Route by risk.** Security, deploy and CI changes (high blast radius)
   you do yourself. New, test-verifiable logic can go to a cheaper builder
-  agent, if one is set up (e.g. via an opencode orchestration skill), one
-  task per prompt and strictly one run at a time on a shared quota.
+  agent (a sub-agent or a separate coding agent) if your environment has
+  one: one task per prompt, and one run at a time on a shared quota. If
+  there is none, do it yourself with the same checks.
   Pattern transfer ("do it like file X") you also do yourself.
 - **Never trust a builder's "N/N tests pass".** Re-run the exact command
   yourself, read the test bodies, and do your own mutation check: break
@@ -107,8 +108,23 @@ each deploy:
 
 Add a post-deploy smoke test to CI for the things that must never
 regress, like "sensitive path is not 200" and "server config file is
-403". Give it retries: the first request right after an rsync can see a
+403". Give it retries: the first request right after a deploy can see a
 half-updated site.
+
+## Adapt to the hosting type
+
+The checks above are the same everywhere; what they mean depends on how
+the site is served:
+
+| Hosting type | Access rules live in | "Flush the cache" means | Deploy trap to check |
+|---|---|---|---|
+| Traditional host (Apache/nginx, often with PHP) | `.htaccess` / server config | host panel or CDN purge | dotfiles dropped from the upload; `--delete` removing server-only files |
+| Static host / CDN (Netlify, Vercel, Cloudflare Pages, S3+CDN) | `_headers`/`_redirects`, platform config, bucket policy | platform purge or new deploy | files in the publish dir you didn't mean to publish |
+| App platform / serverless | route handlers, middleware, platform config | edge cache purge / revalidation | env vars or secrets baked into client bundles |
+| Containers / VMs | reverse proxy config | proxy/CDN purge | debug endpoints or source maps exposed in production |
+
+Whatever the type: find where the site's data files and secrets live, and
+prove from outside that they are not reachable.
 
 ## Phase 5: close out
 

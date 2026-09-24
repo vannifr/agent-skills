@@ -1,14 +1,19 @@
 # Pitfalls seen in real remediation runs
 
 Each entry: the trap, why it hides, and the check that exposes it.
+Entries tagged with a tool (e.g. *[GitHub Actions]*, *[Apache]*, *[npm]*)
+only apply when you use it, but each carries a general lesson: look for
+the equivalent in your own stack.
 
 ## Data exposure
 
-- **CI artifacts drop dotfiles.** `actions/upload-artifact@v4` defaults to
+- *[GitHub Actions]* **CI artifacts drop dotfiles.** `actions/upload-artifact@v4` defaults to
   `include-hidden-files: false`. `.htaccess` never reaches the deploy job,
   and `rsync --delete` then removes it from the server, taking its access
-  rules with it. Check: the upload log's file count, and a live request to
-  a path that `.htaccess` should block.
+  rules with it. General lesson: check that config dotfiles (`.htaccess`,
+  `_headers`, `.well-known/`) survive every hop from build to server.
+  Check: the upload log's file count, and a live request to a path the
+  config should block.
 - **Data files inside the web root.** A signup list written next to the
   endpoint is one missing config file away from public. It also gets
   overwritten on every deploy if it's tracked in git. Fix: store it above
@@ -18,40 +23,45 @@ Each entry: the trap, why it hides, and the check that exposes it.
   or GPTBot if they have their own group. A `Disallow` line also
   advertises the sensitive path.
 - **Proxy cache outlives the fix.** The origin returns 403 but the
-  host's nginx/CDN cache still answers 200 with the old body
+  host's proxy/CDN cache still answers 200 with the old body
   (`x-proxy-cache: HIT`). A request with a query string bypasses it and
   looks fine. Check the bare URL, and flush the cache via the hosting
   panel.
 
 ## Hollow quality gates
 
-- **Unquoted globs in npm scripts.** npm runs scripts with `/bin/sh`,
+- *[npm]* **Unquoted globs in npm scripts.** npm runs scripts with `/bin/sh`,
   which has no globstar. `public_html/**/*.html` expands to one
   subdirectory's files, so the linter reports "Scanned 1 files". Fix:
-  quote the globs so the tool expands them.
-- **Misnamed config file.** `html-validate` reads `.htmlvalidate.json`,
-  not `.html-validate.json`. Check with the tool's `--print-config`.
-- **Advisory checks after deploy.** A validation workflow triggered by
+  quote the globs so the tool expands them. General lesson: read the
+  linter's own "files scanned" count, never trust a green exit code.
+- *[html-validate]* **Misnamed config file.** `html-validate` reads `.htmlvalidate.json`,
+  not `.html-validate.json`. General lesson: print the effective config
+  (`--print-config` or equivalent) to prove your overrides load.
+- *[GitHub Actions]* **Advisory checks after deploy.** A validation workflow triggered by
   `workflow_run` after deploy, with `continue-on-error`, can never stop a
   bad release. Move it into a job the deploy `needs:`.
-- **`serve -s` in a11y checks.** SPA mode answers every missing page with
+- *[serve]* **SPA fallback in a11y checks.** SPA mode answers every missing page with
   index.html and a 200, so a missing page passes.
-- **Old headless browsers.** pa11y-ci 3 ships Chromium 91, which ignores
+- *[pa11y-ci]* **Old headless browsers.** pa11y-ci 3 ships Chromium 91, which ignores
   range media queries (`@media (width <= 768px)`). The mobile layout is
-  never tested. Use prefix syntax (`max-width`) or upgrade.
+  never tested. General lesson: check which browser version your CI
+  tools bundle. Use prefix syntax (`max-width`) or upgrade.
 
 ## Deploy script
 
-- **`process.exit()` inside `catch` skips `finally`.** A temp SSH key
+- *[Node]* **`process.exit()` inside `catch` skips `finally`.** A temp SSH key
   written in `try` stays on disk when the deploy fails. Use
-  `process.exitCode = 1`.
-- **`rsync -a` copies artifact mtimes.** Every deploy resets
+  `process.exitCode = 1`. General lesson: temporary credentials must be
+  cleaned up on the failure path too.
+- *[rsync]* **`rsync -a` copies artifact mtimes.** Every deploy resets
   Last-Modified/ETag on unchanged files. Use `-rlz --checksum`.
-- **gitleaks-action on pull requests** needs `GITHUB_TOKEN` in `env`, or
+- *[GitHub Actions]* **gitleaks-action on pull requests** needs `GITHUB_TOKEN` in `env`, or
   every PR run fails at its first step.
-- **`workflow_run` + `branches: [main]`** matches a fork PR whose head
+- *[GitHub Actions]* **`workflow_run` + `branches: [main]`** matches a fork PR whose head
   branch is named main. Gate on `workflow_run.event == 'push'` and the
-  same `head_repository`.
+  same `head_repository`. General lesson: jobs that consume artifacts
+  from another run must not trust runs triggered by forks.
 
 ## Front end
 
