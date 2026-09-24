@@ -1,6 +1,6 @@
 ---
 name: site-review-remediation
-description: Use when asked to review the whole codebase of a website or web app AND fix what is found, end to end — full-code review in resumable chunks, security/data-exposure findings first, fixes shipped as small green commits, every fix validated on the live production site, CI followed until green. Works on any stack and hosting type (traditional web host, static host/CDN, app platform, containers). Trigger on "review the whole site and fix everything", "full code review and remediation", "audit and fix this website", or when the requested end state is "every fix validated live". NOT for reviewing a single diff/PR (use a code-review skill), NOT for a gap inventory without fixing (use an NFR/gap-audit skill), NOT for visual-only or conversion-only reviews (use a visual or landing-page review skill).
+description: Use when asked to review the whole codebase of a website or web app AND fix what is found, end to end. Works on any stack and hosting type (traditional web host, static host/CDN, app platform, containers). Trigger on "review the whole site and fix everything", "full code review and remediation", "audit and fix this website", or when the requested end state is "every fix validated live". NOT for reviewing a single diff/PR (use a code-review skill), NOT for a gap inventory without fixing (use an NFR/gap-audit skill), NOT for visual-only or conversion-only reviews (use a visual or landing-page review skill).
 ---
 
 # Site Review & Remediation
