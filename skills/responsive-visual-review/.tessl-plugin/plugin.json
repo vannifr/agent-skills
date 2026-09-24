@@ -1,0 +1,8 @@
+{
+  "name": "vannifr/responsive-visual-review",
+  "description": "Use when you need a structural visual review of a website across breakpoints (mobile/tablet/desktop) to catch layout breaks, overflow, and spacing issues without a baseline or hosted regression service. NOT for CRO/conversion/copy review, NOT for new UI design work, NOT for automated pixel-diff regression gating in CI, NOT for accessibility/contrast auditing.",
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}

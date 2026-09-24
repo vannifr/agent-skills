@@ -1,0 +1,8 @@
+{
+  "name": "vannifr/cross-browser-render-check",
+  "description": "Use when you need to check browser-specific CSS/layout/JS rendering differences (Chromium/Firefox/WebKit) before shipping a CSS/JS change or investigating compatibility issues across engines. NOT for viewport/breakpoint layout review (use responsive-visual-review), NOT for functional/interaction E2E testing across browsers (use playwright-testing), NOT for designing a polyfill/feature-detection fix.",
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}

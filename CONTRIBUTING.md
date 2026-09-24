@@ -15,6 +15,12 @@
 
 ## Adding a new skill
 
+0. This is the **public** skill repo. There's a separate **private** one
+   (`agent-config/claude-code/skills/`) for personal/business-specific
+   skills that shouldn't be tool-agnostic or publicly reusable. No skill
+   name should exist in both — check `ls ~/projects/agent-config/claude-code/skills`
+   first. See that repo's README ("Waar hoort een nieuwe skill?") for the
+   placement rule.
 1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name`,
    `description` — see any existing skill for the format).
 2. Keep it tool-agnostic: no instructions specific to one coding agent's
