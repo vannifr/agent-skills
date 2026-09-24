@@ -1,0 +1,8 @@
+{
+  "name": "vannifr/site-review-remediation",
+  "description": "Use when asked to review the whole codebase of a website or web app AND fix what is found, end to end — full-code review in resumable chunks, security/data-exposure findings first, fixes shipped as small green commits, every fix validated on the live production site, CI followed until green. Trigger on \"review the whole site and fix everything\", \"full code review and remediation\", \"review de code van de ganse site\", or when a /goal like \"everything live validated\" is set for a site. NOT for reviewing a single diff/PR (use a code-review skill), NOT for a skill/NFR gap inventory without fixing (use nfr-gap-audit), NOT for visual-only or conversion-only reviews (use responsive-visual-review / landing-page-audit).",
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}
