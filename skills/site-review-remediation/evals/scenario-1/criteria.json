@@ -1,0 +1,14 @@
+{
+  "context": "Tests whether the agent discovers that green quality gates are hollow (unquoted globs expanded by /bin/sh without globstar so only one file is checked, a misnamed html-validate config that is never loaded, SPA-mode serve and continue-on-error hiding failures), fixes them, and only makes a check blocking after the existing content passes it.",
+  "type": "weighted_checklist",
+  "checklist": [
+    { "name": "Unquoted glob found", "description": "The report explains that public_html/**/*.html is unquoted in npm scripts, so /bin/sh (no globstar) expands it to only the events/ subdirectory file(s) and index.html is never checked", "max_score": 15 },
+    { "name": "Globs quoted", "description": "package.json lint/test scripts pass the globs quoted (e.g. 'public_html/**/*.html') so the tool expands them", "max_score": 10 },
+    { "name": "Config name fixed", "description": "The report notes that html-validate reads .htmlvalidate.json, not .html-validate.json, and the file is renamed (or the config is passed explicitly)", "max_score": 10 },
+    { "name": "Coverage evidence", "description": "The report gives before/after evidence of coverage, such as the number of files scanned or the list of files checked", "max_score": 10 },
+    { "name": "HTML errors fixed", "description": "index.html is fixed: redundant role attributes removed, button gets type=\"button\", raw & encoded, and the empty <h3> removed or given content", "max_score": 15 },
+    { "name": "Blocking only when green", "description": "The report states that a check is made blocking only after confirming the current content passes it, and the final verify passes", "max_score": 15 },
+    { "name": "serve -s flagged", "description": "The report flags that 'serve -s' answers missing pages with index.html (200), so pa11y can pass a missing page, and removes -s", "max_score": 10 },
+    { "name": "pa11y advisory decision", "description": "The report makes an explicit, justified decision about continue-on-error on pa11y (and mentions the old Chromium in pa11y-ci 3 or proposes an upgrade)", "max_score": 15 }
+  ]
+}

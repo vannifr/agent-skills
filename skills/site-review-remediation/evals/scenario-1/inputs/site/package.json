@@ -1,0 +1,11 @@
+{
+  "name": "lumen-talks",
+  "private": true,
+  "scripts": {
+    "lint": "htmlhint public_html/**/*.html",
+    "test": "html-validate public_html/**/*.html",
+    "build": "rm -rf dist && cp -r public_html dist",
+    "verify": "npm run lint && npm run test && npm run build"
+  },
+  "devDependencies": { "html-validate": "^10.0.0", "htmlhint": "^1.1.4", "pa11y-ci": "^3.1.0", "serve": "^14.2.4" }
+}

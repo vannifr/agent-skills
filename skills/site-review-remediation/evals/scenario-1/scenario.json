@@ -1,0 +1,1 @@
+{ "description": "Quality gates that silently check almost nothing", "include": ["./inputs"] }

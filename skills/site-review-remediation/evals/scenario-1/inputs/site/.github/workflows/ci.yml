@@ -1,0 +1,11 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run verify
+      - run: npx serve -s dist -p 3000 &
+      - run: npx pa11y-ci http://localhost:3000/ http://localhost:3000/events/archive.html
+        continue-on-error: true

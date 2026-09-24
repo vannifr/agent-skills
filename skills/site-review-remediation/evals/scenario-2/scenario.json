@@ -1,0 +1,1 @@
+{ "description": "Closing out a remediation run when two steps were refused and one fix is not live yet", "include": ["./inputs"] }
