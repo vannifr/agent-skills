@@ -1,6 +1,6 @@
 ---
 name: site-revision
-description: Use when asked for a full revision of an existing marketing or practitioner website — positioning, content, proof, bilingual parity, technical quality and CI — with every change validated on the live site. Orchestrates the whole run from blind-spot interview and positioning decision through a baseline persona walkthrough, work packages in customer language, a fact-and-quote verification gate, a live feedback loop with the owner, a follow-up persona walkthrough, a technical review and a final all-URL check with retrospective. Trigger on "full revision of the website", "reposition and rewrite the site", "content and technical review, everything validated live", or when the owner reviews on the live site and wants feedback batched into pushes. NOT for a code-only review-and-fix (use a code review-and-remediation skill), NOT for a gap inventory without changes (use an NFR/gap-audit skill), NOT for a single page's copy (use a copy-editing skill).
+description: Use when asked for a full revision of an existing marketing or practitioner website — positioning, content, proof, bilingual parity, technical quality and CI — with every change validated on the live site. Orchestrates the whole run from blind-spot interview and positioning decision through a baseline persona walkthrough, work packages in customer language, a fact-and-quote verification gate, a live feedback loop with the owner, a follow-up persona walkthrough, a technical review and a final all-URL check with retrospective. Trigger on "full revision of the website", "website overhaul", "site refresh", "reposition and rewrite the site", "content and technical review, everything validated live", or when the owner reviews on the live site and wants feedback batched into pushes. NOT for a code-only review-and-fix (use a code review-and-remediation skill), NOT for a gap inventory without changes (use an NFR/gap-audit skill), NOT for a single page's copy (use a copy-editing skill).
 ---
 
 # Site Revision
@@ -35,7 +35,7 @@ persona before/after, and the release rhythm.
 
 ## Phase 0 — Baseline and guardrails
 
-1. **Parameters**: fill [templates/site-config.md](templates/site-config.md)
+1. **Parameters**: fill [references/site-config-template.md](references/site-config-template.md)
    with the owner: languages and URL pairs, voice rules and lint command,
    forbidden terms per language, names that must never appear (clients,
    and the owner's own name if they don't want to be findable by it),
@@ -67,14 +67,14 @@ persona before/after, and the release rhythm.
 
 ## Phase 2 — Persona walkthrough, baseline
 
-Run [templates/persona-walkthrough.md](templates/persona-walkthrough.md)
+Run [references/persona-walkthrough-template.md](references/persona-walkthrough-template.md)
 on the live site before rewriting: fixed personas, fixed questions, a
 score per question with the URL and the literal fragment that answers it.
 Save it; phase 7 repeats it with the same personas and questions.
 
 ## Phase 3 — Plan
 
-Write the plan from [templates/revision-plan.md](templates/revision-plan.md):
+Write the plan from [references/revision-plan-template.md](references/revision-plan-template.md):
 goal, acceptance criteria, tiered work packages (A mechanical, B text
 within a fixed design, C owner judgement), routing per tier (who or
 which model does which tier), and a retrospective section that is filled
@@ -155,6 +155,22 @@ pages (numbers, dates, roles). Fix or explicitly accept each one.
    remaining owner-only tasks (external listings, testimonials to
    collect, the post-event case study) and a date to re-measure the KPIs
    (4–6 weeks) and decide on consolidating overlapping pages.
+
+## Scripts
+
+All take their site-specific values as arguments; run with `--help` or
+read the header comment.
+
+- `scripts/final_check.py --base <origin> [--sitemap <path>]
+  [--extra-url <path>] [--forbid-name <text>] [--forbid-term <word>]
+  [--term-skip-prefix <path>]` — prints problems per URL, exit 1 if any.
+- `scripts/parity_check.py --dist <build dir> --base <origin>
+  --from-lang <xx> --to-lang <yy>` — prints language pairs whose
+  structure or word ratio differs, exit 1 if any.
+- `scripts/live_verify.sh <origin> <patterns file>` — lines
+  `present|absent <path> <text>`, prints failures and totals.
+- `scripts/exif_scan.sh <image dir>` — self-tests the filter, then lists
+  files with metadata, exit 1 if any.
 
 ## Pitfalls
 
