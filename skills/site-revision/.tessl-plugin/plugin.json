@@ -1,0 +1,8 @@
+{
+  "name": "vannifr/site-revision",
+  "description": "Use when asked for a full revision of an existing marketing or practitioner website — positioning, content, proof, bilingual parity, technical quality and CI — with every change validated on the live site. Orchestrates the whole run from blind-spot interview and positioning decision through a baseline persona walkthrough, work packages in customer language, a fact-and-quote verification gate, a live feedback loop with the owner, a follow-up persona walkthrough, a technical review and a final all-URL check with retrospective. Trigger on \"full revision of the website\", \"reposition and rewrite the site\", \"content and technical review, everything validated live\", or when the owner reviews on the live site and wants feedback batched into pushes. NOT for a code-only review-and-fix (use a code review-and-remediation skill), NOT for a gap inventory without changes (use an NFR/gap-audit skill), NOT for a single page's copy (use a copy-editing skill).",
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}
