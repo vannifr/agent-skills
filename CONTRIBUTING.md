@@ -5,12 +5,13 @@
 - Every PR runs `structure-lint` (frontmatter validity, `SKILL.md` line
   limit, working relative links, no placeholder text) — this needs no
   secrets and runs on PRs from forks too.
-- A PR that touches `skills/**` also runs a Tessl quality-gate review
-  (`tessl review run quality --threshold 80`) on the changed skill
-  directories. That step needs a `TESSL_TOKEN` repository secret, which
-  isn't available to fork PRs by GitHub's own design — on a fork PR you'll
-  see it skip with an explicit note, not fail silently. A maintainer runs
-  it manually before merging in that case.
+- The Tessl quality-gate review (`tessl review run quality --threshold 80`)
+  costs Tessl credits, so CI runs it only on a **manual** pipeline, never on
+  push or PR. Start it in the CI UI ("Run pipeline"); by default it reviews
+  the skill directories changed in the last commit, or set the variable
+  `REVIEW_SKILLS="skills/<name> ..."` to choose. Locally:
+  `tessl review run quality --threshold 80 skills/<name>`. The step needs a
+  `TESSL_TOKEN` secret.
 
 ## Adding a new skill
 

@@ -2,7 +2,7 @@
 # Vervangt .github/workflows/skill-quality-gate.yml
 
 when:
-  - event: [push, pull_request]
+  - event: [push, pull_request, manual]
 
 steps:
   - name: gitleaks
@@ -32,7 +32,9 @@ steps:
       - |
         BEFORE_SHA=$(git rev-parse HEAD~1 2>/dev/null || echo "")
         HEAD_SHA=$(git rev-parse HEAD)
-        if [ -z "$BEFORE_SHA" ]; then
+        if [ -n "${REVIEW_SKILLS:-}" ]; then
+          CHANGED="$REVIEW_SKILLS"
+        elif [ -z "$BEFORE_SHA" ]; then
           echo "First commit — reviewing all skill directories."
           CHANGED=$(find skills -mindepth 1 -maxdepth 1 -type d)
         else
@@ -53,4 +55,9 @@ steps:
       TESSL_TOKEN:
         from_secret: tessl_token
     depends_on: [structure-tests, structure-lint]
+    # Tessl credits are limited: the review runs only on a manual pipeline
+    # (Woodpecker UI "Run pipeline", optionally with variable
+    # REVIEW_SKILLS="skills/<name> skills/<other>"), never on push.
+    when:
+      - event: manual
     failure: ignore
