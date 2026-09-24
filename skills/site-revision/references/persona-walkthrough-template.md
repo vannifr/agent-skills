@@ -12,6 +12,9 @@ reports compare.
 
 ## Personas (adapt to the site, keep them fixed across both runs)
 
+Derive them from the customer evidence (phase 1): real triggers, jobs and
+objections. Mark any persona detail without evidence as an assumption.
+
 1. **Newcomer** — does not know the method or service; wants to
    understand what it is and whether it fits.
 2. **Practitioner/expert** — knows the field; tests whether the provider
@@ -34,6 +37,7 @@ the URL, and the **literal fragment** that answers it.
 - What does it cost, or how is a price made? How do we procure it?
 - Who is the provider, and why them?
 - How do I get in touch, and what happens next?
+- The recurring objections from the customer evidence, literally.
 - Persona-specific questions (e.g. the practitioner: does the site
   describe opening, closing and follow-up correctly?).
 

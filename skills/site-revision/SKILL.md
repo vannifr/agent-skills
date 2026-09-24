@@ -1,6 +1,6 @@
 ---
 name: site-revision
-description: Use when asked for a full revision of an existing marketing or practitioner website — positioning, content, proof, bilingual parity, technical quality and CI — with every change validated on the live site. Orchestrates the whole run from blind-spot interview and positioning decision through a baseline persona walkthrough, work packages in customer language, a fact-and-quote verification gate, a live feedback loop with the owner, a follow-up persona walkthrough, a technical review and a final all-URL check with retrospective. Trigger on "full revision of the website", "website overhaul", "site refresh", "reposition and rewrite the site", "content and technical review, everything validated live", or when the owner reviews on the live site and wants feedback batched into pushes. NOT for a code-only review-and-fix (use a code review-and-remediation skill), NOT for a gap inventory without changes (use an NFR/gap-audit skill), NOT for a single page's copy (use a copy-editing skill).
+description: Use when asked for a full revision of an existing marketing or practitioner website — positioning, content, proof, bilingual parity, technical quality and CI — with every change validated on the live site. Orchestrates the whole run from customer evidence and jobs to be done (requests, won and lost proposals, feedback) and a positioning decision through a baseline persona walkthrough, work packages in customer language, a fact-and-quote verification gate, a live feedback loop with the owner, a follow-up persona walkthrough, a technical review and a final all-URL check with retrospective. Trigger on "full revision of the website", "website overhaul", "site refresh", "reposition and rewrite the site", "content and technical review, everything validated live", or when the owner reviews on the live site and wants feedback batched into pushes. NOT for a code-only review-and-fix (use a code review-and-remediation skill), NOT for a gap inventory without changes (use an NFR/gap-audit skill), NOT for a single page's copy (use a copy-editing skill).
 ---
 
 # Site Revision
@@ -53,13 +53,35 @@ persona before/after, and the release rhythm.
    (a separate governance repository, `docs/decisions.md`, or the plan).
    Every positioning or naming choice goes there before it goes on the site.
 
-## Phase 1 — Blind spots and positioning
+## Phase 1 — Customer evidence and jobs to be done
+
+Before any positioning choice, understand what buyers are trying to get
+done, in their own words. Ask the owner for, one source at a time:
+
+- incoming requests and quote requests (mails, forms, call notes);
+- proposals that were won and lost, and why a lead dropped out;
+- feedback after assignments (mails, evaluations, public write-ups);
+- testimonials, and whether they may be quoted and how to attribute them;
+- questions buyers ask before they commit (size, price, procurement,
+  experience, format, risk).
+
+Anonymise people; ask per organisation whether it may be named. Record
+the analysis with
+[references/customer-evidence-template.md](references/customer-evidence-template.md):
+per source the trigger, the job, the desired outcome, objections and
+anxieties, the literal words used, and the buying process. Summarise the
+recurring jobs and objections. They drive the positioning (phase 1b), the
+personas and their questions (phase 2) and the FAQ headings (phase 4). If the owner has no
+requests yet, say so and mark every persona assumption as unverified.
+
+## Phase 1b — Blind spots and positioning
 
 1. Ask for the owner's reasons (too few requests, shifting offer, unclear
    difference from competitors), then interview **one question at a
    time** about audience, offer boundaries, sibling sites, and what
    is confidential.
-2. Research competitors and the search results buyers see
+2. Check the options against the customer evidence from phase 1, then
+   research competitors and the search results buyers see
    (see [references/search-and-geo.md](references/search-and-geo.md)).
 3. Present options with a recommendation, get an explicit decision, log
    it. Record what the site must NOT claim (roles the owner did not have,
@@ -82,7 +104,7 @@ during the run, not at the end.
 
 ## Phase 4 — Content in the customer's language
 
-- Source phrases from real requests and mails: the words customers used
+- Source phrases from the customer evidence (phase 1): the words customers used
   ("cold feet", "how do we procure this?", "can you handle a group our
   size?") become FAQ questions and headings. Do not invent anecdotes.
 - Proof first: a shareable overview of gatherings with numbers, dates,
