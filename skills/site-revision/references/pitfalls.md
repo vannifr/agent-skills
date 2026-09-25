@@ -15,5 +15,6 @@
 | Rewrite by an agent drops a point the owner just asked for | The rewrite brief did not say which recent changes are fixed | List the owner's latest corrections as "must keep" in every rewrite brief |
 | NL page uses a borrowed English term the owner banned | Term in a template or FAQ answer | Forbidden-terms list per language in the final check |
 | Owner's name ends up in a file name or alt text | Photo exported with the name | Neutral file names; names policy in the final check |
+| A deleted page still returns 200 with the old content, but only without a query string | An edge cache kept the old HTML (e.g. `cache-control: public, s-maxage=604800`, a large `age`) | Verify removals without a cache-buster; purge the URL in the CDN, or wait until `s-maxage` runs out |
 | Session limit hit with nothing delivered | Parallel agents, some spawning their own agents | One agent at a time, no nesting, small packages |
 | Workstation-hosted CI broken after sleep | Database recovery, secrets store sealed, DNS or IP conflicts | Health check before the first push; follow the host's recovery runbook |
