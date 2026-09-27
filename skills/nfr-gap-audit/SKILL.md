@@ -183,8 +183,9 @@ For a **recurring** audit, use recheck mode
 conditions, re-measure every baseline row with the same command and
 environment, re-walk the checklist only for domains touched since the
 prior commit, and sort every GAP into fixed / still open / regressed /
-new. A baseline row that got worse is a regression and is at least High
-severity. Output is a separate `docs/audit/recheck-YYYY-MM-DD.md` delta
+new, and put rows that still pass but are running out of headroom on a
+watch list. A baseline row that got worse is a regression and is at
+least High severity. Output is a separate `docs/audit/recheck-YYYY-MM-DD.md` delta
 report, linked from the full report — never an overwrite of it.
 
 ## Output

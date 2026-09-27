@@ -103,3 +103,19 @@ Identify extra NFRs relevant to this specific project:
 | High | Missing social proof, generic headline, weak security |
 | Medium | Form field friction, inconsistent tone, incomplete metadata |
 | Low | Missing sticky CTA, no video, stock-like imagery |
+
+### Mapping tool severities to GAP severity
+
+Tools grade on their own scales; map them like this so two audits of
+the same site agree:
+
+| Tool output | GAP severity |
+|---|---|
+| axe `critical` that blocks a core task (navigation, search, form submit, checkout) | Critical |
+| axe `critical` elsewhere, or axe `serious` | High |
+| axe `moderate` | Medium |
+| axe `minor` | Low |
+| `npm audit`/`pip-audit`/`cargo audit` critical, or any known-exploited advisory | Critical |
+| Same, high | High |
+| Same, moderate/low | Medium/Low |
+| Lighthouse category below target | Severity of the worst underlying audit, not of the score itself |

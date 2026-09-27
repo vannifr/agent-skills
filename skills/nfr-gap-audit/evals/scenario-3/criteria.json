@@ -1,11 +1,11 @@
 {
-  "context": "Tests whether the agent recognises that a recurring check against a prior ID'd baseline qualifies for recheck mode (minor dependency bump, same project type), re-uses the prior baseline IDs and environment, classifies every prior GAP as fixed/still open/regressed/new, treats worsened baseline rows as regressions of at least High severity, writes a separate dated delta report without overwriting the prior report, and skips skill discovery/installation.",
+  "context": "Tests whether the agent recognises that a recurring check against a prior ID'd baseline qualifies for recheck mode (minor dependency bump, same project type), re-uses the prior baseline IDs and environment, classifies every prior GAP as fixed/still open/regressed/new, treats worsened baseline rows as regressions of at least High severity, writes a separate dated delta report without overwriting the prior report, and skips skill discovery/installation. Also checks that a passing metric close to its budget is flagged as a watch item.",
   "type": "weighted_checklist",
   "checklist": [
     {
       "name": "Recheck mode chosen with reason",
       "description": "The output states at the top that a recheck (lightweight/recurring/delta audit) was run rather than a full audit, and justifies it by the unchanged project type/stack or only a minor astro version bump",
-      "max_score": 10
+      "max_score": 8
     },
     {
       "name": "Separate delta report",
@@ -15,7 +15,7 @@
     {
       "name": "Prior baseline IDs reused",
       "description": "The baseline comparison refers to the prior row IDs (B-PERF-1, B-A11Y-1, B-A11Y-2, B-SEO-2, B-SEC-1, B-SEC-2 etc.) with before and now values side by side",
-      "max_score": 10
+      "max_score": 8
     },
     {
       "name": "Performance regression flagged",
@@ -53,9 +53,14 @@
       "max_score": 8
     },
     {
+      "name": "Shrinking headroom on watch",
+      "description": "B-PERF-3 (home JS 120 KB to 265 KB, still under the 300 KB budget) is reported as still passing but flagged as a watch/trend item close to its budget, not as a failed metric",
+      "max_score": 6
+    },
+    {
       "name": "No skill discovery or installation",
       "description": "The output does not run or plan a Tessl/VoltAgent skill search or skill installation step as part of this check",
-      "max_score": 8
+      "max_score": 6
     }
   ]
 }

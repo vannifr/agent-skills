@@ -68,6 +68,21 @@ count:
 | ⏸️ | Not run — tool unavailable, companion missing, or needs consent (load test). State why in Evidence; it becomes an open action |
 | ➖ | Deliberately skipped for this project, with the reason in Evidence (e.g. no public traffic, so no field data) |
 
+**Count and fraction metrics** ("5/7 headers", "3 broken links"):
+for a "N of M present" metric, ⚠️ means at least half of M present, ❌
+less than half; for a count with target 0, ⚠️ means 1-2, ❌ means 3 or
+more. The Critical-class rule above overrides both.
+
+**Partial evidence**: if the collected output covers only part of a
+metric (e.g. 6 of the 7 expected headers are named), record what was
+measured, keep the status it supports, and add "partial: <what's
+missing>" in Evidence. Don't guess the missing part.
+
+**In a recheck, the prior report's status for a row wins** over a
+re-derivation from this legend when the two disagree at the same value
+— statuses have to stay comparable across runs. Note the disagreement
+once and fix the legend or the row going forward.
+
 "Not run" is never ✅. A missing measurement is recorded as ⏸️, not
 guessed from the code.
 

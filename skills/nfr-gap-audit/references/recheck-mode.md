@@ -48,6 +48,10 @@ which one and switch to the full audit.
    - **Still open** — unchanged (keep its original severity and ID)
    - **Regressed** — was fixed or passing, now fails again
    - **New** — not in the prior report
+
+   A GAP that improved without closing (3/7 → 5/7 headers) stays
+   **Still open**, with "partially fixed: <what changed>" in its note;
+   its baseline row shows the Δ.
 6. **Report deltas** (template below). Regressions and new
    Critical/High GAPs go to the top, regardless of domain.
 
@@ -65,6 +69,23 @@ work broke, which usually means a missing test or CI gate. Record the
 likely cause (the commit range from step 2) and add "add a CI gate for
 this metric" to the fix.
 
+## Watch list: passing but trending toward failure
+
+A row can stay ✅ while its headroom disappears (JS 120 KB → 265 KB
+against a 300 KB budget). Put a row on the **watch list** — not the GAP
+list — when it still passes but has used more than 80% of its budget,
+or has moved more than half the remaining distance to its threshold
+since the prior run. A watch item carries no severity; it names the
+likely cause and the next measurement. It becomes a GAP (and a
+regression) only when the row actually fails.
+
+## When the prior report can't be edited
+
+If the prior report is read-only (another team's repo, an archived
+file, an instruction not to touch it), skip the "link it from the main
+report" step: put the prior report's path in the recheck's own header
+and tell the user where the link should be added.
+
 ## Delta report template
 
 Write to `docs/audit/recheck-YYYY-MM-DD.md` and link it from the main
@@ -76,12 +97,17 @@ report's Open Actions — don't overwrite the full report.
 - **Compared to:** full audit of 2026-06-14 (commit `abc1234`)
 - **Now:** commit `def5678`, 47 commits, 112 files changed
 - **Touched domains:** Performance, Security, Accessibility
-- **Verdict:** 1 regression, 2 new GAPs (1 High), 3 fixed, 5 still open
+- **Verdict:** 1 regression, 2 new GAPs (1 High), 3 fixed, 5 still open, 1 on watch
 
 ## Regressions
 | ID | Metric | Before | Now | Likely cause |
 |---|---|---|---|---|
 | B-A11Y-1 | axe serious+critical | 0 ✅ | 3 ❌ | new `Modal` component, commits `e1f..9a2` |
+
+## Watch list
+| ID | Metric | Before | Now | Target | Why watch |
+|---|---|---|---|---|---|
+| B-PERF-3 | Total JS (home) | 120 KB | 265 KB | ≤300 KB | 88% of budget; new `@docsearch/js` |
 
 ## Baseline delta
 | ID | Metric | Before | Now | Δ | Status |
