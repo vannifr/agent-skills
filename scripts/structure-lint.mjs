@@ -62,7 +62,7 @@ function checkSkill(skillDir) {
   while ((linkMatch = linkPattern.exec(content)) !== null) {
     const target = linkMatch[1];
     if (/^https?:\/\//.test(target) || target.startsWith('#')) continue;
-    const targetPath = resolve(skillDir, target);
+    const targetPath = resolve(skillDir, target.split('#')[0]);
     if (!existsSync(targetPath)) {
       errors.push(`${skillMdPath}: broken relative link "${target}" (resolved to ${targetPath})`);
     }

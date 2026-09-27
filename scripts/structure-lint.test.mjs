@@ -104,3 +104,23 @@ test('ignores absolute http(s) links and anchor links', () => {
   assert.equal(result.code, 0);
   rmSync(root, { recursive: true, force: true });
 });
+
+test('passes with a relative link carrying a #fragment to an existing file', () => {
+  const root = makeFixture(
+    '---\nname: example-skill\ndescription: A valid example skill for testing.\n---\n\nSee [guide](references/details.md#execution-guide).\n',
+    { 'references/details.md': '# Details\n\n## Execution guide\n' }
+  );
+  const result = runLint(root);
+  assert.equal(result.code, 0);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('fails on a #fragment link whose file does not exist', () => {
+  const root = makeFixture(
+    '---\nname: example-skill\ndescription: A valid example skill for testing.\n---\n\nSee [guide](references/missing.md#section).\n'
+  );
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /broken relative link/);
+  rmSync(root, { recursive: true, force: true });
+});
