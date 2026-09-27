@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent recognises that a recurring check against a prior ID'd baseline qualifies for recheck mode (minor dependency bump, same project type), re-uses the prior baseline IDs and environment, classifies every prior GAP as fixed/still open/regressed/new, treats worsened baseline rows as regressions of at least High severity, writes a separate dated delta report without overwriting the prior report, and skips skill discovery/installation.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Recheck mode chosen with reason",
+      "description": "The output states at the top that a recheck (lightweight/recurring/delta audit) was run rather than a full audit, and justifies it by the unchanged project type/stack or only a minor astro version bump",
+      "max_score": 10
+    },
+    {
+      "name": "Separate delta report",
+      "description": "The findings are written to a new file under docs/ (e.g. docs/audit/recheck-2026-09-26.md or similar dated name), and inputs/skill-audit-report.md is left unmodified",
+      "max_score": 8
+    },
+    {
+      "name": "Prior baseline IDs reused",
+      "description": "The baseline comparison refers to the prior row IDs (B-PERF-1, B-A11Y-1, B-A11Y-2, B-SEO-2, B-SEC-1, B-SEC-2 etc.) with before and now values side by side",
+      "max_score": 10
+    },
+    {
+      "name": "Performance regression flagged",
+      "description": "B-PERF-1 (Lighthouse Performance 94 to 87, from passing to below the ≥90 target) is identified as a regression, not just a lower number",
+      "max_score": 10
+    },
+    {
+      "name": "Accessibility regression flagged",
+      "description": "B-A11Y-1 (axe serious+critical 0 to 2) and/or B-A11Y-2 (98 to 91) is identified as a regression linked to the new SearchModal component",
+      "max_score": 10
+    },
+    {
+      "name": "Regressions at least High and on top",
+      "description": "Regressions are assigned High or Critical severity (not Medium/Low) and appear before fixed or still-open items in the report",
+      "max_score": 10
+    },
+    {
+      "name": "Fixed GAPs identified",
+      "description": "G-SEC-1 (dependency vuln, now 0), G-SEO-1 (broken links, now 0) and G-SEC-3 (Referrer-Policy/Permissions-Policy now present) are marked as fixed/resolved",
+      "max_score": 10
+    },
+    {
+      "name": "Still-open GAP identified",
+      "description": "G-SEC-2 (missing Content-Security-Policy) is marked as still open, keeping its ID and High severity",
+      "max_score": 8
+    },
+    {
+      "name": "New GAP with concrete fix",
+      "description": "A new GAP is recorded for the SearchModal dialog (missing accessible name and/or focus management), including a concrete fix such as aria-labelledby/aria-label on the dialog, moving focus in on open and returning it on close, or using a native <dialog>",
+      "max_score": 8
+    },
+    {
+      "name": "Regression-prevention action",
+      "description": "The report recommends adding a CI gate or automated test (e.g. axe or Lighthouse budget in CI) so the regressed metric is caught automatically next time",
+      "max_score": 8
+    },
+    {
+      "name": "No skill discovery or installation",
+      "description": "The output does not run or plan a Tessl/VoltAgent skill search or skill installation step as part of this check",
+      "max_score": 8
+    }
+  ]
+}

@@ -90,12 +90,12 @@ refactor(domain): short description
 
 `docs/skill-audit-report.md` (or the project's equivalent):
 
-1. **Executive Summary** — project type, tech stack, overall status
+1. **Executive Summary** — mode (full/recheck), project type, tech stack, overall status, companion skills used, which reviews ran with a reviewer vs. the [fallback](review-fallback.md)
 2. **Installed Skills** — table with all skills (before/after, source, relevance)
-3. **Baseline Scores** — all metrics at the start
+3. **Baseline Scores** — header block + ID'd table in the [baseline template](baseline-template.md) shape
 4. **GAP Analysis** — per domain, sorted by severity
 5. **Improvement Plan** — 7 phases with actions and priorities
 6. **Implementation Results** — per phase: what was done, scores before/after
 7. **Retrospectives** — per phase
-8. **Open Actions** — non-code items (dashboard actions, client contact, etc.)
+8. **Open Actions** — non-code items (dashboard actions, client contact, etc.), every ⏸️ baseline row, and links to later recheck reports
 9. **Recommendations** — next steps, long-term improvements

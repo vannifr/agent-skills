@@ -22,6 +22,17 @@ triggers automatically on a new feature or 3+ new files — leave that
 reactive flow alone and reach for this skill only for an explicit,
 project-wide audit including NFR checklists and skill installation.
 
+## Pick the mode first
+
+| Mode | Use when | Runs |
+|---|---|---|
+| **Full audit** | First audit, stack or project type changed, major framework upgrade, or the last audit is 6+ months old | Phases 0-6 below |
+| **Recheck** | A prior report with an ID'd baseline exists and none of the above applies | Re-measure baseline, re-walk touched domains, report fixed/still open/regressed/new — see [recheck-mode.md](references/recheck-mode.md) |
+
+State the chosen mode and why in the first line of the report. When in
+doubt, recheck-mode.md's entry conditions decide; a failed condition
+means full audit.
+
 ## Phase 0 — Project discovery
 
 1. **Determine the tech stack**: read `package.json`/`pyproject.toml`/
@@ -75,7 +86,8 @@ flag but not quantitatively verify — cross-browser rendering, real-user
 field performance, load testing, third-party script/vendor risk,
 translation quality beyond key-parity. See
 [companion-skills.md](references/companion-skills.md) for which to reach
-for and when. Same rule as any Phase 1 source: not installed or not
+for and when, and its [execution guide](references/companion-skills.md#execution-guide)
+for run order, preconditions and which baseline rows each one fills. Same rule as any Phase 1 source: not installed or not
 reachable → note it as an open action, don't block the audit.
 
 ## Phase 2 — Baseline measurement
@@ -91,13 +103,22 @@ stack (swap for the project's actual tools):
 - **Python**: `pip-audit`, `pytest --cov`
 - **Rust**: `cargo audit`, `cargo test`
 
-Document a baseline table before anything changes, e.g.:
+Document the baseline before anything changes, in the fixed shape of
+[baseline-template.md](references/baseline-template.md): a header block
+(date, commit, target URL, throttling preset, runs per metric), then one
+row per metric with a stable ID, command, current, target, status and
+evidence, e.g.:
 
-| Metric | Current | Target | Status |
-|---|---|---|---|
-| Lighthouse Performance | 62 | ≥90 | ⚠️ |
-| `npm audit` (high+) | 3 | 0 | ❌ |
-| Test coverage | 41% | ≥80% | ⚠️ |
+| ID | Domain | Metric | Command / source | Current | Target | Status | Evidence |
+|---|---|---|---|---|---|---|---|
+| B-PERF-1 | Performance | Lighthouse Performance | `npx lighthouse <url>` | 62 | ≥90 | ⚠️ | `docs/audit/lh-home.json` |
+| B-SEC-1 | Security | Dependency vulns high+ | `npm audit` | 3 | 0 | ❌ | |
+
+Use only the template's five statuses (✅ ⚠️ ❌, ⏸️ for not run, ➖ for
+deliberately skipped) and
+its default targets unless the project defines its own. A metric that
+couldn't be measured is ⏸️, never a guess. The IDs are what makes a
+later recheck possible.
 
 ## Phase 3 — GAP analysis
 
@@ -115,7 +136,14 @@ those follow a different path in Phase 5 than a plain mechanical fix.
 Where a GAP has a concrete fix, include a short code example in the
 finding itself, not just the checklist item — a GAP recorded as "add
 `loading="lazy"` to below-fold images" is more actionable than "improve
-lazy loading."
+lazy loading." Every GAP cites its evidence: a baseline row ID, a
+file:line, or a companion finding.
+
+**Review the GAP list before Phase 4.** With a reviewer/subagent
+available, hand it the GAP list and baseline only and let it challenge
+severities and evidence. Without one, run the cold-read pass in
+[review-fallback.md](references/review-fallback.md), which also covers
+the single-agent fallback for skill vetting and companion runs.
 
 ## Phase 4 — Improvement plan
 
@@ -150,19 +178,21 @@ After each phase, briefly document: what was done, what worked well, what
 could be better, which new GAPs were discovered, scores before/after.
 Template in [improvement-plan-template.md](references/improvement-plan-template.md).
 
-For a **recurring** audit on a project already covered by a prior full
-run: rerun only Phase 2 (baseline) and Phase 3 (GAP analysis) against the
-current state, skipping Phase 0 (discovery) and Phase 1 (skill
-installation) unless the tech stack or installed skills have materially
-changed. Compare the new baseline/GAP list against the prior report's
-"Baseline Scores" and "GAP Analysis" sections and report deltas — this
-keeps the skill usable as a lightweight pre-deploy/weekly/monthly recheck,
-not just a one-off.
+For a **recurring** audit, use recheck mode
+([recheck-mode.md](references/recheck-mode.md)): check the entry
+conditions, re-measure every baseline row with the same command and
+environment, re-walk the checklist only for domains touched since the
+prior commit, and sort every GAP into fixed / still open / regressed /
+new. A baseline row that got worse is a regression and is at least High
+severity. Output is a separate `docs/audit/recheck-YYYY-MM-DD.md` delta
+report, linked from the full report — never an overwrite of it.
 
 ## Output
 
 Final report at `docs/skill-audit-report.md` (or the project's equivalent
-of a `docs/` directory): executive summary, installed skills before/after,
+of a `docs/` directory): executive summary (mode, companions used, and which reviews ran with a
+reviewer vs. the [fallback](references/review-fallback.md)), installed
+skills before/after,
 baseline scores, GAP analysis per domain by severity, improvement plan,
 implementation results per phase, retrospectives, open non-code actions
 (including unreachable discovery sources and GAPs awaiting stakeholder

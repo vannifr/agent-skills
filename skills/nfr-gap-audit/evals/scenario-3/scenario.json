@@ -1,0 +1,4 @@
+{
+  "description": "Recurring NFR recheck against a prior ID'd baseline with a regression",
+  "include": ["./inputs"]
+}
