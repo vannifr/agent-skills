@@ -137,6 +137,21 @@ test('final_check: --require-snippet reports pages without the analytics snippet
   assert.match(r.out, /\/b\/: missing snippet 'data-site="x"'/, r.out);
 });
 
+test('final_check: launch blockers are reported', async () => {
+  const blocked = page({
+    title: '<title>A</title>',
+    head: '<meta name="robots" content="noindex, nofollow">',
+    body: '<p>Lorem ipsum dolor sit amet</p><a href="http://localhost:3000/contact/">contact</a>',
+  });
+  const clean = page({ title: '<title>B</title>', body: '<p>Real text</p>' });
+  const r = await runSite({ '/a/': blocked, '/b/': clean }, { 'robots.txt': 'User-agent: *\nDisallow: /\n' });
+  assert.match(r.out, /\/a\/: noindex on a sitemap page/, r.out);
+  assert.match(r.out, /\/a\/: placeholder text 'lorem ipsum'/, r.out);
+  assert.match(r.out, /\/a\/: link to a local host: http:\/\/localhost:3000/, r.out);
+  assert.match(r.out, /robots\.txt disallows the whole site/, r.out);
+  assert.doesNotMatch(r.out, /\/b\/: (noindex|placeholder|link to a local)/, r.out);
+});
+
 test('parity_check: --pairs pairs pages with different slugs when hreflang is absent', () => {
   const root = mkdtempSync(join(tmpdir(), 'parity-test-'));
   writeTree(root, {

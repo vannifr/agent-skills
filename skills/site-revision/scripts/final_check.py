@@ -7,6 +7,9 @@ visible on the page, every <img> with alt/width/height and a working
 same-site src, no forbidden names anywhere in the HTML, no forbidden
 terms in the visible main text (quotes excluded) of pages outside
 --term-skip-prefix, and each --require-snippet present on every page.
+Launch blockers: noindex (meta robots or X-Robots-Tag) on a sitemap
+page, a robots.txt that disallows the whole site, placeholder text, and
+links or resources pointing at a local host.
 Also checks that repository files outside the build output are not
 publicly served: every top-level entry of --private-from that is not in
 --build-dir (for a directory, the directory and its first file), plus
@@ -36,13 +39,57 @@ import urllib.request
 UA = {"User-Agent": "Mozilla/5.0 (site-revision final check)"}
 
 
-def fetch(url, method="GET"):
+def fetch(url, method="GET", with_headers=False):
     sep = "&" if "?" in url else "?"
     target = url if method == "HEAD" else f"{url}{sep}cb={random.randint(1, 10**9)}"
     req = urllib.request.Request(target, method=method, headers=UA)
     with urllib.request.urlopen(req, timeout=30) as resp:
         body = resp.read().decode("utf-8", "replace") if method == "GET" else ""
+        if with_headers:
+            return resp.status, body, resp.headers
         return resp.status, body
+
+
+LOCAL_HOST = re.compile(r'(?:href|src)="(https?://(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(?::\d+)?)')
+PLACEHOLDERS = ["lorem ipsum"]
+
+
+def check_launch_blockers(path, html, headers, in_sitemap, args, issues):
+    robots = headers.get("X-Robots-Tag", "") if headers else ""
+    for tag in re.findall(r"<meta\s[^>]*>", html, re.I):
+        if re.search(r'name="robots"', tag, re.I):
+            content = re.search(r'content="([^"]*)"', tag, re.I)
+            robots += " " + (content.group(1) if content else "")
+    if in_sitemap and "noindex" in robots.lower():
+        issues.append(f"{path}: noindex on a sitemap page")
+    text = visible_text(html).lower()
+    for placeholder in PLACEHOLDERS:
+        if placeholder in text:
+            issues.append(f"{path}: placeholder text '{placeholder}'")
+    for origin in set(LOCAL_HOST.findall(html)):
+        if not args.base.startswith(origin):
+            issues.append(f"{path}: link to a local host: {origin}")
+
+
+def check_robots_txt(args, issues):
+    try:
+        status, body = fetch(args.base + "/robots.txt")
+    except Exception:  # noqa: BLE001 - no robots.txt means nothing is blocked
+        return
+    agents, group_started = set(), False
+    for raw in body.splitlines():
+        line = raw.split("#", 1)[0].strip()
+        key, _, value = line.partition(":")
+        key, value = key.strip().lower(), value.strip()
+        if key == "user-agent":
+            if group_started:
+                agents, group_started = set(), False
+            agents.add(value)
+        elif key in ("allow", "disallow"):
+            group_started = True
+            if key == "disallow" and value == "/" and "*" in agents:
+                issues.append("robots.txt disallows the whole site")
+                return
 
 
 def sitemap_urls(base, sitemap_path):
@@ -172,20 +219,23 @@ def main():
     args = parser.parse_args()
     args.base = args.base.rstrip("/")
 
-    urls = sitemap_urls(args.base, args.sitemap) + [args.base + p for p in args.extra_url]
+    sitemap = sitemap_urls(args.base, args.sitemap)
+    urls = sitemap + [args.base + p for p in args.extra_url]
     issues, titles = [], {}
     for url in urls:
         path = url[len(args.base):] or "/"
         try:
-            status, html = fetch(url)
+            status, html, headers = fetch(url, with_headers=True)
         except Exception as exc:  # noqa: BLE001
             issues.append(f"{path}: fetch failed ({exc})")
             continue
         if status != 200:
             issues.append(f"{path}: status {status}")
         check_page(path, html, args, issues, titles)
+        check_launch_blockers(path, html, headers, url in sitemap, args, issues)
 
     check_private_paths(args, issues)
+    check_robots_txt(args, issues)
 
     for title, paths in titles.items():
         if title and len(paths) > 1:
