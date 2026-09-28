@@ -11,6 +11,7 @@ or rewritten text, including text a delegated agent wrote.
 | Testimonial | The owner confirms wording and attribution | A paraphrase, a quote assembled from feedback |
 | Event facts (date, size, role) | The owner, or the organiser's own page | An earlier version of the site |
 | The owner's own experiences | The owner | Anything else — never fill in an anecdote |
+| Price or competitor comparison | The other party's own current page, cited with URL and the date checked | Memory, an old quote, a third-party roundup; "official" only if the source calls itself that |
 
 ## Procedure
 
@@ -31,6 +32,10 @@ or rewritten text, including text a delegated agent wrote.
    real origin (e.g. a book title and year) or drop it.
 7. Anything that fails: remove it, and list it for the owner with the
    exact passage.
+8. Search the code for content that will change by itself after this
+   gate: date-gated flags (e.g. a date after which the owner's name
+   appears), scheduled publication dates, time-limited offers. List each
+   with its date in the decision log and get the owner's confirmation.
 
 ## Test the scan itself
 

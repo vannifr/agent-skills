@@ -25,8 +25,13 @@ persona before/after, and the release rhythm.
   locally, push as one batch, validate live, report the URLs.
 - **Never push while the previous pipeline of the same repo is running**
   (most CI servers cancel it). Commit locally in the meantime.
-- **One question per message** to the owner during interviews. Bundle
-  doubts only in written reports.
+- **Audit first, then ask.** Before changing anything, run the read-only
+  part in one go: phase 0 checks, the customer evidence you can reach
+  yourself (form database, mailbox exports, analytics), the phase 2
+  walkthrough and a technical scan (`final_check.py` on the current
+  site). Then send the owner **one report with all open questions
+  bundled**. One question per message only in the positioning interview
+  (phase 1b), where each answer changes the next question.
 - **Report, don't correct**: when a rule or checklist hits a doubtful
   case, surface it instead of silently reinterpreting.
 - **Verify CI health before the first push**: runner up, secrets store
@@ -41,22 +46,30 @@ persona before/after, and the release rhythm.
    and the owner's own name if they don't want to be findable by it),
    source locations (proposals, customer mails, proceedings, photos),
    personas, and KPIs.
-2. **Analytics works and has a baseline** (visits, contact-form
-   submissions, top pages). Without it, later consolidation is guesswork.
-   Some hosted analytics inject their script only for real browsers:
-   confirm in the analytics dashboard, not in HTML fetched from the
-   command line.
+2. **Analytics works on every page and has a baseline** (visits,
+   contact-form submissions, top pages). Without it, later consolidation
+   is guesswork. Check per page, not only in the dashboard total: run
+   `final_check.py --require-snippet <tag>` when the tag is in the HTML;
+   when the host injects it only for real browsers, look for sitemap
+   pages with zero views in the dashboard instead.
 3. **CI is local-parity checked** before content work starts: the local
    verify command covers what CI checks (a `ci-local-parity` skill, if
    available, does this systematically).
-4. **Decision log**: one place for decisions with date and rationale
+4. **Publication hygiene**: internal files must not be served. Request
+   `AGENTS.md`, `CLAUDE.md`, `README.md`, `docs/`, `.git/HEAD`, `.env`,
+   `package.json`, CI config and any project folders that aren't site
+   content (tools, workers, scripts) on the live origin; anything other
+   than a 404 is a finding for the first batch. `final_check.py` checks
+   the common paths; add the project's own with `--private-path`.
+5. **Decision log**: one place for decisions with date and rationale
    (a separate governance repository, `docs/decisions.md`, or the plan).
    Every positioning or naming choice goes there before it goes on the site.
 
 ## Phase 1 — Customer evidence and jobs to be done
 
 Before any positioning choice, understand what buyers are trying to get
-done, in their own words. Ask the owner for, one source at a time:
+done, in their own words. Read what you can reach yourself first, then
+ask the owner for the rest in one bundled request:
 
 - incoming requests and quote requests (mails, forms, call notes);
 - proposals that were won and lost, and why a lead dropped out;
@@ -126,8 +139,11 @@ removed, and the owner is told. Procedure and the recurring failure
 patterns: [references/fact-verification.md](references/fact-verification.md).
 
 Also in this gate: image rights (own photos, publisher covers,
-recognisable people's consent), metadata stripped from every image,
-names policy respected in file names and alt text.
+recognisable people's consent), sensitive metadata (GPS, serial numbers,
+author, software) stripped from every image while keeping its colour
+profile, names policy respected in file names and alt text, price and
+competitor comparisons with their source and date, and content that
+changes by itself later (date-gated flags, scheduled publication).
 
 ## Phase 6 — Live feedback loop
 
@@ -166,11 +182,14 @@ pages (numbers, dates, roles). Fix or explicitly accept each one.
 
 ## Phase 9 — Final check and retrospective
 
-1. Run [scripts/final_check.py](scripts/final_check.py) against production
-   for every sitemap URL plus deliberately non-indexed pages: status,
-   unique titles, one H1, valid JSON-LD, FAQ schema count equals visible
-   questions, images with alt/size and a working URL, no forbidden names,
-   no forbidden terms per language. Target: zero problems.
+1. Run [scripts/final_check.py](scripts/final_check.py) first against a
+   local preview server of the build (before the deploy, where broken
+   links are cheap), then against production, for every sitemap URL plus
+   deliberately non-indexed pages: status, unique titles, one H1, valid
+   JSON-LD, every FAQ schema question visible, images with alt/size and a
+   working URL, no forbidden names, no forbidden terms per language
+   outside quotes, analytics on every page, no internal files served.
+   Target: zero problems.
 2. Run [scripts/exif_scan.sh](scripts/exif_scan.sh) on the image
    directory.
 3. Complete the plan's status and retrospective; hand the owner the
@@ -185,14 +204,20 @@ read the header comment.
 
 - `scripts/final_check.py --base <origin> [--sitemap <path>]
   [--extra-url <path>] [--forbid-name <text>] [--forbid-term <word>]
-  [--term-skip-prefix <path>]` — prints problems per URL, exit 1 if any.
+  [--term-skip-prefix <path>] [--require-snippet <text>]
+  [--private-path <path>]` — prints problems per URL, exit 1 if any.
+  `--base` may be a local preview server of the build.
 - `scripts/parity_check.py --dist <build dir> --base <origin>
-  --from-lang <xx> --to-lang <yy>` — prints language pairs whose
-  structure or word ratio differs, exit 1 if any.
+  --from-lang <xx> --to-lang <yy> [--pairs <file>]` — prints language
+  pairs whose structure or word ratio differs, exit 1 if any. Pages are
+  paired via hreflang; `--pairs` (`<from path> <to path>` per line) covers
+  sites with different slugs per language or no hreflang links.
 - `scripts/live_verify.sh <origin> <patterns file>` — lines
   `present|absent <path> <text>`, prints failures and totals.
 - `scripts/exif_scan.sh <image dir>` — self-tests the filter, then lists
-  files with metadata, exit 1 if any.
+  files with sensitive metadata (GPS, serials, author, software), exit 1
+  if any; the header has the strip command that keeps the colour
+  profile.
 
 ## Pitfalls
 

@@ -18,4 +18,7 @@
 | A deleted page still returns 200 with the old content, but only without a query string | An edge cache kept the old HTML (e.g. `cache-control: public, s-maxage=604800`, a large `age`) | Verify removals without a cache-buster; purge the URL in the CDN, or wait until `s-maxage` runs out |
 | HTML validation reports stray `</content>` or `</invoke>` end tags after an agent rewrite | The delegated agent wrote fragments of its own tool call into the file | Grep changed files for tool-call tags before committing; the HTML validator catches it, a Markdown linter does not |
 | Session limit hit with nothing delivered | Parallel agents, some spawning their own agents | One agent at a time, no nesting, small packages |
+| Checks pass or fail on changes you didn't make | Another agent or the owner is editing the same working directory | Run checks and builds in a clean `git worktree` of the commit under test |
+| Local tests pass against the wrong site | A different app already listens on the test port and the test runner silently reuses it | Check the port is free (`ss -ltnp`) before starting the preview server, or disable server reuse |
+| Every sitemap `lastmod` is the same date, or jumps on each deploy | `lastmod` taken from the commit or build date; shallow CI clones make it worse | Take `lastmod` from the content's own updated date, or leave it out |
 | Workstation-hosted CI broken after sleep | Database recovery, secrets store sealed, DNS or IP conflicts | Health check before the first push; follow the host's recovery runbook |
