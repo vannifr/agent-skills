@@ -44,6 +44,70 @@ tens of credits to run), so this step is encouraged, not required, for
 every PR; a maintainer may run it before merging a significant change if
 the contributor can't.
 
+## Evaluating a skill and processing feedback
+
+Feedback on a skill arrives from three places: a retrospective after a
+real run, an eval run, and someone's review ("4/5, missing X"). None of
+it goes into the skill unfiltered — most suggestions are true about the
+run, not about the skill.
+
+### 1. Evaluate
+
+**Local comparison (no credits)** — the quickest way to see whether a
+skill changes outcomes, and to collect concrete friction:
+
+1. Copy a scenario's `task.md` and `inputs/` into two fresh scratch
+   directories, outside the repo.
+2. Run two agents on the same model, in parallel: one told to read and
+   follow `skills/<name>/SKILL.md` (and **not** its `evals/`), one told
+   to use no skills. Ask the with-skill agent to end with a list of
+   places where the skill was unclear, contradictory or made it guess.
+3. Score both outputs against the scenario's `criteria.json` yourself
+   (or with a third agent), not by the agents that produced them.
+4. Read the result critically:
+   - With-skill ≈ without-skill → the skill adds nothing there, **or**
+     the scenario leaks the answer in its task text. Fix the scenario
+     before drawing conclusions about the skill.
+   - One run per variant is a signal, not proof. Don't quote the score
+     as a measurement.
+
+**Official (costs credits)** — `tessl eval run ./skills/<name>` before a
+publish that changes behavior; see "Updating an existing skill's
+behavior" above.
+
+### 2. Triage every feedback point
+
+Sort each point into exactly one bucket before editing anything:
+
+| Bucket | Test | Goes to |
+|---|---|---|
+| **Skill** | It's about the skill's own job, and would help on another project, another agent and another host | The skill |
+| **Project / host** | True, but about this project, this agent, this CI or this model (which reviewer agent loops, how to poll this CI, token limits of this host) | That project's `AGENTS.md`/`CLAUDE.md`, or global agent config |
+| **Drop** | Already covered (check which skill version the feedback was based on), an artifact of how the eval task was worded, a one-off edge case, or a request for numbers nobody measured | Nowhere — note in the commit message why it was dropped, if it was a prominent point |
+
+Red flags that a point belongs in "Project / host" or "Drop": it names
+a specific agent, model or CI tool; it's about efficiency of the run
+rather than quality of the result; it adds a new rule that competes
+with an existing one instead of sharpening it.
+
+### 3. Apply
+
+- **Tighten before adding.** Prefer sharpening or merging an existing
+  section over a new one; remove overlap you find on the way. A skill
+  that grows every round gets followed less.
+- **Behavior change → eval criterion.** Add or update a criterion in
+  `evals/` for each change meant to alter what the agent does, and run
+  `tessl eval lint ./skills/<name>/evals/`.
+- **Scripts test-first.** A fix to `scripts/` gets a failing test in
+  `scripts/*.test.mjs` first.
+- **Keep it registry-clean**: tool-agnostic, no personal wording, no
+  invented figures, links working (`node scripts/structure-lint.mjs`).
+- **Commit** with the source of the feedback in the message (e.g. "from
+  a local eval of scenario-3", "from a real-run retrospective") and one
+  commit per coherent change.
+- **Don't publish** as part of processing feedback. Republishing to
+  Tessl is a separate decision; see below.
+
 ## Publishing a skill to Tessl
 
 Not every skill in this repo belongs on the Tessl registry. Publishing makes
