@@ -22,6 +22,31 @@ Record in the report's Executive Summary which steps ran with a reviewer
 and which used the fallback (`Review: GAP list cold-read (no reviewer
 agent available)`), so a reader knows how the findings were checked.
 
+## Choosing and watching a reviewer agent
+
+Reviewer agents fail in ways that burn a lot of tokens quietly: looping
+on the same tool call, re-reading the same files, or never returning.
+Guard against that instead of trusting one agent type blindly:
+
+- **Prefer a reviewer the project already trusts.** Check `AGENTS.md`/
+  `CLAUDE.md` or project memory for a note on which reviewer agent or
+  model works; use that one.
+- **Give it a narrow input**: the diff or the GAP list plus the
+  baseline, and the question. Not the whole repo.
+- **Cap it**: a turn or token budget and a timeout that fit the input
+  (a GAP list review should not need more than a few thousand tokens of
+  output).
+- **Stop it on loop signs**: the same tool call repeated, no new files
+  read over several turns, a loop-detection error from the host, or the
+  cap reached without a verdict.
+- **Switch once, then fall back**: retry with a different agent type or
+  model; if that one fails too, use the single-agent fallback in the
+  table above. Never retry the same failing reviewer again unchanged.
+- **Record what happened**: add a one-line note to the project's
+  `AGENTS.md`/`CLAUDE.md` (or project memory) — "reviewer X loops on
+  large diffs, use Y" — so the next audit starts with the reviewer that
+  works.
+
 ## Skill vetting checklist
 
 Before installing a skill from outside the Tessl registry (GitHub
