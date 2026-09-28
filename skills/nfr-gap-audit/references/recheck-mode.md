@@ -36,8 +36,10 @@ fails, say which one and switch to the full audit.
    manifests → Security; CI files → CI/CD; locale files → i18n. Every
    domain is re-measured in step 3, but only the touched domains get
    the full checklist walk in step 4.
-3. **Re-measure every baseline row** with the same command, target and
-   environment recorded in the prior header block. Same preset, same
+3. **Re-measure every baseline row** by running the project's baseline
+   script from the prior audit (if there is none, write it now from the
+   prior report's Command column), with the same target and environment
+   recorded in the prior header block. Same preset, same
    URL, same number of runs — otherwise the delta is noise. A row whose
    tool is now unavailable becomes ⏸️, not a copy of the old value.
 4. **Re-walk the GAP checklist** from [gap-checklists.md](gap-checklists.md)

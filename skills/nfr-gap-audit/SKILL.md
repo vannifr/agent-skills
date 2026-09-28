@@ -150,10 +150,19 @@ its default targets unless the project defines its own. A metric that
 couldn't be measured is ⏸️, never a guess. The IDs are what makes a
 later recheck possible.
 
+Save the exact commands you ran as one baseline script **in the
+project** (in the project's own scripting or task-runner convention,
+next to the report), writing its results to
+`docs/audit/baseline-YYYY-MM-DD.json`. The skill doesn't ship one
+because the commands depend on the stack; the project's copy is what a
+recheck re-runs instead of re-deriving them.
+
 ## Phase 3 — GAP analysis
 
 Walk the checklist in [gap-checklists.md](references/gap-checklists.md) per
-relevant domain (so **not** the domains marked ❌ for this project type):
+relevant domain as a literal checklist: copy the domain's items into the
+report and answer every one — ✅, ❌ (becomes a GAP) or n.a. — with its
+evidence, so no item is skipped from memory. Cover each relevant domain (so **not** the domains marked ❌ for this project type):
 performance, accessibility, SEO, testing, security, CI/CD, analytics,
 design system, marketing/copy, plus automatically identified extra NFRs
 like i18n/PWA/error handling/monitoring/privacy/content
@@ -225,7 +234,9 @@ report, linked from the full report — never an overwrite of it.
 ## Output
 
 Final report at `docs/skill-audit-report.md` (or the project's equivalent
-of a `docs/` directory): executive summary (mode, companions used, and which reviews ran with a
+of a `docs/` directory), copied from the skeleton in
+[report-template.md](references/report-template.md) at the start of the
+audit: executive summary (mode, companions used, and which reviews ran with a
 reviewer vs. the [fallback](references/review-fallback.md)), installed
 skills before/after,
 baseline scores, GAP analysis per domain by severity, improvement plan,
