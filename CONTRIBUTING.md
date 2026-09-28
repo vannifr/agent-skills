@@ -36,9 +36,16 @@
      agent instruction files");
    - scripts bundled with the skill are fine, but their defaults must
      not assume a stack either.
-3. Keep `SKILL.md` under 500 lines; split detail into `references/` files
+3. A skill that changes a project defines **done** explicitly: the
+   change is committed, CI for that exact commit is green (checked, not
+   assumed, never made green by weakening a gate), and the change is
+   verified on the live/deployed application. What can't be verified
+   is reported as "not verified" with the reason, never as done. See
+   the "Definition of done" section in `nfr-gap-audit` or
+   `site-revision` for the wording.
+4. Keep `SKILL.md` under 500 lines; split detail into `references/` files
    linked from the body.
-4. Run `node scripts/structure-lint.mjs` locally before opening a PR.
+5. Run `node scripts/structure-lint.mjs` locally before opening a PR.
 
 ## Updating an existing skill's behavior
 
