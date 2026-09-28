@@ -97,12 +97,26 @@ test('final_check: forbidden term inside a quote is not reported, outside it is'
   assert.match(r.out, /\/b\/: forbidden term 'synergy'/, r.out);
 });
 
-test('final_check: publicly served internal files are reported', async () => {
+test('final_check: repository files outside the build output are reported when served', async () => {
+  const repo = mkdtempSync(join(tmpdir(), 'repo-'));
+  const build = join(repo, 'build');
+  writeTree(repo, {
+    'notes.md': 'internal', 'tools/run.sh': 'echo', 'secret.env': 'KEY=1', 'build/index.html': 'x',
+  });
   const html = page({ title: '<title>Home</title>' });
-  const r = await runSite({ '/': html }, { 'AGENTS.md': '# rules', 'tools/run.sh': 'echo' }, ['--private-path', '/tools/run.sh']);
-  assert.match(r.out, /internal file publicly served: \/AGENTS\.md/, r.out);
+  const r = await runSite({ '/': html }, { 'notes.md': 'internal', 'tools/run.sh': 'echo' },
+    ['--private-from', repo, '--build-dir', build, '--private-path', '/extra.txt']);
+  rmSync(repo, { recursive: true, force: true });
+  assert.match(r.out, /internal file publicly served: \/notes\.md/, r.out);
   assert.match(r.out, /internal file publicly served: \/tools\/run\.sh/, r.out);
-  assert.doesNotMatch(r.out, /publicly served: \/\.env/, r.out);
+  assert.doesNotMatch(r.out, /publicly served: \/secret\.env/, r.out);
+  assert.doesNotMatch(r.out, /publicly served: \/index\.html/, r.out);
+});
+
+test('final_check: no hard-coded private paths without flags', async () => {
+  const html = page({ title: '<title>Home</title>' });
+  const r = await runSite({ '/': html }, { 'AGENTS.md': '# rules' });
+  assert.doesNotMatch(r.out, /publicly served/, r.out);
 });
 
 test('final_check: --require-snippet reports pages without the analytics snippet', async () => {

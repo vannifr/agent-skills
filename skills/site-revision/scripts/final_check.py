@@ -7,8 +7,10 @@ visible on the page, every <img> with alt/width/height and a working
 same-site src, no forbidden names anywhere in the HTML, no forbidden
 terms in the visible main text (quotes excluded) of pages outside
 --term-skip-prefix, and each --require-snippet present on every page.
-Also checks that internal files (AGENTS.md, .git/, .env, CI config, ...
-plus --private-path) are not publicly served.
+Also checks that repository files outside the build output are not
+publicly served: every top-level entry of --private-from that is not in
+--build-dir (for a directory, the directory and its first file), plus
+each --private-path.
 
 --base can be a local preview server of the build, to catch problems
 before the deploy.
@@ -18,24 +20,19 @@ Usage:
       [--sitemap /sitemap-0.xml] [--extra-url /about/ ...] \
       [--forbid-name "Jane Doe" ...] [--forbid-term givens ...] \
       [--term-skip-prefix /en/ ...] [--require-snippet 'data-site="x"' ...] \
-      [--private-path /tools/ ...]
+      [--private-from . --build-dir dist] [--private-path /tools/ ...]
 
 Exit code 1 when any problem is found.
 """
 import argparse
 import json
+import os
 import random
 import re
 import sys
 import urllib.request
 
 UA = {"User-Agent": "Mozilla/5.0 (site-revision final check)"}
-
-PRIVATE_PATHS = [
-    "/AGENTS.md", "/CLAUDE.md", "/README.md", "/.git/HEAD", "/.git/config",
-    "/.env", "/package.json", "/docs/", "/.woodpecker.yml",
-    "/.github/workflows/", "/.gitlab-ci.yml", "/wrangler.toml",
-]
 
 
 def fetch(url, method="GET"):
@@ -118,6 +115,28 @@ def check_page(path, html, args, issues, titles):
                 issues.append(f"{path}: image {src.group(1)} failed ({exc})")
 
 
+def private_paths(args):
+    paths = list(args.private_path)
+    if not args.private_from:
+        return paths
+    build = os.path.abspath(args.build_dir) if args.build_dir else None
+    for entry in sorted(os.listdir(args.private_from)):
+        full = os.path.join(args.private_from, entry)
+        if build and (os.path.abspath(full) == build or os.path.exists(os.path.join(build, entry))):
+            continue
+        if not os.path.isdir(full):
+            paths.append(f"/{entry}")
+            continue
+        paths.append(f"/{entry}/")
+        for root, dirs, files in os.walk(full):
+            dirs.sort()
+            if files:
+                rel = os.path.relpath(os.path.join(root, sorted(files)[0]), args.private_from)
+                paths.append("/" + rel.replace(os.sep, "/"))
+                break
+    return paths
+
+
 def check_private_paths(args, issues):
     def fingerprint(body):
         title = re.search(r"<title[^>]*>(.*?)</title>", body, re.S)
@@ -128,7 +147,7 @@ def check_private_paths(args, issues):
         fallback = fingerprint(body) if status == 200 else None
     except Exception:  # noqa: BLE001 - a 404 raises; no fallback page then
         fallback = None
-    for path in PRIVATE_PATHS + args.private_path:
+    for path in private_paths(args):
         try:
             status, body = fetch(args.base + path)
         except Exception:  # noqa: BLE001 - 403/404 raise: not served, fine
@@ -146,7 +165,9 @@ def main():
     parser.add_argument("--forbid-term", action="append", default=[])
     parser.add_argument("--term-skip-prefix", action="append", default=[])
     parser.add_argument("--require-snippet", action="append", default=[], help="text every page must contain, e.g. the analytics tag")
-    parser.add_argument("--private-path", action="append", default=[], help="extra path that must not be served, e.g. /tools/")
+    parser.add_argument("--private-path", action="append", default=[], help="path that must not be served")
+    parser.add_argument("--private-from", help="repository root; its top-level entries must not be served")
+    parser.add_argument("--build-dir", help="build output dir; entries present there are site content")
     args = parser.parse_args()
     args.base = args.base.rstrip("/")
 
