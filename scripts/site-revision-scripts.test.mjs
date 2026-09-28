@@ -152,6 +152,20 @@ test('final_check: launch blockers are reported', async () => {
   assert.doesNotMatch(r.out, /\/b\/: (noindex|placeholder|link to a local)/, r.out);
 });
 
+test('final_check: --placeholder reports project-specific placeholder markers', async () => {
+  const html = page({ title: '<title>A</title>', body: '<form action="https://forms.example/YOUR_FORM_ID"></form>' });
+  const r = await runSite({ '/a/': html }, {}, ['--placeholder', 'YOUR_FORM_ID']);
+  assert.match(r.out, /\/a\/: placeholder text 'YOUR_FORM_ID'/, r.out);
+});
+
+test('final_check: --term-allow exempts an exact phrase but not other uses of the term', async () => {
+  const allowed = page({ title: '<title>A</title>', body: '<p>This is not a framework.</p>' });
+  const other = page({ title: '<title>B</title>', body: '<p>Our framework helps. This is not a framework.</p>' });
+  const r = await runSite({ '/a/': allowed, '/b/': other }, {}, ['--forbid-term', 'framework', '--term-allow', 'not a framework']);
+  assert.doesNotMatch(r.out, /\/a\/: forbidden term/, r.out);
+  assert.match(r.out, /\/b\/: forbidden term 'framework'/, r.out);
+});
+
 test('parity_check: --pairs pairs pages with different slugs when hreflang is absent', () => {
   const root = mkdtempSync(join(tmpdir(), 'parity-test-'));
   writeTree(root, {

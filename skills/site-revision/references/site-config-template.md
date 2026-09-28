@@ -20,8 +20,16 @@ check takes its forbidden names and terms from here.
 - Voice guide and lint command (if any):
 - Forbidden terms per language (e.g. a borrowed English term the owner
   wants translated in the other language):
+- Exact phrases in which a forbidden term is fine (e.g. a "what this is
+  not" line):
 - Terms that must be used consistently:
 - Register (formal/informal address):
+
+## Launch blockers
+
+- Placeholder values still in the content or config that must not ship
+  (dummy form IDs, stand-in photos, provisional dates or prices), each
+  with the owner who replaces it:
 
 ## Names and confidentiality
 

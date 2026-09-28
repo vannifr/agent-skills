@@ -5,10 +5,12 @@ Checks every URL in the sitemap (plus --extra-url pages): HTTP 200, a
 unique <title>, exactly one <h1>, valid JSON-LD, every FAQPage question
 visible on the page, every <img> with alt/width/height and a working
 same-site src, no forbidden names anywhere in the HTML, no forbidden
-terms in the visible main text (quotes excluded) of pages outside
+terms in the visible main text (quotes and --term-allow phrases
+excluded) of pages outside
 --term-skip-prefix, and each --require-snippet present on every page.
 Launch blockers: noindex (meta robots or X-Robots-Tag) on a sitemap
-page, a robots.txt that disallows the whole site, placeholder text, and
+page, a robots.txt that disallows the whole site, placeholder text
+(lorem ipsum plus each --placeholder), and
 links or resources pointing at a local host.
 Also checks that repository files outside the build output are not
 publicly served: every top-level entry of --private-from that is not in
@@ -22,7 +24,8 @@ Usage:
   final_check.py --base https://example.org \
       [--sitemap /sitemap-0.xml] [--extra-url /about/ ...] \
       [--forbid-name "Jane Doe" ...] [--forbid-term givens ...] \
-      [--term-skip-prefix /en/ ...] [--require-snippet 'data-site="x"' ...] \
+      [--term-skip-prefix /en/ ...] [--term-allow "not a framework" ...] \
+      [--placeholder YOUR_FORM_ID ...] [--require-snippet 'data-site="x"' ...] \
       [--private-from . --build-dir dist] [--private-path /tools/ ...]
 
 Exit code 1 when any problem is found.
@@ -62,9 +65,9 @@ def check_launch_blockers(path, html, headers, in_sitemap, args, issues):
             robots += " " + (content.group(1) if content else "")
     if in_sitemap and "noindex" in robots.lower():
         issues.append(f"{path}: noindex on a sitemap page")
-    text = visible_text(html).lower()
-    for placeholder in PLACEHOLDERS:
-        if placeholder in text:
+    source = unescape(html).lower()
+    for placeholder in PLACEHOLDERS + args.placeholder:
+        if placeholder.lower() in source:
             issues.append(f"{path}: placeholder text '{placeholder}'")
     for origin in set(LOCAL_HOST.findall(html)):
         if not args.base.startswith(origin):
@@ -130,6 +133,8 @@ def check_page(path, html, args, issues, titles):
     main_html = main.group(0) if main else html
     unquoted = re.sub(r"<(blockquote|q)[\s>].*?</\1>", " ", main_html, flags=re.S)
     text = visible_text(unquoted)
+    for phrase in args.term_allow:
+        text = re.sub(re.escape(phrase), " ", text, flags=re.I)
     if not any(path.startswith(p) for p in args.term_skip_prefix):
         for term in args.forbid_term:
             if re.search(rf"\b{re.escape(term)}\b", text, re.I):
@@ -212,12 +217,16 @@ def main():
     parser.add_argument("--forbid-name", action="append", default=[])
     parser.add_argument("--forbid-term", action="append", default=[])
     parser.add_argument("--term-skip-prefix", action="append", default=[])
+    parser.add_argument("--term-allow", action="append", default=[], help="exact phrase in which a forbidden term is fine, e.g. 'not a framework'")
+    parser.add_argument("--placeholder", action="append", default=[], help="project placeholder marker that must not ship, e.g. a dummy form ID")
     parser.add_argument("--require-snippet", action="append", default=[], help="text every page must contain, e.g. the analytics tag")
     parser.add_argument("--private-path", action="append", default=[], help="path that must not be served")
-    parser.add_argument("--private-from", help="repository root; its top-level entries must not be served")
+    parser.add_argument("--private-from", help="repository root; its top-level entries must not be served (default: . when --build-dir is given)")
     parser.add_argument("--build-dir", help="build output dir; entries present there are site content")
     args = parser.parse_args()
     args.base = args.base.rstrip("/")
+    if args.build_dir and not args.private_from:
+        args.private_from = "."
 
     sitemap = sitemap_urls(args.base, args.sitemap)
     urls = sitemap + [args.base + p for p in args.extra_url]

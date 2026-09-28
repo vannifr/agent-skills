@@ -233,11 +233,15 @@ read the header comment.
 
 - `scripts/final_check.py --base <origin> [--sitemap <path>]
   [--extra-url <path>] [--forbid-name <text>] [--forbid-term <word>]
-  [--term-skip-prefix <path>] [--require-snippet <text>]
+  [--term-skip-prefix <path>] [--term-allow <phrase>] [--placeholder <text>]
+  [--require-snippet <text>]
   [--private-path <path> ...] [--private-from <repo dir> --build-dir <dir>]`
   — prints problems per URL, exit 1 if any; checks that repository files
   outside the build output are not served. `--base` may be a local
-  preview server of the build.
+  preview server of the build. `--term-allow` exempts an exact phrase
+  (e.g. a "what this is not" line), `--placeholder` adds the project's own
+  dummy values to the launch-blocker check; both come from the site
+  config.
 - `scripts/parity_check.py --dist <build dir> --base <origin>
   --from-lang <xx> --to-lang <yy> [--pairs <file>]` — prints language
   pairs whose structure or word ratio differs, exit 1 if any. Pages are
