@@ -24,7 +24,7 @@
 - Reduce bundle size
 
 ### Phase 4: Testing Expansion
-- Raise coverage by priority: uncovered lines × criticality per file ([coverage pattern](execution-patterns.md#coverage-improvement-pattern))
+- Raise coverage where risk is highest first: rank files by uncovered lines × criticality (auth, money, data writes, parsing), not by what's easiest to test
 - E2E tests for critical user journeys
 - Add visual regression tests
 - Performance budget tests

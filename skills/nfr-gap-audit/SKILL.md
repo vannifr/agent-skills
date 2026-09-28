@@ -50,11 +50,14 @@ means full audit.
    [project-type-reference.md](references/project-type-reference.md) for
    which NFRs are critical/relevant/not-relevant per project type — that
    determines which domains you skip in Phase 2 and 3.
-4. **Check prerequisites once**: every tool, CLI/MCP login, API key and
-   CI access the relevant domains and companions need. Ask the user for
-   all missing items in one message; what stays missing becomes ⏸️
-   baseline rows plus an open action, not a surprise in Phase 5. Check
-   table in [execution-patterns.md](references/execution-patterns.md#prerequisites-check-end-of-phase-0).
+4. **Check prerequisites once**, before Phase 2: Lighthouse/axe and a
+   headless browser, extra browser engines if cross-browser checks
+   apply, a coverage reporter, a reachable staging/preview URL, CI
+   status access (CLI, API or MCP), and any login or API key a
+   companion needs (CrUX key, hosting/CDN CLI or MCP). Ask the user for
+   everything missing in **one** message. What stays missing becomes
+   ⏸️ baseline rows plus an open action; never create credentials
+   yourself.
 
 ## Phase 1 — Skill discovery (dual-source)
 
@@ -153,10 +156,8 @@ the single-agent fallback for skill vetting and companion runs.
 ## Phase 4 — Improvement plan
 
 **Order every GAP by severity first, across all domains: Critical > High >
-Medium > Low.** Give each GAP an Impact (who is affected, how badly) and
-an Effort (S/M/L). Within one severity tier, put high-impact/low-effort
-GAPs first, then break remaining ties using the default domain order
-(quick wins → security hardening → performance → testing →
+Medium > Low.** Within one severity tier, break ties using the default
+domain order (quick wins → security hardening → performance → testing →
 analytics/monitoring → design system → content/marketing) — a High-severity
 Security GAP goes before a Medium-severity Performance GAP even though
 "security" and "performance" are adjacent in that list, because severity
@@ -172,13 +173,9 @@ Per phase, in this order, repeated each time:
 4. Check scores against the Phase 2 baseline — **no regression allowed**
 5. Commit (conventional commits:
    `feat|fix|docs|test|security|perf|refactor(domain): ...`) & push
-6. Verify CI — all gates green before moving to the next change. One
-   wait per push on that commit's pipeline, exiting on any terminal
-   state; on failure read only the failing step's log (pattern in
-   [execution-patterns.md](references/execution-patterns.md#ci-monitoring-pattern-phase-5-step-6))
-
-For a coverage GAP, rank files by uncovered lines × criticality before
-writing tests — see the coverage pattern in the same file.
+6. Verify CI — all gates green before moving to the next change. Wait
+   once on the pipeline for the pushed commit, until any end state; on
+   failure, read only the failing step's log
 
 **Exception:** a GAP marked as privacy/GDPR or legal-risk (Phase 3) does
 not follow this mechanical loop — it requires explicit stakeholder sign-off

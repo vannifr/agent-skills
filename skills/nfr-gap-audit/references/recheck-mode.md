@@ -79,13 +79,6 @@ since the prior run. A watch item carries no severity; it names the
 likely cause and the next measurement. It becomes a GAP (and a
 regression) only when the row actually fails.
 
-## When the prior report can't be edited
-
-If the prior report is read-only (another team's repo, an archived
-file, an instruction not to touch it), skip the "link it from the main
-report" step: put the prior report's path in the recheck's own header
-and tell the user where the link should be added.
-
 ## Delta report template
 
 Write to `docs/audit/recheck-YYYY-MM-DD.md` and link it from the main
