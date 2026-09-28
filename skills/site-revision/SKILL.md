@@ -223,7 +223,8 @@ pages (numbers, dates, roles). Fix or explicitly accept each one.
    collect, the post-event case study) and a date to re-measure the KPIs
    (4–6 weeks) and decide on consolidating overlapping pages. Note
    separately where this skill itself was unclear or missing something,
-   so it can be fed back to the skill's maintainers.
+   so it can be fed back to the skill's maintainers — in the project's
+   report, not by editing the skill's own files during the run.
 
 ## Scripts
 
