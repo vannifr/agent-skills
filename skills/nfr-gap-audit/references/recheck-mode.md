@@ -21,9 +21,9 @@ audit:
 - The prior audit is less than 6 months old.
 
 Check the stack quickly against the prior report's Executive Summary
-(read `package.json`/equivalent and `git log --since=<prior date>
---stat -- package.json` or the lockfile). If any condition fails, say
-which one and switch to the full audit.
+(read the dependency manifest and `git log --since=<prior date>
+--stat -- <dependency manifest>` or the lockfile). If any condition
+fails, say which one and switch to the full audit.
 
 ## Steps
 
@@ -95,17 +95,17 @@ report's Open Actions — don't overwrite the full report.
 ## Regressions
 | ID | Metric | Before | Now | Likely cause |
 |---|---|---|---|---|
-| B-A11Y-1 | axe serious+critical | 0 ✅ | 3 ❌ | new `Modal` component, commits `e1f..9a2` |
+| B-A11Y-1 | Automated accessibility scan serious+critical | 0 ✅ | 3 ❌ | new `Modal` component, commits `e1f..9a2` |
 
 ## Watch list
 | ID | Metric | Before | Now | Target | Why watch |
 |---|---|---|---|---|---|
-| B-PERF-3 | Total JS (home) | 120 KB | 265 KB | ≤300 KB | 88% of budget; new `@docsearch/js` |
+| B-PERF-3 | Total JS (home) | 120 KB | 265 KB | ≤300 KB | 88% of budget; a new third-party search script |
 
 ## Baseline delta
 | ID | Metric | Before | Now | Δ | Status |
 |---|---|---|---|---|---|
-| B-PERF-1 | Lighthouse Performance | 62 | 81 | +19 | ⚠️ |
+| B-PERF-1 | Lab performance score | 62 | 81 | +19 | ⚠️ |
 | B-SEC-1 | Dependency vulns high+ | 3 | 0 | −3 | ✅ |
 
 ## GAPs

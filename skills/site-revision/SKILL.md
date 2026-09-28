@@ -53,14 +53,18 @@ persona before/after, and the release rhythm.
    when the host injects it only for real browsers, look for sitemap
    pages with zero views in the dashboard instead.
 3. **CI is local-parity checked** before content work starts: the local
-   verify command covers what CI checks (a `ci-local-parity` skill, if
+   verify command covers what CI checks (a CI/local-parity skill, if
    available, does this systematically).
-4. **Publication hygiene**: internal files must not be served. Request
-   `AGENTS.md`, `CLAUDE.md`, `README.md`, `docs/`, `.git/HEAD`, `.env`,
-   `package.json`, CI config and any project folders that aren't site
-   content (tools, workers, scripts) on the live origin; anything other
-   than a 404 is a finding for the first batch. `final_check.py` checks
-   the common paths; add the project's own with `--private-path`.
+4. **Publication hygiene**: internal files must not be served. Take the
+   repository's top-level entries that aren't part of the build output —
+   agent instruction files, repository docs, version-control metadata,
+   environment/secret files, dependency manifests, CI configuration, and
+   tooling or worker folders that aren't site content — and request each
+   on the live origin; anything other than a 404 is a finding for the
+   first batch. `final_check.py` checks that repository files outside the
+   build output are not served; pass individual paths with
+   `--private-path`, or `--private-from <repo dir> --build-dir <dir>` to
+   cover every top-level repository entry automatically.
 5. **Decision log**: one place for decisions with date and rationale
    (a separate governance repository, `docs/decisions.md`, or the plan).
    Every positioning or naming choice goes there before it goes on the site.
@@ -120,11 +124,11 @@ during the run, not at the end.
 - Source phrases from the customer evidence (phase 1): the words customers used
   ("cold feet", "how do we procure this?", "can you handle a group our
   size?") become FAQ questions and headings. Do not invent anecdotes.
-- Proof first: a shareable overview of gatherings with numbers, dates,
-  format and the owner's **exact role** (organiser, co-facilitator,
-  assistant, participant), sorted most recent first.
+- Proof first: a shareable overview of past engagements with numbers,
+  dates, format and the owner's **exact role** (e.g. lead, co-lead,
+  supporting, attendee), sorted most recent first.
 - Ask early for testimonials with attribution the owner confirms
-  (a participant, an organiser, translated or not).
+  (a client contact, a partner, translated or not).
 - Bilingual pages change as a pair: same facts, same FAQ order, same
   structured data, reciprocal hreflang.
 - Mark time-bound content (a planned event, "this year") in the plan so
@@ -168,17 +172,17 @@ pages (numbers, dates, roles). Fix or explicitly accept each one.
 
 - Run a technical review for correctness, structured data,
   accessibility, performance, security and redirects, and a responsive
-  check across breakpoints (dedicated review skills such as
-  `site-review-remediation`, `nfr-gap-audit` or `responsive-visual-review`
-  fit here if available).
+  check across breakpoints (a code review-and-remediation skill, an NFR
+  audit skill, or a responsive visual review skill fits here if
+  available).
 - Contact path: end-to-end tests for the contact form (success, error,
   required fields, spam trap) against a mocked form backend, the promised
   reply time on the page, and no published e-mail address unless the
   owner wants one (it mainly attracts spam).
 - Optional but recommended: a manual keyboard and screen-reader pass;
   automated tools find only part of the issues.
-- CI speed-ups found on the way (sampled Lighthouse, weekly full run,
-  hashed asset URLs): [references/ci-speedups.md](references/ci-speedups.md).
+- CI speed-ups found on the way (a sampled lab performance audit, weekly
+  full run, hashed asset URLs): [references/ci-speedups.md](references/ci-speedups.md).
 
 ## Phase 9 — Final check and retrospective
 
@@ -188,8 +192,8 @@ pages (numbers, dates, roles). Fix or explicitly accept each one.
    deliberately non-indexed pages: status, unique titles, one H1, valid
    JSON-LD, every FAQ schema question visible, images with alt/size and a
    working URL, no forbidden names, no forbidden terms per language
-   outside quotes, analytics on every page, no internal files served.
-   Target: zero problems.
+   outside quotes, analytics on every page, no repository files outside
+   the build output served. Target: zero problems.
 2. Run [scripts/exif_scan.sh](scripts/exif_scan.sh) on the image
    directory.
 3. Complete the plan's status and retrospective; hand the owner the
@@ -205,8 +209,10 @@ read the header comment.
 - `scripts/final_check.py --base <origin> [--sitemap <path>]
   [--extra-url <path>] [--forbid-name <text>] [--forbid-term <word>]
   [--term-skip-prefix <path>] [--require-snippet <text>]
-  [--private-path <path>]` — prints problems per URL, exit 1 if any.
-  `--base` may be a local preview server of the build.
+  [--private-path <path> ...] [--private-from <repo dir> --build-dir <dir>]`
+  — prints problems per URL, exit 1 if any; checks that repository files
+  outside the build output are not served. `--base` may be a local
+  preview server of the build.
 - `scripts/parity_check.py --dist <build dir> --base <origin>
   --from-lang <xx> --to-lang <yy> [--pairs <file>]` — prints language
   pairs whose structure or word ratio differs, exit 1 if any. Pages are

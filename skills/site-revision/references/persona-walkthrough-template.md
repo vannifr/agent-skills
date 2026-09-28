@@ -19,9 +19,9 @@ objections. Mark any persona detail without evidence as an assumption.
    understand what it is and whether it fits.
 2. **Practitioner/expert** — knows the field; tests whether the provider
    knows the craft and uses the right terms.
-3. **Decision-maker** — has budget and a concrete event or problem
-   (e.g. a conference of ~150 people); wants proof, size, format, how to
-   buy, and a contact path.
+3. **Decision-maker** — has budget and a concrete project or problem
+   (e.g. an engagement of a certain size); wants proof, size, format, how
+   to buy, and a contact path.
 4. Optional: a buyer from another language or country.
 
 ## Questions per persona
@@ -39,7 +39,7 @@ the URL, and the **literal fragment** that answers it.
 - How do I get in touch, and what happens next?
 - The recurring objections from the customer evidence, literally.
 - Persona-specific questions (e.g. the practitioner: does the site
-  describe opening, closing and follow-up correctly?).
+  describe the service's key stages correctly, start to finish?).
 
 Also per persona: first impression within one screen, where they would
 drop off, and what is missing before they would make contact.

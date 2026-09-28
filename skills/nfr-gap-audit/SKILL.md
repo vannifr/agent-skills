@@ -35,14 +35,15 @@ means full audit.
 
 ## Phase 0 — Project discovery
 
-1. **Determine the tech stack**: read `package.json`/`pyproject.toml`/
-   `Cargo.toml` and the main documentation (`README.md`, `AGENTS.md`,
-   `CLAUDE.md`). Determine project type (static/SPA/SSR/backend/mobile/
+1. **Determine the tech stack**: read the project's dependency
+   manifest and the main documentation (`README.md`, the project's
+   agent instruction files). Determine project type (static/SPA/SSR/backend/mobile/
    library), framework, language, hosting, CI/CD.
 2. **Inventory current skills**: read `tessl.json` (or equivalent) and
-   `.claude/skills/`/`.agents/skills/` — note which domains are already
-   covered. An installed skill ≠ correctly applied: Phase 3 tests the
-   application, not just the installation.
+   the project's local skill-install directory (e.g. `.agents/skills/`)
+   — note which domains are already covered. An installed skill ≠
+   correctly applied: Phase 3 tests the application, not just the
+   installation.
 3. **Identify relevant NFRs** — see [nfr-domains.md](references/nfr-domains.md)
    for the full list (performance, accessibility, security, SEO, testing,
    reliability, maintainability, scalability, privacy/compliance, i18n,
@@ -50,14 +51,15 @@ means full audit.
    [project-type-reference.md](references/project-type-reference.md) for
    which NFRs are critical/relevant/not-relevant per project type — that
    determines which domains you skip in Phase 2 and 3.
-4. **Check prerequisites once**, before Phase 2: Lighthouse/axe and a
+4. **Check prerequisites once**, before Phase 2: a lab performance/
+   accessibility audit tool, an automated accessibility scanner, and a
    headless browser, extra browser engines if cross-browser checks
    apply, a coverage reporter, a reachable staging/preview URL, CI
    status access (CLI, API or MCP), and any login or API key a
-   companion needs (CrUX key, hosting/CDN CLI or MCP). Ask the user for
-   everything missing in **one** message. What stays missing becomes
-   ⏸️ baseline rows plus an open action; never create credentials
-   yourself.
+   companion needs (a real-user field-data key, hosting/CDN CLI or
+   MCP). Ask the user for everything missing in **one** message. What
+   stays missing becomes ⏸️ baseline rows plus an open action; never
+   create credentials yourself.
 
 ## Phase 1 — Skill discovery (dual-source)
 
@@ -100,16 +102,15 @@ reachable → note it as an open action, don't block the audit.
 
 ## Phase 2 — Baseline measurement
 
-Run build, tests, lint, CSS/HTML validation, link check, Lighthouse,
-axe/visual tests and security audit — **skip metrics for domains marked
-❌ for this project type** in
+Run a production build, tests, lint, CSS/HTML validation, a link
+check, a lab performance/accessibility audit, an automated
+accessibility/visual test, and a dependency security audit — **skip
+metrics for domains marked ❌ for this project type** in
 [project-type-reference.md](references/project-type-reference.md) (e.g. no
-Lighthouse a11y/SEO run against a pure backend API). Concrete commands per
-stack (swap for the project's actual tools):
-
-- **Node/JS**: `npx lighthouse <url> --output json`, `npx axe <url>`, `npm audit`
-- **Python**: `pip-audit`, `pytest --cov`
-- **Rust**: `cargo audit`, `cargo test`
+lab a11y/SEO audit run against a pure backend API). Concrete commands
+are project-specific — run the project's own build, test, lint, and
+dependency-audit commands (equivalents exist across JS, Python, Rust
+and other toolchains).
 
 Document the baseline before anything changes, in the fixed shape of
 [baseline-template.md](references/baseline-template.md): a header block
@@ -119,8 +120,8 @@ evidence, e.g.:
 
 | ID | Domain | Metric | Command / source | Current | Target | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| B-PERF-1 | Performance | Lighthouse Performance | `npx lighthouse <url>` | 62 | ≥90 | ⚠️ | `docs/audit/lh-home.json` |
-| B-SEC-1 | Security | Dependency vulns high+ | `npm audit` | 3 | 0 | ❌ | |
+| B-PERF-1 | Performance | Lab performance score | lab performance audit | 62 | ≥90 | ⚠️ | `docs/audit/perf-home.json` |
+| B-SEC-1 | Security | Dependency vulns high+ | dependency audit | 3 | 0 | ❌ | |
 
 Use only the template's five statuses (✅ ⚠️ ❌, ⏸️ for not run, ➖ for
 deliberately skipped) and
@@ -211,6 +212,6 @@ sign-off), recommendations.
 
 ## Documentation sync
 
-Update `AGENTS.md`/`CLAUDE.md` in the same commit as an architectural
+Update the project's agent instruction files in the same commit as an architectural
 change — the commit, CI, and verification rules already live in Phase 5,
 don't repeat them here.

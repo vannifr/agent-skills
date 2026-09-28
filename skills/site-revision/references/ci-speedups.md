@@ -3,31 +3,34 @@
 Apply only after measuring: record the duration of each pipeline step
 first, and compare after the change.
 
-## Sampled Lighthouse per push, full run on a schedule
+## Sampled lab performance audit per push, full run on a schedule
 
-Lighthouse on every page is often most of the pipeline time, while
-performance and accessibility regressions come from shared layouts, CSS
-and JavaScript. Page-level problems (missing alt text, heading order) are
-caught faster by pa11y/axe, which stay on every page.
+A lab performance audit (e.g. Lighthouse) on every page is often most of
+the pipeline time, while performance and accessibility regressions come
+from shared layouts, CSS and JavaScript. Page-level problems (missing alt
+text, heading order) are caught faster by a page-level accessibility
+scanner (e.g. pa11y or axe), which stays on every page.
 
 1. **Pick a sample**: one page per layout/template, both languages for the
    home page, the 404 page, and the heaviest page per template (most
-   images, longest FAQ), plus pages with a form or a wide table. Around
-   ten URLs for a site of ~50 pages.
-2. **Make the sample fixed** in the Lighthouse config. If a build step
-   regenerates the URL list from the build output, stop it doing that for
-   Lighthouse (keep it for pa11y), or the full list returns on the next
-   build.
+   images, longest FAQ), plus pages with a form or a wide table. A small
+   fraction of the site's total pages is usually enough.
+2. **Make the sample fixed** in the performance-audit config. If a build
+   step regenerates the URL list from the build output, stop it doing
+   that for the performance audit (keep it for the accessibility
+   scanner), or the full list returns on the next build.
 3. **Generate a full config for the scheduled run**: a script mode that
-   writes a copy of the Lighthouse config with every built page, without
-   touching the original. Unit-test that the original stays byte-identical
-   and the copy contains every page; mutation-test the function.
-4. **Coverage check**: require every sitemap URL in the pa11y list; for
-   Lighthouse only require that every sample URL still exists in the
-   build output (a stale sample silently measures nothing).
+   writes a copy of the performance-audit config with every built page,
+   without touching the original. Unit-test that the original stays
+   byte-identical and the copy contains every page; mutation-test the
+   function.
+4. **Coverage check**: require every sitemap URL in the accessibility
+   scanner's list; for the performance audit only require that every
+   sample URL still exists in the build output (a stale sample silently
+   measures nothing).
 5. **Scheduled pipeline**: add a schedule/cron trigger that runs only
-   install, build and the full Lighthouse run. Every other step, and
-   **deploy in particular**, must be limited to push events. Steps
+   install, build and the full performance-audit run. Every other step,
+   and **deploy in particular**, must be limited to push events. Steps
    without their own trigger condition inherit the pipeline's triggers and
    would also run on the schedule; give them an explicit push condition.
    Print each step's triggers from the parsed pipeline file to confirm.
@@ -37,8 +40,8 @@ caught faster by pa11y/axe, which stay on every page.
 7. **Trigger the schedule once by hand** and confirm the step list: no
    deploy, full URL count, green.
 
-Typical result: a ~11-minute pipeline to ~3.5 minutes, full coverage
-weekly.
+Typical result: a large drop in per-push pipeline duration, with full
+coverage preserved on the weekly run.
 
 ## Content hash in CSS/JS URLs
 

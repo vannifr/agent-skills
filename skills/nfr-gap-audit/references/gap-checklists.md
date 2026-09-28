@@ -18,7 +18,7 @@
 - [ ] Focus management correct?
 - [ ] Screen reader tests performed?
 - [ ] prefers-reduced-motion supported?
-- [ ] Axe test coverage on all pages?
+- [ ] Automated accessibility scan coverage on all pages?
 
 ## SEO GAP
 - [ ] Meta tags complete (title, description, canonical)?
@@ -90,7 +90,7 @@ Identify extra NFRs relevant to this specific project:
 - [ ] **Internationalization:** Multi-language? RTL? Locale-specific?
 - [ ] **PWA:** Offline support? Service worker? App manifest?
 - [ ] **Error Handling:** Global error boundary? User-friendly error pages?
-- [ ] **Monitoring:** Error tracking (Sentry)? Uptime monitoring?
+- [ ] **Monitoring:** Error tracking? Uptime monitoring?
 - [ ] **Privacy:** GDPR compliant? Cookie consent? Data retention?
 - [ ] **Content Governance:** Editorial workflow? Content review process?
 - [ ] **Scalability:** Build time acceptable? Asset optimization at scale?
@@ -111,11 +111,11 @@ the same site agree:
 
 | Tool output | GAP severity |
 |---|---|
-| axe `critical` that blocks a core task (navigation, search, form submit, checkout) | Critical |
-| axe `critical` elsewhere, or axe `serious` | High |
-| axe `moderate` | Medium |
-| axe `minor` | Low |
-| `npm audit`/`pip-audit`/`cargo audit` critical, or any known-exploited advisory | Critical |
+| Automated accessibility scan (e.g. axe) `critical` that blocks a core task (navigation, search, form submit, checkout) | Critical |
+| Same scan `critical` elsewhere, or `serious` | High |
+| Same scan `moderate` | Medium |
+| Same scan `minor` | Low |
+| Dependency audit critical, or any known-exploited advisory | Critical |
 | Same, high | High |
 | Same, moderate/low | Medium/Low |
-| Lighthouse category below target | Severity of the worst underlying audit, not of the score itself |
+| Lab audit category below target | Severity of the worst underlying audit, not of the score itself |

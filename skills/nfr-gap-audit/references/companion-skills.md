@@ -15,7 +15,7 @@ of that repository.
 |---|---|---|
 | `responsive-visual-review` | The project is a live/local website with layout to check across breakpoints | Design System GAP (responsive design tested?) |
 | `cross-browser-render-check` | Same, and the project has enough traffic/complexity that engine-specific rendering bugs are a real risk | Design System GAP, Testing GAP (cross-browser tests?) |
-| `production-cwv-review` | The project type has Performance marked ✅/⚠️ in [project-type-reference.md](project-type-reference.md) AND has real traffic (CrUX-eligible) or an existing RUM/analytics tool | Performance GAP — cross-checks the Phase 2 Lighthouse baseline against real-user field data |
+| `production-cwv-review` | The project type has Performance marked ✅/⚠️ in [project-type-reference.md](project-type-reference.md) AND has real traffic (field-data-eligible) or an existing RUM/analytics tool | Performance GAP — cross-checks the Phase 2 lab audit baseline against real-user field data |
 | `load-test-bootstrap` | Testing GAP flags "performance budget tests" as unverified, and the project has a backend/API surface worth exercising under concurrency | Testing GAP |
 | `third-party-script-audit` | The project loads any third-party script/embed (analytics, fonts, widgets, ads) | Security GAP (SRI, CSP allowlist), and supplies factual input to a Privacy/GDPR review |
 | `translation-quality-review` | Internationalization is marked ✅/⚠️ in project-type-reference.md AND the project already has automated key-parity checks passing | Internationalization GAP — goes beyond key-parity to actual translation quality |
@@ -50,7 +50,7 @@ needs consent last, so a blocked companion never holds up the others):
 | 2 | `responsive-visual-review` | Browser automation available | `B-DS-1` (layout breaks) |
 | 3 | `cross-browser-render-check` | As #2, plus Firefox/WebKit engines; skip on low-traffic brochure sites | `B-TEST-4` (engine-specific defects) |
 | 4 | `translation-quality-review` | ≥2 locales AND `B-I18N-1` (key parity) is ✅ | `B-I18N-2` (translation defects) |
-| 5 | `production-cwv-review` | CrUX data for the origin, or an existing RUM tool | `B-PERF-2`/`-4`/`-5` (LCP/INP/CLS p75 field) |
+| 5 | `production-cwv-review` | Real-user field data (e.g. CrUX) for the origin, or an existing RUM tool | `B-PERF-2`/`-4`/`-5` (LCP/INP/CLS p75 field) |
 | 6 | `load-test-bootstrap` | User answered its four scope-and-consent questions | `B-TEST-3` (performance budget test) |
 
 No consent answer by the time #6 is up → `B-TEST-3` is ⏸️ "awaiting

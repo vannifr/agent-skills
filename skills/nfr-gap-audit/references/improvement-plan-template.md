@@ -3,7 +3,7 @@
 ## Phase 4: Improvement plan — default order
 
 ### Phase 1: Quick Wins
-- Expand axe test coverage to all pages
+- Expand automated accessibility scan coverage to all pages
 - Add `loading="lazy"` to below-fold images
 - Standardize JSON-LD schema
 - Add BreadcrumbList schema where needed
@@ -35,7 +35,7 @@
 - Activate analytics tool
 - Configure event tracking
 - Set up conversion tracking
-- Install error tracking (Sentry)
+- Install error tracking
 - Configure uptime monitoring
 
 ### Phase 6: Design System & Architecture

@@ -3,7 +3,7 @@
 Automatically identify which of these NFRs are relevant for the project.
 
 **Performance**
-- Lighthouse scores (perf, a11y, best-practices, SEO)
+- Lab audit scores (perf, a11y, best-practices, SEO)
 - CSS/JS bundle size
 - Image optimization status
 - Font loading strategy
@@ -11,7 +11,7 @@ Automatically identify which of these NFRs are relevant for the project.
 
 **Accessibility**
 - WCAG compliance level (A / AA / AAA)
-- Axe test coverage (how many pages?)
+- Automated accessibility scan coverage (how many pages?)
 - Screen reader compatibility
 - Keyboard navigation
 - Color contrast compliance
@@ -73,7 +73,7 @@ Automatically identify which of these NFRs are relevant for the project.
 
 **Monitoring**
 - Analytics tool
-- Error tracking (Sentry, etc.)
+- Error tracking
 - Uptime monitoring
 - Performance monitoring
 - Conversion tracking

@@ -26,7 +26,7 @@ A reviewer agent that loops or returns nothing is not retried
 unchanged: switch once to another agent type or model, and if that
 fails too, use the fallback column above. Which reviewer works is a
 fact about the host and project, not about this audit — record it in the
-project's `AGENTS.md`/`CLAUDE.md`, not here.
+project's agent instruction files, not here.
 
 ## Skill vetting checklist
 

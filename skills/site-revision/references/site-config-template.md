@@ -29,8 +29,8 @@ check takes its forbidden names and terms from here.
   text, structured data or machine-readable files (clients under NDA,
   and the owner's own name if they do not want to be found by it):
 - Clients that may be named, and how (name, sector only, region only):
-- Roles per event, as the owner states them (organiser, co-organiser,
-  facilitator, co-facilitator, assistant, participant):
+- Roles per engagement, as the owner states them (e.g. lead, co-lead,
+  supporting, assistant, attendee):
 
 ## Sources
 

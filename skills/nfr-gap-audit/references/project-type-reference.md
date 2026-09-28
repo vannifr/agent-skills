@@ -1,15 +1,15 @@
 # Project Type Quick Reference
 
-The "Focus Skills" column below lists external Tessl-registry skill identifiers to search for via Phase 1's `tessl_search` — they are not files present in this repo.
+The "Search topics" column lists the domains to search for in Phase 1 for each project type.
 
-| Type | Focus Skills | Key Metrics | NFRs |
+| Type | Search topics | Key Metrics | NFRs |
 |------|-------------|-------------|------|
-| Static site (Eleventy/Hugo) | web-performance, web-accessibility-essentials, seo, aeo-geo-agent, playwright-testing | Lighthouse perf/a11y/SEO, axe coverage, CSS/JS size | SEO, accessibility, performance |
-| SPA (React/Vue/Svelte) | web-performance, playwright-testing, frontend-security-coder, design-system | Lighthouse, test coverage, bundle size, axe coverage | Performance, a11y, security, state management |
-| SSR (Next.js/Nuxt) | web-performance, playwright-testing, frontend-security-coder, seo | Lighthouse, TTFB, test coverage, SEO score | Performance, SEO, security, caching |
-| Backend API | security-hardening, ci-cd-pipelines, behavioural-tdd, gdpr-test-patterns | Security audit, test coverage, CI gates, API response time | Security, reliability, scalability, privacy |
-| Mobile (React Native) | web-performance, web-accessibility-essentials, playwright-testing | Performance, a11y compliance, bundle size | Performance, a11y, offline support |
-| Library/Package | behavioural-tdd, codebase-test-suite-audit, ci-cd-pipelines | Test coverage, API stability, build time | Maintainability, reliability, documentation |
+| Static site | web performance, accessibility, SEO, answer-engine optimisation, E2E testing | Lab perf/a11y/SEO score, automated accessibility scan coverage, CSS/JS size | SEO, accessibility, performance |
+| SPA | web performance, E2E testing, frontend security, design system | Lab audit score, test coverage, bundle size, automated accessibility scan coverage | Performance, a11y, security, state management |
+| SSR app | web performance, E2E testing, frontend security, SEO | Lab audit score, TTFB, test coverage, SEO score | Performance, SEO, security, caching |
+| Backend API | security hardening, CI/CD pipelines, TDD, GDPR testing | Security audit, test coverage, CI gates, API response time | Security, reliability, scalability, privacy |
+| Mobile app | performance, accessibility, E2E testing | Performance, a11y compliance, bundle size | Performance, a11y, offline support |
+| Library/Package | TDD, test-suite audit, CI/CD pipelines | Test coverage, API stability, build time | Maintainability, reliability, documentation |
 
 ## NFR Checklist — which are relevant?
 
