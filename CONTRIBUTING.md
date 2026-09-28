@@ -23,9 +23,19 @@
    placement rule.
 1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name`,
    `description` — see any existing skill for the format).
-2. Keep it tool-agnostic: no instructions specific to one coding agent's
-   tool names or CLI flags unless the skill's entire subject *is* that
-   tool.
+2. Keep it generic — usable on any project, stack, host and coding
+   agent, unless the skill's entire subject *is* that tool:
+   - no project or domain data (client names, cities, source tags,
+     real page titles or figures from one run);
+   - no single-stack commands or files (`npm …`, `package.json`); name
+     the category ("the project's dependency audit") and, if it helps,
+     one "e.g." spanning several ecosystems;
+   - vendor, framework and tool names only as one "e.g." per category,
+     never as a requirement; no pinned third-party skill identifiers;
+   - no agent-specific file names or tool syntax (say "the project's
+     agent instruction files");
+   - scripts bundled with the skill are fine, but their defaults must
+     not assume a stack either.
 3. Keep `SKILL.md` under 500 lines; split detail into `references/` files
    linked from the body.
 4. Run `node scripts/structure-lint.mjs` locally before opening a PR.
@@ -100,8 +110,10 @@ with an existing one instead of sharpening it.
   `tessl eval lint ./skills/<name>/evals/`.
 - **Scripts test-first.** A fix to `scripts/` gets a failing test in
   `scripts/*.test.mjs` first.
-- **Keep it registry-clean**: tool-agnostic, no personal wording, no
-  invented figures, links working (`node scripts/structure-lint.mjs`).
+- **Keep it registry-clean**: generic per "Adding a new skill" step 2,
+  no personal wording, no invented figures, links working
+  (`node scripts/structure-lint.mjs`). A retrospective from one project
+  contributes the general lesson, never that project's specifics.
 - **Commit** with the source of the feedback in the message (e.g. "from
   a local eval of scenario-3", "from a real-run retrospective") and one
   commit per coherent change.
