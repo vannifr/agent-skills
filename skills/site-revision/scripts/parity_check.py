@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Structural parity check between language versions in a built site.
 
-Pairs pages through their <link rel="alternate" hreflang="..."> tags and
-compares, per pair: h2, h3, <details> (FAQ), <img>, <blockquote>, links,
+Pairs pages through their <link rel="alternate" hreflang="..."> tags, or
+through a --pairs file ("<from path> <to path>" per line) for sites whose
+language versions have different slugs or no hreflang links, and compares, per pair: h2, h3, <details> (FAQ), <img>, <blockquote>, links,
 list items, table rows, and word count of the <main> element. Prints only
 pairs that differ, or whose word ratio falls outside --ratio.
 
 Usage:
   parity_check.py --dist dist --base https://example.org \
-      --from-lang nl --to-lang en [--ratio 0.8 1.25]
+      --from-lang nl --to-lang en [--ratio 0.8 1.25] [--pairs pairs.txt]
 """
 import argparse
 import glob
@@ -48,6 +49,7 @@ def main():
     parser.add_argument("--from-lang", required=True)
     parser.add_argument("--to-lang", required=True)
     parser.add_argument("--ratio", nargs=2, type=float, default=[0.8, 1.25])
+    parser.add_argument("--pairs", help='file with "<from path> <to path>" per line; used where hreflang gives no match')
     args = parser.parse_args()
     base = args.base.rstrip("/")
 
@@ -56,15 +58,26 @@ def main():
         rf'|<link[^>]+href="{re.escape(base)}([^"]*)"[^>]+hreflang="{re.escape(args.to_lang)}"'
     )
     lang_re = re.compile(rf'<html[^>]+lang="{re.escape(args.from_lang)}')
+    manual = {}
+    if args.pairs:
+        for line in open(args.pairs, encoding="utf-8"):
+            parts = line.split()
+            if len(parts) == 2 and not line.lstrip().startswith("#"):
+                manual[parts[0].strip("/")] = parts[1]
     pairs, differences = 0, 0
     for path in sorted(glob.glob(os.path.join(args.dist, "**", "index.html"), recursive=True)):
         html = open(path, encoding="utf-8").read()
         if not lang_re.search(html):
             continue
         match = href_re.search(html)
-        if not match:
+        page_path = os.path.relpath(os.path.dirname(path), args.dist).replace(os.sep, "/").strip(".")
+        if match:
+            target = match.group(1) or match.group(2) or "/"
+        elif page_path.strip("/") in manual:
+            target = manual[page_path.strip("/")]
+        else:
             continue
-        other = file_for(args.dist, match.group(1) or match.group(2) or "/")
+        other = file_for(args.dist, target)
         if not other or os.path.samefile(other, path):
             continue
         pairs += 1

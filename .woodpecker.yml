@@ -14,6 +14,8 @@ steps:
   - name: structure-tests
     image: node:22-alpine
     commands:
+      # site-revision script tests spawn python3 and its http.server.
+      - apk add --no-cache python3
       - node --test scripts/*.test.mjs
 
   - name: structure-lint

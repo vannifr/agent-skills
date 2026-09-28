@@ -2,17 +2,23 @@
 """Final all-URL check against a live site.
 
 Checks every URL in the sitemap (plus --extra-url pages): HTTP 200, a
-unique <title>, exactly one <h1>, valid JSON-LD, FAQPage question count
-equal to the visible <details> count, every <img> with alt/width/height
-and a working same-site src, no forbidden names anywhere in the HTML, and
-no forbidden terms in the visible main text of pages outside
---term-skip-prefix.
+unique <title>, exactly one <h1>, valid JSON-LD, every FAQPage question
+visible on the page, every <img> with alt/width/height and a working
+same-site src, no forbidden names anywhere in the HTML, no forbidden
+terms in the visible main text (quotes excluded) of pages outside
+--term-skip-prefix, and each --require-snippet present on every page.
+Also checks that internal files (AGENTS.md, .git/, .env, CI config, ...
+plus --private-path) are not publicly served.
+
+--base can be a local preview server of the build, to catch problems
+before the deploy.
 
 Usage:
   final_check.py --base https://example.org \
       [--sitemap /sitemap-0.xml] [--extra-url /about/ ...] \
       [--forbid-name "Jane Doe" ...] [--forbid-term givens ...] \
-      [--term-skip-prefix /en/ ...]
+      [--term-skip-prefix /en/ ...] [--require-snippet 'data-site="x"' ...] \
+      [--private-path /tools/ ...]
 
 Exit code 1 when any problem is found.
 """
@@ -24,6 +30,12 @@ import sys
 import urllib.request
 
 UA = {"User-Agent": "Mozilla/5.0 (site-revision final check)"}
+
+PRIVATE_PATHS = [
+    "/AGENTS.md", "/CLAUDE.md", "/README.md", "/.git/HEAD", "/.git/config",
+    "/.env", "/package.json", "/docs/", "/.woodpecker.yml",
+    "/.github/workflows/", "/.gitlab-ci.yml", "/wrangler.toml",
+]
 
 
 def fetch(url, method="GET"):
@@ -46,8 +58,12 @@ def sitemap_urls(base, sitemap_path):
     return pages
 
 
+def visible_text(html):
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+
+
 def check_page(path, html, args, issues, titles):
-    title = re.search(r"<title>(.*?)</title>", html, re.S)
+    title = re.search(r"<title[^>]*>(.*?)</title>", html, re.S)
     title = title.group(1).strip() if title else ""
     if not title:
         issues.append(f"{path}: no <title>")
@@ -61,14 +77,20 @@ def check_page(path, html, args, issues, titles):
         if re.search(re.escape(name), html, re.I):
             issues.append(f"{path}: forbidden name '{name}'")
 
+    for snippet in args.require_snippet:
+        if snippet not in html:
+            issues.append(f"{path}: missing snippet '{snippet}'")
+
     main = re.search(r"<main.*?</main>", html, re.S)
-    text = re.sub(r"<[^>]+>", " ", main.group(0) if main else html)
+    main_html = main.group(0) if main else html
+    unquoted = re.sub(r"<(blockquote|q)[\s>].*?</\1>", " ", main_html, flags=re.S)
+    text = visible_text(unquoted)
     if not any(path.startswith(p) for p in args.term_skip_prefix):
         for term in args.forbid_term:
             if re.search(rf"\b{re.escape(term)}\b", text, re.I):
                 issues.append(f"{path}: forbidden term '{term}'")
 
-    details = len(re.findall(r"<details", html))
+    page_text = visible_text(main_html).lower()
     for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
         try:
             data = json.loads(block)
@@ -78,9 +100,10 @@ def check_page(path, html, args, issues, titles):
         items = data if isinstance(data, list) else [data]
         for item in items:
             if isinstance(item, dict) and item.get("@type") == "FAQPage":
-                questions = len(item.get("mainEntity", []))
-                if questions != details:
-                    issues.append(f"{path}: FAQ schema {questions} questions vs {details} visible")
+                for question in item.get("mainEntity", []):
+                    name = re.sub(r"\s+", " ", str(question.get("name", ""))).strip()
+                    if name and name.lower() not in page_text:
+                        issues.append(f"{path}: FAQ schema question not visible: '{name}'")
 
     for img in re.findall(r"<img [^>]*>", html):
         if "alt=" not in img or "width=" not in img or "height=" not in img:
@@ -95,6 +118,25 @@ def check_page(path, html, args, issues, titles):
                 issues.append(f"{path}: image {src.group(1)} failed ({exc})")
 
 
+def check_private_paths(args, issues):
+    def fingerprint(body):
+        title = re.search(r"<title[^>]*>(.*?)</title>", body, re.S)
+        return title.group(1).strip() if title else body[:200]
+
+    try:
+        status, body = fetch(f"{args.base}/__not-found-{random.randint(1, 10**9)}")
+        fallback = fingerprint(body) if status == 200 else None
+    except Exception:  # noqa: BLE001 - a 404 raises; no fallback page then
+        fallback = None
+    for path in PRIVATE_PATHS + args.private_path:
+        try:
+            status, body = fetch(args.base + path)
+        except Exception:  # noqa: BLE001 - 403/404 raise: not served, fine
+            continue
+        if status == 200 and fingerprint(body) != fallback:
+            issues.append(f"internal file publicly served: {path}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--base", required=True, help="production origin, no trailing slash")
@@ -103,6 +145,8 @@ def main():
     parser.add_argument("--forbid-name", action="append", default=[])
     parser.add_argument("--forbid-term", action="append", default=[])
     parser.add_argument("--term-skip-prefix", action="append", default=[])
+    parser.add_argument("--require-snippet", action="append", default=[], help="text every page must contain, e.g. the analytics tag")
+    parser.add_argument("--private-path", action="append", default=[], help="extra path that must not be served, e.g. /tools/")
     args = parser.parse_args()
     args.base = args.base.rstrip("/")
 
@@ -118,6 +162,8 @@ def main():
         if status != 200:
             issues.append(f"{path}: status {status}")
         check_page(path, html, args, issues, titles)
+
+    check_private_paths(args, issues)
 
     for title, paths in titles.items():
         if title and len(paths) > 1:
