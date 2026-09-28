@@ -37,6 +37,9 @@ the URL, and the **literal fragment** that answers it.
 - What does it cost, or how is a price made? How do we procure it?
 - Who is the provider, and why them?
 - How do I get in touch, and what happens next?
+- Would I believe it? Which claims are backed by something I can check
+  (a named client, a number with its source, an attributed testimonial,
+  public work), and which read as unsupported or contradict another page?
 - The recurring objections from the customer evidence, literally.
 - Persona-specific questions (e.g. the practitioner: does the site
   describe the service's key stages correctly, start to finish?).

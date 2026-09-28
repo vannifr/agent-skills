@@ -109,7 +109,8 @@ requests yet, say so and mark every persona assumption as unverified.
 1. Ask for the owner's reasons (too few requests, shifting offer, unclear
    difference from competitors), then interview **one question at a
    time** about audience, offer boundaries, sibling sites, and what
-   is confidential.
+   is confidential. Starting bank:
+   [references/blind-spot-questions.md](references/blind-spot-questions.md).
 2. Check the options against the customer evidence from phase 1, then
    research competitors and the search results buyers see
    (see [references/search-and-geo.md](references/search-and-geo.md)).
@@ -212,13 +213,17 @@ pages (numbers, dates, roles). Fix or explicitly accept each one.
    JSON-LD, every FAQ schema question visible, images with alt/size and a
    working URL, no forbidden names, no forbidden terms per language
    outside quotes, analytics on every page, no repository files outside
-   the build output served. Target: zero problems.
+   the build output served, and no launch blockers (noindex on indexed
+   pages, a robots.txt blocking the site, placeholder text, links to a
+   local host). Target: zero problems.
 2. Run [scripts/exif_scan.sh](scripts/exif_scan.sh) on the image
    directory.
 3. Complete the plan's status and retrospective; hand the owner the
    remaining owner-only tasks (external listings, testimonials to
    collect, the post-event case study) and a date to re-measure the KPIs
-   (4–6 weeks) and decide on consolidating overlapping pages.
+   (4–6 weeks) and decide on consolidating overlapping pages. Note
+   separately where this skill itself was unclear or missing something,
+   so it can be fed back to the skill's maintainers.
 
 ## Scripts
 
