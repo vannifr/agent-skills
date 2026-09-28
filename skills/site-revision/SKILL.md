@@ -14,6 +14,19 @@ This skill orchestrates. It calls other skills for the specialist parts
 and adds what they don't cover: the owner loop, the fact gate, the
 persona before/after, and the release rhythm.
 
+## Definition of done
+
+A package counts as done only when it is committed, the CI pipeline
+**for that exact commit** has finished green (checked, not assumed),
+and the change is **confirmed on the live site** with
+[scripts/live_verify.sh](scripts/live_verify.sh) and the URLs sent to
+the owner. A red pipeline is fixed before the next package; never make
+it green by skipping a check, lowering a threshold or removing a gate
+without the owner's approval. The run as a whole is done only when the
+phase 9 final check reports zero problems on production. A step that
+can't be completed (no deploy access, CI down) is reported as **not
+verified**, with the reason — never as done.
+
 ## Run rules (read first)
 
 - **Small work packages.** One theme or at most one page pair per package,

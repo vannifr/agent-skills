@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly orders a GAP backlog with a Critical-severity item first, applies the default improvement ordering for remaining GAPs, uses conventional commit format with domain scope, handles a Privacy/GDPR GAP as a stakeholder sign-off exception rather than a normal implementation item, describes the 6-step per-phase implementation loop, includes a retrospective template, documents recurring audit phase scoping, and notes AGENTS.md/CLAUDE.md updates for architectural changes.",
+  "context": "Tests whether the agent correctly orders a GAP backlog with a Critical-severity item first, applies the default improvement ordering for remaining GAPs, uses conventional commit format with domain scope, handles a Privacy/GDPR GAP as a stakeholder sign-off exception rather than a normal implementation item, describes the per-phase implementation loop through CI and live verification, includes a retrospective template, documents recurring audit phase scoping, and notes AGENTS.md/CLAUDE.md updates for architectural changes.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -38,8 +38,8 @@
       "max_score": 15
     },
     {
-      "name": "6-step implementation loop",
-      "description": "The plan describes a per-phase implementation loop containing all six of: (1) make the smallest possible change, (2) run tests, (3) verify the build, (4) check scores against a baseline with no regression allowed, (5) commit and push, (6) verify CI",
+      "name": "Implementation loop through live verification",
+      "description": "The plan describes a per-phase implementation loop containing all of: (1) make the smallest possible change, (2) run tests, (3) verify the build, (4) check scores against a baseline with no regression allowed, (5) commit and push, (6) verify CI for that commit is green, (7) verify the change on the live/deployed application",
       "max_score": 10
     },
     {

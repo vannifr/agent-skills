@@ -33,6 +33,27 @@ State the chosen mode and why in the first line of the report. When in
 doubt, recheck-mode.md's entry conditions decide; a failed condition
 means full audit.
 
+## Definition of done
+
+A change counts as done only when all of these are true and checked,
+not assumed:
+
+1. It is committed and pushed to the main line.
+2. The CI pipeline **for that exact commit** has finished green. A
+   failure is fixed before the next change; never make it green by
+   skipping or disabling a test, lowering a threshold or removing a
+   gate without explicit approval.
+3. It is deployed, and the **live application** shows the fix: the
+   GAP's metric re-measured on the live URL, the header or element
+   present in the live response, the flow working end to end.
+4. No baseline row got worse (Phase 5 step 4).
+
+"Tests pass" or "pushed" is not done. When a step can't be completed —
+no deploy access, a manual release, CI unreachable — report the change
+as **not verified** with the reason and the missing step, never as done.
+The report lists per change: commit, pipeline result, and the live
+check (URL and what was observed).
+
 ## Phase 0 — Project discovery
 
 1. **Determine the tech stack**: read the project's dependency
@@ -177,6 +198,8 @@ Per phase, in this order, repeated each time:
 6. Verify CI — all gates green before moving to the next change. Wait
    once on the pipeline for the pushed commit, until any end state; on
    failure, read only the failing step's log
+7. Verify on the live application — re-measure the GAP's metric or
+   check the fix on the deployed URL (see [Definition of done](#definition-of-done))
 
 **Exception:** a GAP marked as privacy/GDPR or legal-risk (Phase 3) does
 not follow this mechanical loop — it requires explicit stakeholder sign-off
@@ -206,7 +229,8 @@ of a `docs/` directory): executive summary (mode, companions used, and which rev
 reviewer vs. the [fallback](references/review-fallback.md)), installed
 skills before/after,
 baseline scores, GAP analysis per domain by severity, improvement plan,
-implementation results per phase, retrospectives, open non-code actions
+implementation results per phase (per change: commit, pipeline result,
+live check), retrospectives, open non-code actions
 (including unreachable discovery sources and GAPs awaiting stakeholder
 sign-off), recommendations.
 
