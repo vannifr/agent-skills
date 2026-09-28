@@ -25,6 +25,7 @@ Usage:
 Exit code 1 when any problem is found.
 """
 import argparse
+from html import unescape
 import json
 import os
 import random
@@ -56,7 +57,7 @@ def sitemap_urls(base, sitemap_path):
 
 
 def visible_text(html):
-    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+    return re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", " ", html))).strip()
 
 
 def check_page(path, html, args, issues, titles):
@@ -98,7 +99,7 @@ def check_page(path, html, args, issues, titles):
         for item in items:
             if isinstance(item, dict) and item.get("@type") == "FAQPage":
                 for question in item.get("mainEntity", []):
-                    name = re.sub(r"\s+", " ", str(question.get("name", ""))).strip()
+                    name = re.sub(r"\s+", " ", unescape(str(question.get("name", "")))).strip()
                     if name and name.lower() not in page_text:
                         issues.append(f"{path}: FAQ schema question not visible: '{name}'")
 

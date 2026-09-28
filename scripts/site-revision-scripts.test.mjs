@@ -83,6 +83,16 @@ test('final_check: FAQ schema question missing from the visible text is reported
   assert.match(r.out, /FAQ schema question not visible: 'What does it cost\?'/, r.out);
 });
 
+test('final_check: FAQ question with HTML entities in the page is matched', async () => {
+  const html = page({
+    title: '<title>FAQ</title>',
+    head: faqSchema(['Comment démarrer ?']),
+    body: '<h2>Comment d&eacute;marrer&nbsp;?</h2>',
+  });
+  const r = await runSite({ '/faq/': html });
+  assert.doesNotMatch(r.out, /FAQ schema question not visible/, r.out);
+});
+
 test('final_check: <title> with attributes is recognised', async () => {
   const html = page({ title: '<title data-i18n="home.title">Home</title>' });
   const r = await runSite({ '/': html });

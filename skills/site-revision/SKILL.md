@@ -188,6 +188,12 @@ pages (numbers, dates, roles). Fix or explicitly accept each one.
   check across breakpoints (a code review-and-remediation skill, an NFR
   audit skill, or a responsive visual review skill fits here if
   available).
+- Structured data matches visible content: every schema on a page
+  (questions, prices and offers, events, reviews) describes content a
+  visitor can see in the served HTML, not only after scripts run. Check
+  per template, since a template adds its schema to every page built
+  from it; `final_check.py` covers FAQ questions, the rest is a manual
+  check on one page per template.
 - Contact path: end-to-end tests for the contact form (success, error,
   required fields, spam trap) against a mocked form backend, the promised
   reply time on the page, and no published e-mail address unless the
