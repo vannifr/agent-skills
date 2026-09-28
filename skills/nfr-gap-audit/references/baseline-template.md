@@ -45,7 +45,7 @@ joins on; never renumber an existing ID, only append new ones.
 | B-TEST-2 | Testing | Line coverage | the project's test command with coverage | 41% | ≥80% | ⚠️ | |
 | B-TEST-3 | Testing | Performance budget test | `load-test-bootstrap` | not run | p95 ≤ 500 ms @ 50 VU | ⏸️ | awaiting consent |
 | B-TEST-4 | Testing | Engine-specific render defects | `cross-browser-render-check` | 1 | 0 | ⚠️ | |
-| B-DS-1 | Design System | Layout breaks at 375/768/1440 | `responsive-visual-review` | 4 | 0 | ❌ | |
+| B-DS-1 | Design System | Layout breaks or overflow at 360/768/1440 | `responsive-visual-review` | 4 | 0 | ❌ | |
 | B-CI-1 | CI/CD | Last 10 pipelines green | CI API/UI | 8/10 | 10/10 | ⚠️ | |
 | B-BUILD-1 | Maintainability | Build succeeds, zero warnings | a production build | 4 warnings | 0 | ⚠️ | |
 | B-LINT-1 | Maintainability | Lint errors | the project's lint command | 0 | 0 | ✅ | |
