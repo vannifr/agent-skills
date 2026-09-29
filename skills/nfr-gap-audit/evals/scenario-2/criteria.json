@@ -56,6 +56,16 @@
       "name": "AGENTS.md architectural update note",
       "description": "The plan notes that the security middleware architectural change should include an update to AGENTS.md or CLAUDE.md in the same commit as the architectural change",
       "max_score": 5
+    },
+    {
+      "name": "Cancelled or superseded pipeline is not green",
+      "description": "The plan's CI verification counts a change as verified only once the pipeline for the pushed commit (or the newest pipeline containing it) has finished green, and states that a cancelled or superseded run must be restarted or re-checked rather than treated as passing",
+      "max_score": 5
+    },
+    {
+      "name": "Guard test for silent regressions",
+      "description": "For at least one finding that can silently regress (the HTTPS redirect, the CSP header or the image format) the plan adds a guard test or CI check and states it must be confirmed failing on the pre-fix version",
+      "max_score": 5
     }
   ]
 }

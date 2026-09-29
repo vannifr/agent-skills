@@ -61,6 +61,16 @@
       "name": "Recommendations section",
       "description": "The report contains a recommendations section with forward-looking suggestions beyond the GAPs identified",
       "max_score": 7
+    },
+    {
+      "name": "Third-party first-view weight",
+      "description": "The baseline or performance findings cover first-view transfer split by first-party vs third-party origin, either measured or marked as not run with a reason (not guessed), and the third-party analytics script or embedded form is called out as a performance or privacy consideration",
+      "max_score": 5
+    },
+    {
+      "name": "Asset versioning checked",
+      "description": "The report explicitly answers whether the stylesheet and script are versioned or cache-busted (content hash or query string): a GAP if they are referenced by plain unversioned filenames, a pass with evidence if versioned",
+      "max_score": 5
     }
   ]
 }
