@@ -39,13 +39,18 @@ A change counts as done only when all of these are true and checked,
 not assumed:
 
 1. It is committed and pushed to the main line.
-2. The CI pipeline **for that exact commit** has finished green. A
-   failure is fixed before the next change; never make it green by
-   skipping or disabling a test, lowering a threshold or removing a
-   gate without explicit approval.
+2. The CI pipeline **for that exact commit** has finished green — or,
+   if a later push or an automated merge superseded it, the newest
+   pipeline that contains the commit. A cancelled run is not green:
+   restart it. A failure is fixed before the next change; never make it
+   green by skipping or disabling a test, lowering a threshold or
+   removing a gate without explicit approval.
 3. It is deployed, and the **live application** shows the fix: the
    GAP's metric re-measured on the live URL, the header or element
-   present in the live response, the flow working end to end.
+   present in the live response, the flow working end to end. For a
+   multilingual or responsive site, run the
+   [live smoke check](references/improvement-plan-template.md#phase-5-live-smoke-check)
+   across every language and breakpoint.
 4. No baseline row got worse (Phase 5 step 4).
 
 "Tests pass" or "pushed" is not done. When a step can't be completed —
@@ -148,14 +153,20 @@ Use only the template's five statuses (✅ ⚠️ ❌, ⏸️ for not run, ➖ f
 deliberately skipped) and
 its default targets unless the project defines its own. A metric that
 couldn't be measured is ⏸️, never a guess. The IDs are what makes a
-later recheck possible.
+later recheck possible. Timing rows also record their measurement
+conditions, and no number becomes a GAP before the
+[Measurement sanity](references/baseline-template.md#measurement-sanity)
+checks.
 
 Save the exact commands you ran as one baseline script **in the
 project** (in the project's own scripting or task-runner convention,
 next to the report), writing its results to
 `docs/audit/baseline-YYYY-MM-DD.json`. The skill doesn't ship one
 because the commands depend on the stack; the project's copy is what a
-recheck re-runs instead of re-deriving them.
+recheck re-runs instead of re-deriving them. It is project code and
+falls under the project's own quality gates (tests, lint, coverage
+threshold): keep it a thin wrapper around commands the project already
+has, and budget tests for any logic beyond that.
 
 ## Phase 3 — GAP analysis
 
@@ -199,7 +210,9 @@ outranks domain. The corresponding action templates are in
 
 Per phase, in this order, repeated each time:
 1. Make the smallest possible change
-2. Run tests
+2. Run tests; for a GAP that can silently regress (payload weight,
+   headers, markup rules, cache policy) add a guard test or CI check
+   and confirm it fails on the pre-fix commit
 3. Verify the build
 4. Check scores against the Phase 2 baseline — **no regression allowed**
 5. Commit (conventional commits:

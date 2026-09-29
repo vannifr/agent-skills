@@ -21,6 +21,25 @@ A score without the commit, the URL and the throttling preset can't be
 compared later — a recheck against a different preset measures the
 preset, not the project.
 
+## Measurement conditions for timing rows
+
+Timing metrics (LCP, load time) move with how they're measured, so record
+the conditions next to the number:
+
+- **Simulated vs real throttling.** A lab tool's simulated timing can be
+  several times off a throttled real-browser run of the same page. For a
+  timing row record both; a large gap is itself a finding — trace it
+  (e.g. many parallel downloads, a big non-critical payload) before
+  trusting either value.
+- **One measurement per URL.** A hosted measurement service may cache by
+  URL: give every run a unique query string, or three "runs" are one.
+- **Cold caches after a deploy.** The first minutes after a deploy run
+  slower (cold edge cache). Re-measure a few minutes later before
+  recording.
+- **Record what, not only how long.** For LCP also record the LCP element
+  and its phase breakdown (e.g. load delay vs render delay): the element
+  and the phase say what to fix, the number only says it is slow.
+
 ## Table
 
 Keep the columns and their order. The `ID` column is what a recheck
@@ -33,6 +52,7 @@ joins on; never renumber an existing ID, only append new ones.
 | B-PERF-3 | Performance | Total JS transferred (home) | same lab audit, byte-weight metric | 410 KB | ≤300 KB | ⚠️ | same JSON |
 | B-PERF-4 | Performance | INP p75 (field) | `production-cwv-review` | 180 ms | ≤200 ms | ✅ | |
 | B-PERF-5 | Performance | CLS p75 (field) | `production-cwv-review` | 0.04 | ≤0.1 | ✅ | |
+| B-PERF-6 | Performance | First-view transfer by origin (first- vs third-party), home | same lab audit, network-request summary | 1.6 MB, of which 1.4 MB third-party | project budget; 0 KB from widgets needed only below the fold | ❌ | request list in `docs/audit/perf-home.json` |
 | B-A11Y-1 | Accessibility | Automated accessibility scan (e.g. axe) violations (serious+critical), all pages | automated accessibility scan | 7 | 0 | ❌ | `docs/audit/a11y-scan.json` |
 | B-A11Y-2 | Accessibility | Lab accessibility score | same lab audit | 88 | ≥95 | ⚠️ | |
 | B-SEO-1 | SEO | Lab SEO score | same lab audit | 92 | ≥95 | ⚠️ | |
@@ -85,6 +105,23 @@ once and fix the legend or the row going forward.
 
 "Not run" is never ✅. A missing measurement is recorded as ⏸️, not
 guessed from the code.
+
+## Measurement sanity
+
+Before a number becomes a GAP, check that it measures the project and
+not the measurement:
+
+- **An order-of-magnitude jump against the prior run** (a duplicate-title
+  count going from single digits to hundreds) is a measurement suspect
+  first: trace it to its source before recording anything.
+- **Scan tracked source only** — the files version control lists (e.g.
+  `git ls-files`) — never build output, coverage or vendored
+  directories; generated copies inflate counts.
+- **A heuristic check is a hypothesis.** Before counting a pattern-based
+  finding (a regex, a DOM heuristic), open 2-3 flagged instances and
+  confirm they're real. Intentional cases — a deliberately eager-loaded
+  hero image, an input wrapped by its own label — are exclusions, not
+  GAPs.
 
 ## Default targets
 

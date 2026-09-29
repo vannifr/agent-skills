@@ -9,6 +9,8 @@
 - [ ] Core Web Vitals within targets?
 - [ ] Bundle size optimized?
 - [ ] CDN caching correctly configured?
+- [ ] Assets that changed together with the HTML versioned or cache-busted (content hash or query string) in the same commit — no new HTML running against a cached old script or stylesheet?
+- [ ] Third-party widgets and embeds used only below the fold or after interaction (forms, maps, video, chat) loaded on demand, not on first view?
 
 ## Accessibility GAP
 - [ ] Semantic HTML correct (headings, landmarks, labels)?
@@ -59,6 +61,7 @@
 - [ ] Pipeline has a lint gate?
 - [ ] Pipeline has a deploy gate?
 - [ ] Pipeline has a verify gate?
+- [ ] Network downloads in pipeline steps (tool installs, vulnerability databases) retry on transient failure (e.g. `curl --retry --retry-all-errors`, a loop for tools without a retry option)?
 - [ ] Rollback procedure documented?
 - [ ] Staging environment present?
 

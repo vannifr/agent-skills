@@ -12,8 +12,10 @@ audit:
 - A prior report exists (`docs/skill-audit-report.md` or equivalent)
   with a "Baseline Scores" table in the
   [baseline template](baseline-template.md) shape — IDs included.
-  An older report without IDs: assign IDs to its rows first, then
-  recheck.
+  An older report without IDs: keep its GAP labels (P1, S1, ...) as the
+  GAP IDs, assign `B-<DOMAIN>-n` IDs to the baseline rows only, and note
+  for each prior GAP which baseline row measures it (or "not
+  measurable") — then recheck.
 - The project type and framework are unchanged (no SPA→SSR move, no new
   backend, no new locale).
 - No major-version upgrade of the framework or build tool since the
@@ -69,7 +71,9 @@ A baseline row that moves from ✅ to ⚠️/❌, or from ⚠️ to ❌, is a
 underlying GAP was Medium on first discovery — something that used to
 work broke, which usually means a missing test or CI gate. Record the
 likely cause (the commit range from step 2) and add "add a CI gate for
-this metric" to the fix.
+this metric" to the fix. Before recording one, rule out a change in how
+the row is measured — see
+[Measurement sanity](baseline-template.md#measurement-sanity).
 
 ## Watch list: passing but trending toward failure
 

@@ -63,6 +63,27 @@ perf(domain): short description
 refactor(domain): short description
 ```
 
+## Phase 5: Live smoke check
+
+The "verify on the live application" step for a site with several
+languages or breakpoints. Run it on the deployed URLs once CI is green,
+for every URL in the sample × every language × mobile, tablet and
+desktop widths:
+
+- HTTP status is 200 and the final URL is the expected one
+- `<html lang>` matches the page's language, and shared chrome (header,
+  footer) is in that language too
+- The main heading is visible
+- No horizontal overflow at the viewport width
+- Stylesheets and fonts are actually applied; no 404s for images,
+  scripts or styles (relative paths break on nested routes)
+- No uncaught script errors — list known third-party console noise
+  explicitly as excluded, never ignore errors silently
+
+Keep it as one re-runnable check in the project, under the same rule as
+the Phase 2 baseline script (a thin wrapper, tested). The breakpoint
+layout part is what `responsive-visual-review` automates.
+
 ## Phase 6: Retrospective template
 
 ```markdown
