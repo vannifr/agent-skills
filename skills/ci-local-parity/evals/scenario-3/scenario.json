@@ -1,0 +1,4 @@
+{
+  "description": "Audit of an apparently healthy CI and local verification setup with hidden gaps",
+  "include": ["./inputs"]
+}

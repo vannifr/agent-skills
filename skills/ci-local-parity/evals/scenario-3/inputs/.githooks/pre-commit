@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged -v
+fi
+pnpm verify

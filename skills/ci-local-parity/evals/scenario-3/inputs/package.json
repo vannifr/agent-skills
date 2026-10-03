@@ -1,0 +1,21 @@
+{
+  "name": "doc-evidence-tools",
+  "version": "1.4.0",
+  "description": "Checks markdown research documents against evidence rules",
+  "type": "module",
+  "scripts": {
+    "lint:docs": "node scripts/lint-docs.mjs docs/",
+    "lint:tracked": "node scripts/lint-tracked.mjs",
+    "test": "node --test test/",
+    "test:coverage": "c8 --reporter=lcov --reporter=text node --test test/",
+    "test:coverage:check": "c8 --check-coverage --lines 90 --reporter=text node --test test/",
+    "verify": "pnpm lint:docs && pnpm lint:tracked && pnpm test",
+    "hooks:install": "git config core.hooksPath .githooks"
+  },
+  "devDependencies": {
+    "c8": "^10.1.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

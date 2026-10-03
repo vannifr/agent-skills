@@ -1,0 +1,36 @@
+{
+  "context": "Tests whether an audit of an apparently healthy CI and local verification setup finds gaps that general CI/local-parity thinking should expose beyond the obvious ones: a quality threshold enforced only locally, an unpinned package manager behind pinned images, no guard against silently shrinking test suites, and a custom linter tested only on valid input. Also checks that one known gap (secret scanning only in pre-commit) is found, and that the proposed health evidence is concrete CI results rather than local claims.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Coverage threshold not enforced in CI",
+      "description": "The audit identifies that the coverage threshold (90%) is only enforced in the pre-push hook (via `test:coverage:check`) while the CI `test` step runs `test:coverage`, which only generates the report without failing below the threshold. The fix makes CI run the threshold-enforcing check (e.g. `pnpm test:coverage:check`, or adds `--check-coverage` to the CI step) so the same threshold gates CI. Identifying only that coverage 'is generated' without noting that nothing enforces it in CI scores zero.",
+      "max_score": 18
+    },
+    {
+      "name": "Package manager version not pinned",
+      "description": "The audit identifies that CI images are digest-pinned but the package manager is not: `package.json` has no `packageManager` field while CI runs `corepack enable`, so the pnpm version resolved in CI can differ from local and drift over time. The fix adds a `packageManager` field with an exact version (e.g. `pnpm@x.y.z`, optionally with a hash) to `package.json`, or pins the version explicitly in CI.",
+      "max_score": 18
+    },
+    {
+      "name": "No guard against silently disappearing tests",
+      "description": "The audit uses `git-log.txt` to notice that the recent 'refactor tests' commit netted out 115 deleted lines (a test file and two fixtures removed) with no gate noticing, and that nothing prevents tests or assertions from silently disappearing. The fix proposes a concrete mechanical guard, such as a minimum test/assertion count or a test-count/assertion-count ratchet recorded in the repo and checked in `verify` and CI, or a CI check that fails when the number of tests drops versus a committed baseline. A coverage threshold alone, or 'review test changes carefully', does not count.",
+      "max_score": 18
+    },
+    {
+      "name": "Custom linter lacks must-fail corpus",
+      "description": "The audit identifies that the project's own document linter (`scripts/lint-docs.mjs` / `scripts/rules.mjs`) is only tested with documents that should pass, so a rule that never fires (or is accidentally disabled) would go unnoticed. The fix adds a negative corpus: documents that each MUST fail a specific rule, with a test asserting that each fixture fails with the expected rule id, run as part of `verify`/CI. The audit may also note that the deleted fixtures `invalid-a.md` and `invalid-b.md` in the 'refactor tests' commit were exactly such a corpus.",
+      "max_score": 18
+    },
+    {
+      "name": "Secret scanning only in pre-commit",
+      "description": "The audit identifies that gitleaks runs only in `pre-commit` and is skipped silently when the binary is not installed (`command -v` guard), and that there is no CI backstop. The fix adds a diff-scoped gitleaks step/job to `.woodpecker.yml` (not a bare full-history scan) that gates later steps via `depends_on` or step ordering, and ideally makes the local hook warn visibly instead of skipping silently.",
+      "max_score": 12
+    },
+    {
+      "name": "Evidence is concrete CI status per gate",
+      "description": "The statement of what would show the pipeline is healthy cites the real CI pipeline status of the post-fix push (e.g. the pipeline number and its success state, queried from the CI system rather than assumed) and the per-step/per-gate results (lint, test with coverage threshold, sonarqube, secret scan, negative-corpus test), and optionally demonstrates the new gates by showing them fail on a deliberate violation. Statements like 'pushed', 'local verify is green', or 'the last 5 runs succeeded' as the sole evidence score zero.",
+      "max_score": 16
+    }
+  ]
+}

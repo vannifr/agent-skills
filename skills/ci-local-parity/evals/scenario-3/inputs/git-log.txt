@@ -1,0 +1,34 @@
+$ git log --stat --format='%h %ad %s' --date=short -6
+
+e41c9d2 2026-09-30 refactor tests
+ test/lint-docs.test.mjs   | 74 ------------------------------------------------
+ test/rules.test.mjs       | 31 ++++++++------------
+ test/fixtures/invalid-a.md | 12 --------
+ test/fixtures/invalid-b.md |  9 ------
+ 4 files changed, 11 insertions(+), 115 deletions(-)
+
+b7a30f8 2026-09-29 feat: add no-empty-findings rule
+ scripts/rules.mjs     | 8 ++++++++
+ test/rules.test.mjs   | 6 ++++++
+ 2 files changed, 14 insertions(+)
+
+5cd2e91 2026-09-26 chore: add sonar-project.properties
+ sonar-project.properties | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+a90f4b3 2026-09-24 fix: handle CRLF in lint-docs
+ scripts/lint-docs.mjs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+3e8d7c1 2026-09-22 feat: add primary-needs-quote rule
+ scripts/rules.mjs     | 7 +++++++
+ test/rules.test.mjs   | 5 +++++
+ 2 files changed, 12 insertions(+)
+
+0d2f6a8 2026-09-19 chore: install hooks via pnpm hooks:install
+ .githooks/pre-commit | 5 +++++
+ .githooks/pre-push   | 5 +++++
+ package.json         | 1 +
+ 3 files changed, 11 insertions(+)
+
+Last 5 pipeline runs on main (all "success"): #212 #213 #214 #215 #216

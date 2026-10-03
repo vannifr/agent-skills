@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+pnpm verify
+pnpm test:coverage:check
+node scripts/local-sonar-check.mjs
