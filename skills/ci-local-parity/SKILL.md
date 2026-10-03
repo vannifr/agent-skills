@@ -74,9 +74,9 @@ existing one:
       a build that genuinely doesn't drift, and document the process for
       bumping it deliberately. The package manager version counts too
       (e.g. `packageManager` in `package.json` when CI uses corepack).
-      **Look the real value up** from the registry
-      (e.g. `docker buildx imagetools inspect <image>`) or the package
-      manager; a local cache or an invented value is not a pin. If you
+      **Look the real value up** from the registry (the image-inspect or
+      resolve command of your registry or package manager); a local cache
+      or an invented value is not a pin. If you
       cannot look it up, say so and leave the task open. Then make CI
       fail on placeholder markers (e.g. `REPLACE_WITH…`, `<version>`)
       in the CI files and manifest: a committed placeholder is worse than

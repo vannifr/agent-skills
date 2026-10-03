@@ -14,12 +14,12 @@
     },
     {
       "name": "Placeholders replaced with real values",
-      "description": "The audit replaces `REPLACE_WITH_PINNED_DIGEST` with a real digest looked up from the registry (e.g. via an image-inspect command) and `pnpm@<versie>` with a real exact version, rather than leaving the markers or inventing a plausible-looking hash. If the digest cannot be looked up in the environment, it says so explicitly and does NOT commit a made-up value.",
+      "description": "The audit replaces `REPLACE_WITH_PINNED_DIGEST` with a real digest looked up from the registry (e.g. via an image-inspect command) and `pnpm@<version>` with a real exact version, rather than leaving the markers or inventing a plausible-looking hash. If the digest cannot be looked up in the environment, it says so explicitly and does NOT commit a made-up value.",
       "max_score": 18
     },
     {
       "name": "Placeholder guard in CI",
-      "description": "A CI or verify check fails when placeholder markers (e.g. `REPLACE_WITH`, `<versie>`/`<version>`, `TODO-pin`) are present in the CI files or `package.json`, so an unfinished pin cannot be committed green.",
+      "description": "A CI or verify check fails when placeholder markers (e.g. `REPLACE_WITH`, `<version>`, `TODO-pin`) are present in the CI files or `package.json`, so an unfinished pin cannot be committed green.",
       "max_score": 14
     },
     {

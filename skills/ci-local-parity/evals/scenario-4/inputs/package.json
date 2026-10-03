@@ -2,7 +2,7 @@
   "name": "link-checker",
   "version": "0.3.0",
   "type": "module",
-  "packageManager": "pnpm@<versie>",
+  "packageManager": "pnpm@<version>",
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
