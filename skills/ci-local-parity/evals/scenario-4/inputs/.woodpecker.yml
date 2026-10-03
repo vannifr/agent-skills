@@ -1,0 +1,28 @@
+when:
+  - event: push
+    branch: main
+
+steps:
+  - name: install
+    image: node:22-slim@sha256:REPLACE_WITH_PINNED_DIGEST
+    commands:
+      - corepack enable
+      - pnpm install --frozen-lockfile
+
+  - name: lint
+    image: node:22-slim@sha256:REPLACE_WITH_PINNED_DIGEST
+    commands:
+      - corepack enable
+      - pnpm lint
+
+  - name: test
+    image: node:22-slim@sha256:REPLACE_WITH_PINNED_DIGEST
+    commands:
+      - corepack enable
+      - pnpm test
+
+  - name: deps-audit
+    image: node:22-slim@sha256:REPLACE_WITH_PINNED_DIGEST
+    commands:
+      - corepack enable
+      - pnpm audit:deps

@@ -1,0 +1,22 @@
+{
+  "name": "link-checker",
+  "version": "0.3.0",
+  "type": "module",
+  "packageManager": "pnpm@<versie>",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/",
+    "check:links": "node scripts/check-links.mjs",
+    "audit:deps": "pnpm audit --prod",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:links",
+    "hooks:install": "git config core.hooksPath .githooks"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

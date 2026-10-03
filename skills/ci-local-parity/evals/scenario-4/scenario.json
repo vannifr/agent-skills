@@ -1,0 +1,4 @@
+{
+  "description": "Set up CI for a project whose local verify and CI have drifted apart, with unfinished pins",
+  "include": ["./inputs"]
+}

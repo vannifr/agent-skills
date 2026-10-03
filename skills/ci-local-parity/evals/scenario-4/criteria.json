@@ -1,0 +1,36 @@
+{
+  "context": "Tests whether an agent finishing a half-configured CI setup makes parity mechanically enforced rather than a convention, replaces unfinished placeholders with real values, handles a local check that depends on a missing tool correctly, and reports concrete evidence. The teammate's notes claim 'CI mirrors verify' while the files show it does not.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Parity drift found and closed",
+      "description": "The audit notices that `verify` runs `typecheck` and `check:links`, which no CI step runs, so CI is green while local verify would fail (and the reverse for `audit:deps`, which only CI runs). The fix adds the missing CI steps calling the same package scripts (or a single `verify` call) and documents or covers the network-dependent `audit:deps` locally.",
+      "max_score": 18
+    },
+    {
+      "name": "Parity enforced by a test",
+      "description": "The audit adds a mechanical parity check beyond one-off fixes: a test or script that parses the CI config and the `verify` script and fails when a sub-script of `verify` is not invoked by some CI step, or a CI step invokes a project script that `verify` neither runs nor lists as an explicit, documented exception. It runs in `verify` and in CI. 'The notes say CI mirrors verify' or a documented convention alone scores zero.",
+      "max_score": 22
+    },
+    {
+      "name": "Placeholders replaced with real values",
+      "description": "The audit replaces `REPLACE_WITH_PINNED_DIGEST` with a real digest looked up from the registry (e.g. via an image-inspect command) and `pnpm@<versie>` with a real exact version, rather than leaving the markers or inventing a plausible-looking hash. If the digest cannot be looked up in the environment, it says so explicitly and does NOT commit a made-up value.",
+      "max_score": 18
+    },
+    {
+      "name": "Placeholder guard in CI",
+      "description": "A CI or verify check fails when placeholder markers (e.g. `REPLACE_WITH`, `<versie>`/`<version>`, `TODO-pin`) are present in the CI files or `package.json`, so an unfinished pin cannot be committed green.",
+      "max_score": 14
+    },
+    {
+      "name": "Degradation only with a CI backstop",
+      "description": "The pre-push hook skips the vulnerability scan with a warning when `osv-scanner` is missing. The audit recognises this is only acceptable if CI runs an equivalent blocking check, and makes the choice explicitly: here CI already runs `audit:deps`, so degrading with a visible warning is acceptable, while any local check without a CI counterpart must fail hard when its tool is missing. Blanket 'always warn' or 'always fail' without tying it to a CI backstop scores low.",
+      "max_score": 12
+    },
+    {
+      "name": "Evidence in fixed form",
+      "description": "The statement of healthy evidence names the commit SHA, the CI pipeline number, the status per step, and the gate values (test count, quality-gate or audit result), obtained from the CI system after the push. 'Pushed' or 'verify is green locally' alone scores zero.",
+      "max_score": 16
+    }
+  ]
+}

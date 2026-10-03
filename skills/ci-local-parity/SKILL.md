@@ -34,11 +34,17 @@ existing one:
       scan), is there an *explicit*, separately runnable local command
       that covers it? Is that gap *literally* documented (in
       CLAUDE.md/AGENTS.md/README), not silently assumed?
-- [ ] **Does that separate check degrade gracefully** when the external
-      dependency is unreachable (no server, no token, tool not
-      installed)? A hard crash on "SonarQube unreachable" is just as bad
-      as silently skipping it — it must give a visible warning and only
-      then decide whether to block.
+- [ ] **Is parity itself enforced by a test, not just agreed?** A test
+      that parses the CI config and the `verify` script and fails when a
+      sub-script of `verify` is not called by any CI step, or when a CI
+      step calls a project script that `verify` neither runs nor lists as
+      a documented exception. It runs in `verify` and in CI. Without it,
+      parity is a convention that drifts at the next change.
+- [ ] **Does a local check that can't run (tool missing, service
+      unreachable) degrade only when CI blocks on the same check?** With
+      a blocking CI counterpart, a visible warning locally is fine. With
+      none, the local check is the only gate and must fail hard. Never
+      skip silently, and never choose warn-or-fail by habit.
 - [ ] **Are there git hooks enforcing this**, not just documentation
       someone can forget to read? At minimum `pre-commit` (the fast,
       network-free gate) and `pre-push` (that plus the slower/network-
@@ -68,6 +74,13 @@ existing one:
       a build that genuinely doesn't drift, and document the process for
       bumping it deliberately. The package manager version counts too
       (e.g. `packageManager` in `package.json` when CI uses corepack).
+      **Look the real value up** from the registry
+      (e.g. `docker buildx imagetools inspect <image>`) or the package
+      manager; a local cache or an invented value is not a pin. If you
+      cannot look it up, say so and leave the task open. Then make CI
+      fail on placeholder markers (e.g. `REPLACE_WITH…`, `<version>`)
+      in the CI files and manifest: a committed placeholder is worse than
+      a floating tag, because it breaks the pull or corepack outright.
 - [ ] **Are third-party GitHub Actions pinned to a commit SHA, not a
       version tag?** `actions/checkout@v6` can be repointed after the
       fact; `actions/checkout@<full-sha>` can't. Same principle as the
@@ -121,6 +134,7 @@ reachable, only then the real check:
 #!/bin/sh
 set -e
 
+# (Skip-with-warning is only valid because CI runs this check blocking.)
 # 1. Credentials/tool present? Not "installed", "usable right now".
 if [ -z "$SONAR_TOKEN" ] || ! command -v sonar-scanner >/dev/null 2>&1; then
   echo "WARN: SonarQube credentials/tool missing — skipping (not blocking)."
@@ -141,6 +155,9 @@ sonar-scanner
 In CI the same step must wait for and fail on the quality gate
 (`-Dsonar.qualitygate.wait=true`); otherwise it is green whatever the
 gate says.
+
+A skip like the above is only legitimate with a blocking CI step for
+the same check. Without one, replace the `exit 0` branches with `exit 1`.
 
 **Never `test -n "$X" && A || B` for this kind of conditional logic.** If
 `A` fails for an unrelated reason (a transient tool error, not "nothing
@@ -279,6 +296,14 @@ parity" as coverage reporting or secret scanning.
    package, e.g. `apt-get install -y git` before the test step), not in
    the test code — the test code is right to use the binary directly,
    it's the image that's missing it.
+
+## Report evidence in a fixed form
+
+"Pushed" and "local verify is green" are not evidence. After the push,
+query the real CI system and report: commit SHA, pipeline number, status
+per step, and the gate values (test count, coverage %, quality-gate or
+audit result). When a gate is new, also show it failing once on a
+deliberate violation.
 
 ## What this doesn't replace
 
