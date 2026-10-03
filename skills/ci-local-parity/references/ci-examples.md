@@ -89,9 +89,9 @@ steps:
     run: |
       if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
         echo "New branch or first push — scanning only the last commit."
-        ./gitleaks detect --source . --log-opts="-1 $HEAD_SHA" -v --redact
+        ./gitleaks git --log-opts="-1 $HEAD_SHA" -v --redact
       else
-        ./gitleaks detect --source . --log-opts="$BEFORE_SHA..$HEAD_SHA" -v --redact
+        ./gitleaks git --log-opts="$BEFORE_SHA..$HEAD_SHA" -v --redact
       fi
 ```
 
@@ -99,10 +99,21 @@ Then actually make build and/or deploy wait on this job (`needs:
 secret-scan` on every job that would otherwise proceed without the scan)
 — otherwise CI does scan, but blocks nothing on a finding.
 
-For CI-runner-specific quirks (e.g. how a self-hosted Woodpecker instance
-validates secrets, shallow-clone behavior, or other platform-specific
-lessons) — see the shared, cross-project playbook for that specific
-stack, not this skill: this one deliberately stays CI-system-agnostic.
+Woodpecker equivalent (the clone is shallow by default, so deepen it
+first; `CI_PREV_COMMIT_SHA` is empty on a first pipeline):
+
+```yaml
+- name: secret-scan
+  image: <image-with-git-and-gitleaks>
+  commands:
+    - git fetch --deepen=50 || git fetch --unshallow || true
+    - |
+      if [ -z "$CI_PREV_COMMIT_SHA" ] || [ "$CI_PREV_COMMIT_SHA" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$CI_PREV_COMMIT_SHA^{commit}" 2>/dev/null; then
+        gitleaks git --log-opts="-1 $CI_COMMIT_SHA" -v --redact
+      else
+        gitleaks git --log-opts="$CI_PREV_COMMIT_SHA..$CI_COMMIT_SHA" -v --redact
+      fi
+```
 
 ## Reproducing the CI container image locally
 
@@ -131,3 +142,41 @@ The fix for a genuine missing-binary case belongs in the CI step itself
 (install the missing package, e.g. `apt-get install -y git` before the
 test step), not in the test code — the test code is right to use the
 binary directly, it's the image that's missing it.
+
+## Test-count ratchet (Node built-ins)
+
+Usage: `node scripts/test-ratchet.mjs <base> <head>`; in CI pass the
+push range, in `pre-push` the range being pushed.
+
+```js
+import { execFileSync } from 'node:child_process';
+const [base, head] = process.argv.slice(2);
+const git = (...a) => execFileSync('git', a, { encoding: 'utf8' });
+const skip = (why) => { console.warn(`WARN: ${why} — ratchet skipped.`); process.exit(0); };
+if (!base || /^0+$/.test(base)) skip('no base commit (first push)');
+try { git('cat-file', '-e', `${base}^{commit}`); } catch { skip('base commit unknown'); }
+const range = `${base}..${head}`;
+const TESTS = /\b(?:it|test)(?:\.\w+)?\s*\(/g;
+const ASSERTS = /\b(?:expect|assert[\w.]*)\s*\(/g;
+const count = (line, re) => (line.match(re) ?? []).length;
+const files = git('diff', '--name-only', range)
+  .split('\n').filter((f) => /\.(test|spec)\.[cm]?[jt]sx?$/.test(f));
+let tests = 0, asserts = 0;
+for (const f of files) {
+  for (const line of git('diff', '-U0', range, '--', f).split('\n')) {
+    if (/^(\+\+\+|---)/.test(line)) continue;
+    const sign = line[0] === '+' ? 1 : line[0] === '-' ? -1 : 0;
+    tests += sign * count(line, TESTS);
+    asserts += sign * count(line, ASSERTS);
+  }
+}
+if (tests < 0 || asserts < 0) {
+  const msg = `Test count dropped (tests ${tests}, assertions ${asserts})`;
+  if (/^Test-Removal: \S/m.test(git('log', '--format=%B', range))) {
+    console.warn(`${msg} — waived by Test-Removal trailer`);
+  } else {
+    console.error(`${msg}. Add a "Test-Removal: <reason>" trailer if intended.`);
+    process.exit(1);
+  }
+}
+```

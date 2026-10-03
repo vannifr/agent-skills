@@ -11,13 +11,10 @@ CI checks. Every time a CI step checks something local can't trivially do
 (network access, an external service, a slow scan), that's an explicitly
 named gap — never an implicit assumption.
 
-> **Not the same thing:** two other public tools with similar-sounding
-> names (`claude-pre-commit`, `config-drift-checker`) validate **Claude
-> Code's own configuration** (SKILL.md structure, CLAUDE.md, hooks) via
-> pre-commit/eval regression. This skill is about a different axis
-> entirely: validating that an *application's* CI pipeline and its local
-> verification stay in sync — not about linting the agent's own config
-> files.
+> **Not the same thing:** tools like `claude-pre-commit` and
+> `config-drift-checker` validate Claude Code's own configuration. This
+> skill is about an *application's* CI pipeline and its local
+> verification staying in sync.
 
 ## Checklist — for every project with CI
 
@@ -69,11 +66,20 @@ existing one:
       binary list looks the same today — pin
       `node:22-slim@sha256:<digest>` (or your registry's equivalent) for
       a build that genuinely doesn't drift, and document the process for
-      bumping it deliberately.
+      bumping it deliberately. The package manager version counts too
+      (e.g. `packageManager` in `package.json` when CI uses corepack).
 - [ ] **Are third-party GitHub Actions pinned to a commit SHA, not a
       version tag?** `actions/checkout@v6` can be repointed after the
       fact; `actions/checkout@<full-sha>` can't. Same principle as the
       image-digest bullet above, applied to the CI supply chain.
+- [ ] **Can the gate be weakened by deleting tests?** A gate that can be
+      weakened by deleting tests isn't a gate — see "Test-count ratchet"
+      below.
+- [ ] **Does every custom gate (linter, validator, policy check) have a
+      must-fail corpus?** Fixtures that must be rejected, each naming
+      the expected rule, plus a meta-test that every rule has at least
+      one failing fixture. A gate proven only on valid input is
+      unproven: a rule that always passes goes unnoticed.
 - [ ] **Does secret scanning (gitleaks or similar) also have a CI
       backstop, not just a `pre-commit` hook?** A `pre-commit` hook is
       bypassable and never scans a commit from outside that checkout —
@@ -132,6 +138,10 @@ fi
 sonar-scanner
 ```
 
+In CI the same step must wait for and fail on the quality gate
+(`-Dsonar.qualitygate.wait=true`); otherwise it is green whatever the
+gate says.
+
 **Never `test -n "$X" && A || B` for this kind of conditional logic.** If
 `A` fails for an unrelated reason (a transient tool error, not "nothing
 found"), fallback `B` still triggers and its exit code masks `A`'s real
@@ -142,8 +152,8 @@ Activate with: `git config core.hooksPath .githooks`, preferably via a
 step.
 
 **Gitleaks belongs in `pre-commit`, not again in `pre-push`.** At push
-time there's normally nothing staged, so `gitleaks protect --staged` in
-`pre-push` is a sham check that always reports "0 commits scanned."
+time there's normally nothing staged, so `gitleaks git --pre-commit --staged`
+in `pre-push` is a sham check that always reports "0 commits scanned."
 `pre-commit` already scanned the staged diff before the commit existed,
 and CI scans the push again, diff-scoped — `pre-push` therefore only
 needs to repeat `verify`, not gitleaks.
@@ -194,7 +204,7 @@ scope restriction permanently blocks a repo the moment even one
 innocuous pattern has ever appeared in the history (an env-var name in
 documentation like `curl -u "$SONAR_TOKEN:"`, a public analytics beacon
 token, documented default credentials). Locally (`pre-commit`, before the
-commit exists): `gitleaks protect --staged -v .`. In CI (after the
+commit exists): `gitleaks git --pre-commit --staged -v`. In CI (after the
 push): diff-scoped to this push's range — see "Gitleaks in CI" below for
 the concrete implementation, including the explicit fallback for a
 freshly registered CI system or a first push. Before enabling gitleaks on
@@ -229,6 +239,21 @@ directly into `run:` with `${{ }}`).
 
 Full YAML for both options, and why each key point matters:
 [ci-examples.md](references/ci-examples.md).
+
+## Test-count ratchet: deleting tests must not pass silently
+
+Refactors and agent-written fix commits quietly drop tests, and
+reviewers (human or model) routinely miss a deleted test because the
+remaining tests still pass. Enforce mechanically, in `pre-push` and in
+CI on the push range, that the net number of test declarations and
+assertions in test files does not decrease — unless a commit in the
+range carries an explicit trailer (e.g. `Test-Removal: <reason>`).
+Node sketch, including the first-push fallback (warn, exit 0):
+[ci-examples.md](references/ci-examples.md).
+
+The ratchet only sees test and assertion counts, not deleted fixtures;
+the must-fail corpus meta-test (every rule has a failing fixture)
+covers that. They complement each other.
 
 ## Local green ≠ CI-container green: image parity is parity too
 

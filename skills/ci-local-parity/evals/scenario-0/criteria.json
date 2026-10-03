@@ -64,12 +64,12 @@
     },
     {
       "name": "gitleaks not in pre-push",
-      "description": "`.githooks/pre-push` does NOT contain a `gitleaks protect --staged` call or any other gitleaks invocation",
+      "description": "`.githooks/pre-push` does NOT contain a `gitleaks git --pre-commit --staged` call or any other gitleaks invocation",
       "max_score": 7
     },
     {
       "name": "gitleaks in pre-commit",
-      "description": "`.githooks/pre-commit` contains a gitleaks invocation (e.g. `gitleaks protect --staged`) for local secret scanning",
+      "description": "`.githooks/pre-commit` contains a gitleaks invocation (e.g. `gitleaks git --pre-commit --staged`) for local secret scanning",
       "max_score": 6
     }
   ]

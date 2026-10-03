@@ -4,7 +4,7 @@
   "checklist": [
     {
       "name": "Gitleaks in pre-commit",
-      "description": "`.githooks/pre-commit` contains a `gitleaks protect --staged` invocation (or equivalent staged-only scan)",
+      "description": "`.githooks/pre-commit` contains a `gitleaks git --pre-commit --staged` invocation (or equivalent staged-only scan)",
       "max_score": 12
     },
     {
