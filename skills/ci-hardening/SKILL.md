@@ -38,7 +38,14 @@ closing local/CI drift, use `ci-local-parity` first.
 - [ ] Does a step fail hard on a tool error, not only on a finding?
 - [ ] Does no step silently fall back (`|| true`, `2>/dev/null`,
       `continue-on-error`, an early `exit 0`) on a path that disables the
-      check?
+      check? Includes install-and-ignore (`<install tool> || true`): it can
+      hide that the image lacks the installer or the tool entirely. Assert
+      what the step needs instead (e.g. `git --version`).
+- [ ] Is the expected count derived from an independent source? A
+      threshold computed from the same shallow clone the scan sees is
+      circular; check the clone state explicitly (shallow? partial?) and
+      list known exceptions (e.g. empty commits) instead of loosening the
+      threshold.
 
 **Coverage**
 - [ ] Is every file of every type covered? Compare the step's glob or file
@@ -62,6 +69,21 @@ closing local/CI drift, use `ci-local-parity` first.
 - [ ] Are images and plugins pinned by digest, with the real value looked up
       from the registry, never invented?
 - [ ] Is the tool version in CI equal to the local one, with no placeholders?
+      A new gate is first run locally in the exact CI image: a version
+      difference (linter rules differ per release) otherwise surfaces as a
+      red pipeline on a file that was clean locally. Pin tool versions in a
+      lockfile or requirements file, not `install <tool>` unpinned.
+- [ ] Do language/runtime versions match between CI and local, or is the
+      difference deliberate and written down?
+
+**Pipeline shape**
+- [ ] Do cheap blocking gates (secret scans) run first, with later steps
+      depending on them, and does the quality-server step wait on the test
+      and vulnerability steps it reports on?
+- [ ] Does a vulnerability scan also run on a schedule, so it finds new
+      advisories without a commit? Verify the schedule actually fired once.
+- [ ] Does the analysis scope (e.g. a quality server's source list) include
+      every code directory that exists in the repository?
 
 **Regression**
 - [ ] Is there a test-count ratchet (a falling count only with an explicit
@@ -75,6 +97,11 @@ closing local/CI drift, use `ci-local-parity` first.
       `git config --show-origin --get-all core.hooksPath`; agent worktrees
       sometimes set it to `/dev/null`, and `git config --worktree` without
       `extensions.worktreeConfig` writes to the shared config.
+
+**After mechanical changes**
+- [ ] After a formatter or autofix run, re-run the quality gate: formatters
+      can move an inline suppression away from the line it covers and
+      resurface an old finding as new.
 
 **Concurrency**
 - [ ] Do local pre-push and CI post to the same analysis project (e.g. a

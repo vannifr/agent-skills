@@ -14,7 +14,7 @@
     },
     {
       "name": "Silent fallbacks removed",
-      "description": "The audit flags `|| true` / `2>/dev/null` / continue-on-error on a path that disables a check and makes the step fail hard on a tool error.",
+      "description": "The audit flags `|| true` / `2>/dev/null` / continue-on-error on a path that disables a check including the install-and-ignore `apk add ... || true` that can hide a missing tool, and makes the step fail hard on a tool error.",
       "max_score": 16
     },
     {

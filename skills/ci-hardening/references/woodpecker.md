@@ -18,3 +18,10 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **Secret-fetching steps failing with an auth error** and no code cause
   often mean the secret store is sealed or unreachable; fix that before
   touching the pipeline.
+- **Declare dependencies between steps** (`depends_on`) so cheap blocking
+  gates run first and reporting steps wait for the results they report on.
+- **Scheduled runs** use `event: cron`; confirm the first scheduled run
+  actually executed, since the CLI may lack a way to trigger it on demand.
+- **Local lint version:** `woodpecker-cli lint` accepts what that CLI
+  version accepts; keep the CLI version in mind when a pipeline passes lint
+  locally but fails on the server.

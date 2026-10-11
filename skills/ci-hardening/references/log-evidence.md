@@ -19,3 +19,6 @@ Rules of thumb:
   `git rev-list --count HEAD`), not against the tool's own idea of its input.
 - A count that is correct today can fall to zero tomorrow (a moved
   directory, a shallow clone): put the "> 0" check in the pipeline itself.
+- When the independent count has known exceptions (e.g. commits without a
+  diff that a history scanner skips), encode the exception in the check
+  rather than loosening it, and assert the clone is complete separately.
