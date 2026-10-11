@@ -4,27 +4,34 @@
 when:
   - event: [push, pull_request, manual]
 
+clone:
+  git:
+    image: woodpeckerci/plugin-git@sha256:550075c844fcec0af41d9d28f9860aa5d8c43e1e9419be4b9266dc02c2f29804
+    settings:
+      depth: 0
+      partial: false
+
 steps:
   - name: gitleaks
-    image: ghcr.io/gitleaks/gitleaks:v8.30.1
+    image: ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
     commands:
-      - git fetch --unshallow 2>/dev/null || git fetch --depth=100 2>/dev/null || true
-      - gitleaks detect --verbose --redact
+      - sh scripts/secret-scan.sh selftest
+      - sh scripts/secret-scan.sh
 
   - name: structure-tests
-    image: node:22-alpine
+    image: node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
     commands:
       # site-revision script tests spawn python3 and its http.server.
       - apk add --no-cache python3
       - node --test scripts/*.test.mjs
 
   - name: structure-lint
-    image: node:22-alpine
+    image: node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
     commands:
       - node scripts/structure-lint.mjs
 
   - name: tessl-review
-    image: node:22-alpine
+    image: node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
     commands:
       # node:22-alpine has no git; without it the diff below fails and the
       # review never ran.
