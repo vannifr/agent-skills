@@ -65,7 +65,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      hits (real, or a variable reference). A baseline entry is only for a
      demonstrable false positive, with the reason in the commit. A baseline
      is a limited, documented exception: apply it to the real scan only,
-     never to the self-test; regenerate it after a history rewrite or author
+     never to the self-test; generate it with redaction like the scan, and
+     regenerate it after a history rewrite or author
      change (entries match on all fields); log which baseline was used and
      how many entries it has. The same goes for any allowlist or ignore file
      the scanner loads by itself: review it like a baseline, and let the
@@ -75,7 +76,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    - A new gate script must fall inside the coverage of the existing lint
      step: compare the glob's count with `git ls-files` right away.
    - Pre-flight: run the other existing gates (above all the dependency
-     audit) locally so the gate commit does not turn red for an unrelated
+     audit) locally, and again after adding a tool dependency for a new gate
+     (it drags in its own advisories) so the gate commit does not turn red for an unrelated
      reason. For a red audit one lookup decides the route: patched version
      available (fix-available field, advisory's first-patched version) means
      override or update; none means a documented ignore.
@@ -89,12 +91,16 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    - Verify each commit landed (`git log -1`, clean `git status`), check its
      author is the intended commit identity, and report the hash actually
      pushed (a rebase changes it). With bots or parallel sessions pushing,
-     rebase onto the remote first; if a rebase fails on someone else's
-     uncommitted changes and nothing new is on the remote, push without it.
+     rebase onto the remote first. If the working directory is dirty or
+     behind (someone else's work in progress), do the change in a temporary
+     detached worktree of the remote default branch and push from there,
+     leaving the checkout untouched; clean up afterwards (container output in
+     the scratch area may be root-owned).
 4. **Evidence report** in one place: pushed hash, CI run number, the quoted
    log lines, before/after numbers (see Report form), never "improved". Take
-   the evidence from the run that contains the hash: with auto-cancel on
-   quick successive pushes a run can end `killed`, which is no evidence.
+   the evidence from the run that contains the hash and exactly that gate
+   (an earlier run may still hold the old, broken version): with auto-cancel
+   on quick successive pushes a run can end `killed`, which is no evidence.
 
 ## Checklist
 
@@ -181,7 +187,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 
 **Pipeline shape**
 - [ ] Is any gate, above all the secret scan, behind a pipeline-level path
-      or event filter? A docs-only commit then triggers no run. Read the
+      or event filter? A docs-only commit then triggers no run. When moving
+      the filter to step level, check that every other step keeps its own
+      exclude and that steps depending on a skipped step behave as intended. Read the
       filter; verifying with a docs-only commit pushes to trunk, so do that
       only with the owner's consent, otherwise report "not verified".
 - [ ] Do cheap blocking gates (secret scans) run first, with later steps

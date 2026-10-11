@@ -38,6 +38,14 @@ trailer) and assert the ratchet fails; repeat with the waiver and assert it
 passes.
 Also assert it fails hard (not skips) when the base reference is missing.
 
+## Impossible-assertion self-test (score or report based gates)
+
+For a gate that evaluates reports (e.g. a performance or accessibility
+audit): require one report per configured URL, print the scores, and in CI
+also run the gate against an assertion that cannot hold (a score above the
+maximum) and require that it fails. A tool resolved to the wrong package, or
+a gate that reads no report, then fails instead of printing a greeting.
+
 ## Rules
 
 - Self-tests run in CI and locally, from one script.
