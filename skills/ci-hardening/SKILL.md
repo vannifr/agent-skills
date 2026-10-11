@@ -77,7 +77,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      the scanner loads by itself: review it like a baseline, and let the
      self-test run with the repository's own config.
    - If a wrapper script exists, let the CI step call the new check directly
-     and keep the wrapper branch only as local parity (no dead CI branch).
+     and keep the wrapper branch only as local parity (no dead CI branch). Remove
+     the wrapper's other superseded paths too (a previous-commit range
+     branch, a `--full` mode, a staged-only fallback), not just the CI one.
      A guard the wrapper already had is replaced by the new script, and its
      old tests move with it; they are not left behind as duplicate logic.
    - Replacing a gate means extending its parity or guard tests, never
@@ -100,7 +102,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      an ignore comes last, with a reason and an expiry. A recurring recipe
      for a red dependency audit: [dependency-audit.md](references/dependency-audit.md).
    - Verify each commit landed (`git log -1`, clean `git status`), check its
-     author is the intended commit identity, and report the hash actually
+     author is the intended commit identity (older commits stay as they are;
+     never rewrite shared history for it), and report the hash actually
      pushed (a rebase changes it). With bots or parallel sessions pushing,
      rebase onto the remote first. If the working directory is dirty or
      behind (someone else's work in progress), do the change in a temporary
@@ -149,6 +152,10 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       list with `git ls-files` per file type (extensionless files such as git
       hooks escape an `*.sh` glob). Hand-kept lists inside scripts (a compile
       list, a test file list) drift when a file is added.
+- [ ] Does the repository track file types the scanner cannot inspect
+      (office documents, PDFs, spreadsheets, images with text)? Report it as
+      a coverage finding: convert to text before the scan, or an explicit
+      decision by the owner, above all for customer material.
 - [ ] Are vendored, generated and tooling directories excluded explicitly and
       centrally, so "every file" means every file the team owns?
 - [ ] Are non-code languages linted (container files, YAML, JSON, pipeline

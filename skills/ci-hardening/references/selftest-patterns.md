@@ -46,6 +46,13 @@ also run the gate against an assertion that cannot hold (a score above the
 maximum) and require that it fails. A tool resolved to the wrong package, or
 a gate that reads no report, then fails instead of printing a greeting.
 
+## Test the shallow-clone guard with a real shallow clone
+
+Make the `--depth=1` test clone (from the working tree with `file://`) of a
+repository that contains the script itself, or the test fails on "file not
+found" instead of on the guard. Assert the exact failure message and exit
+code of the guard, not only a non-zero exit.
+
 ## Prove the guards of a gate script without the real tool
 
 The checks around a scanner (shallow or partial clone, 0 scanned, a count
@@ -78,6 +85,9 @@ self-test that proves the scan.
   with only the default branch, not in a working repository.
 - Use a unique commit marker in `git log` parsing; `@` collides with hunk
   headers (`@@`) when patches are printed.
+- The CI clone can count one commit more than a local `expected-count`
+  (the gate commit itself, or commits fetched later). The floor is a lower
+  bound, so a higher scan count is not drift.
 - A shell wrapper or hook may truncate or rewrite `git log` output; compute
   counts with the raw command, ideally in the CI image.
 
