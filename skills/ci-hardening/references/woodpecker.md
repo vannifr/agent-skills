@@ -12,7 +12,8 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **Lint the pipeline file** before pushing: `woodpecker-cli lint
   .woodpecker.yml`.
 - **Fetch log evidence** for a finished pipeline:
-  `woodpecker-cli pipeline log show <repo> <number> <step>`.
+  `woodpecker-cli pipeline log show <repo> <number> <step>`; the step name
+  is required, so list the steps first (`pipeline show <repo> <number>`).
 - **Pin by digest.** Look the digest up in the registry (e.g. `skopeo
   inspect docker://<image>:<tag>`); never type a plausible-looking hash.
 - **Secret-fetching steps failing with an auth error** and no code cause
@@ -20,8 +21,18 @@ Written for Woodpecker; the same questions apply to other CI systems.
   touching the pipeline.
 - **Declare dependencies between steps** (`depends_on`) so cheap blocking
   gates run first and reporting steps wait for the results they report on.
-- **Scheduled runs** use `event: cron`; confirm the first scheduled run
-  actually executed, since the CLI may lack a way to trigger it on demand.
+- **Scheduled runs** use `event: cron`; confirm one ever ran with
+  `woodpecker-cli pipeline ls <repo> --event cron` (older CLI versions have
+  no cron subcommand to trigger or list schedules).
+- **Wrapper scripts:** a step often calls a repository script that scopes
+  itself by `CI_PREV_COMMIT_SHA` (empty on a first or forced push); audit
+  that script, not only the pipeline file.
 - **Local lint version:** `woodpecker-cli lint` accepts what that CLI
   version accepts; keep the CLI version in mind when a pipeline passes lint
   locally but fails on the server.
+- **Log output noise:** the CLI may print a version-warning JSON line into
+  the log stream; filter it out before grepping.
+- **Advisory steps:** list every step with `failure: ignore`; each needs a
+  written reason, otherwise it is a gate that cannot fail.
+- **Look up digests in a loop:**
+  `for i in <image:tag> ...; do skopeo inspect --format '{{.Digest}}' docker://$i; done`
