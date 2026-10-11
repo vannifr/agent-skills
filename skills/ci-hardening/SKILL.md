@@ -66,7 +66,10 @@ closing local/CI drift, use `ci-local-parity` first.
      step: check the glob's count against `git ls-files` right away.
    - An existing findings baseline (old, documented leaks) is a limited,
      documented exception: apply it to the real scan only, never to the
-     self-test (the example reads it from an optional environment variable).
+     self-test (the example reads it from an optional environment variable
+     and logs which baseline it used, so a dropped baseline is visible).
+     When replacing a wrapper that auto-detected a baseline, pass it
+     explicitly.
    - Verify every commit with `git log` and `git status` and never pipe a
      commit's output through a filter: a hook failure vanishes, the commit
      does not happen, and the staged files land in the next commit.
@@ -78,14 +81,18 @@ closing local/CI drift, use `ci-local-parity` first.
      was actually pushed and find the CI run by that hash.
    - Pre-flight before a gate push: run the other existing gates (above
      all the dependency audit) locally, so the gate commit does not turn
-     red for an unrelated reason.
+     red for an unrelated reason. For a red audit, one lookup decides the
+     route: if a patched version exists (the audit's fix-available field,
+     the advisory's first-patched version), use an override or update; if
+     none exists, a documented ignore is the only option.
    - A new working gate exposes existing debt. When the pipeline turns red
      after a gate push, first separate cause: your change or a new
      advisory or finding underneath? Then: read the details (severity,
      attack vector), look for an override path (a resolver override, a
      lockfile-only fix, a pinned transitive version), fix, and document
      the result. Never weaken the gate; an explicit ignore comes last,
-     with a reason and an expiry.
+     with a reason and an expiry. An allowlist entry without a reason or
+     an expiry is itself a finding (low to medium).
 4. **Evidence report.** Before/after in numbers (files covered, commits
    scanned, pinned images n/m, tests, strictness level), never "improved".
 
@@ -235,8 +242,9 @@ or a server are marked "n/a (not auditable read-only)".
 ## Report form
 
 Start with a standard summary table: images pinned n/m, files linted vs
-`git ls-files` per language (shell, config, container), commits scanned vs
-commits in range, gates with a must-fail proof n/m, floors present.
+`git ls-files` per language (shell, config, container), commits scanned n
+vs the scan's own expected lower bound m (commits with added lines), never
+vs `git rev-list --all`, gates with a must-fail proof n/m, floors present.
 Local gates that CI lacks (and the reverse) are parity findings: hand them
 to `ci-local-parity` instead of fixing them here.
 

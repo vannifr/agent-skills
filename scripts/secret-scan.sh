@@ -47,6 +47,7 @@ fi
 [ "$(git rev-parse --is-shallow-repository)" = false ] || { echo "FAIL: shallow clone, history incomplete"; exit 1; }
 [ -z "$(git config --get remote.origin.partialclonefilter || true)" ] || { echo "FAIL: partial clone, history incomplete"; exit 1; }
 SCAN_BASELINE=${GITLEAKS_BASELINE:-}
+echo "baseline: ${SCAN_BASELINE:-none}"
 expected=$(git log --format='COMMIT %H' --numstat | awk '/^COMMIT /{if(c&&f)n++; c=1; f=0; next} NF&&$1!="0"{f=1} END{if(c&&f)n++; print n+0}')
 scan .
 [ "$SCAN_RC" -eq 0 ] || exit "$SCAN_RC"
