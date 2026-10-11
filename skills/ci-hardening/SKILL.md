@@ -54,11 +54,19 @@ closing local/CI drift, use `ci-local-parity` first.
    - When a wrapper script already exists, let the CI step call the new
      check directly and keep the wrapper branch only as local parity;
      otherwise a dead CI branch stays behind.
+   - A new gate script must fall inside the coverage of the existing lint
+     step: check the glob's count against `git ls-files` right away.
+   - An existing findings baseline (old, documented leaks) is a limited,
+     documented exception: apply it to the real scan only, never to the
+     self-test (the example reads it from an optional environment variable).
    - Verify every commit with `git log` and `git status` and never pipe a
      commit's output through a filter: a hook failure vanishes, the commit
      does not happen, and the staged files land in the next commit.
    - In repositories with bots that push (dependency updates), pull with
-     rebase before pushing. A rebase changes the hash: report the hash that
+     rebase before pushing. Parallel sessions share a working directory:
+     if the rebase fails on someone else's uncommitted changes, check
+     `git log HEAD..origin/<default>`; when nothing new is there, push
+     without a rebase. A rebase changes the hash: report the hash that
      was actually pushed and find the CI run by that hash.
    - A gate that turns red on a new advisory is working. Do not weaken it:
      look for an override path first (a resolver override or pinned

@@ -6,8 +6,11 @@ scan() {
     report=$(mktemp)
     log=$(mktemp)
     rc=0
-    gitleaks detect --source "$dir" --no-color --redact --verbose \
-        --report-format json --report-path "$report" >"$log" 2>&1 || rc=$?
+    set -- --source "$dir" --no-color --redact --verbose --report-format json --report-path "$report"
+    if [ -n "${SCAN_BASELINE:-}" ]; then
+        set -- "$@" --baseline-path "$SCAN_BASELINE"
+    fi
+    gitleaks detect "$@" >"$log" 2>&1 || rc=$?
     cat "$log"
     SCAN_RC=$rc
     SCAN_REPORT=$report
@@ -43,6 +46,7 @@ fi
 
 [ "$(git rev-parse --is-shallow-repository)" = false ] || { echo "FAIL: shallow clone, history incomplete"; exit 1; }
 [ -z "$(git config --get remote.origin.partialclonefilter || true)" ] || { echo "FAIL: partial clone, history incomplete"; exit 1; }
+SCAN_BASELINE=${GITLEAKS_BASELINE:-}
 expected=$(git log --format='COMMIT %H' --numstat | awk '/^COMMIT /{if(c&&f)n++; c=1; f=0; next} NF&&$1!="0"{f=1} END{if(c&&f)n++; print n+0}')
 scan .
 [ "$SCAN_RC" -eq 0 ] || exit "$SCAN_RC"
