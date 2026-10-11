@@ -48,6 +48,14 @@ parser and asserts the rules below.
   with a hint, so an unavailable source does not surface as an unrelated
   key error.
 
+## Language pitfalls for the guard test
+
+A guard that needs a YAML parser may not have one: Python's standard library
+has none, so test the YAML text with regular expressions or add the parser
+as a test dependency. A small alpine-based test image may lack git, which
+the guard tests need: install it in the test step (that is within the scope
+of the gate fix).
+
 ## Write the guard tests so the quality gate accepts them
 
 The guard tests are code too and go through the quality server. Keep one

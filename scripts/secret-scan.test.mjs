@@ -36,3 +36,12 @@ test('expected count only includes commits with added non-binary lines', () => {
   rmSync(dir, { recursive: true, force: true });
   assert.equal(out, '1');
 });
+
+test('baseline entry count also works for a baseline on a single line', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'secret-scan-baseline-'));
+  const file = join(dir, 'baseline.json');
+  writeFileSync(file, '[{"RuleID":"a"},{"RuleID":"b"},{"RuleID":"c"}]');
+  const out = execFileSync('sh', [SCRIPT, 'baseline-count', file], { encoding: 'utf8' }).trim();
+  rmSync(dir, { recursive: true, force: true });
+  assert.equal(out, '3');
+});

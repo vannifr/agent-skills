@@ -85,6 +85,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    - Replacing a gate means extending its parity or guard tests, never
      loosening them: replace the assertions of the old structure by stricter
      ones, say so in the commit, and never remove an assertion to get green.
+     Adding a guard test can require a change to the test step itself (a
+     tool the guard needs in the image); that stays within the scope of the
+     gate fix.
    - A new gate script must fall inside the coverage of the existing lint
      step: compare the glob's count with `git ls-files` right away.
    - Pre-flight: run the other existing gates (above all the dependency
@@ -134,9 +137,10 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       install-and-ignore (`<install tool> || true`, which can hide that the
       image lacks the installer or the tool). Assert what the step needs
       (e.g. `git --version`) instead.
-- [ ] Does a wrapper script exit 0 with a warning when its tool is missing?
-      Acceptable locally only with a blocking CI counterpart; in CI it must
-      fail.
+- [ ] Does a wrapper script or a git hook exit 0 with a warning when its
+      tool is missing (`command -v tool || exit 0`)? Acceptable locally only
+      with a blocking CI counterpart; in CI it must fail, and a hook that is
+      the only local barrier should fail too.
 - [ ] Is every advisory step (`failure: ignore`, `allow_failure`) listed
       with a written reason? Otherwise it is a gate that cannot fail.
 - [ ] Does the step run the intended binary? A package runner can resolve
