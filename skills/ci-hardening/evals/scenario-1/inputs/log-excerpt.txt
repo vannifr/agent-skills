@@ -1,0 +1,8 @@
+[secrets] INF 1 commits scanned.
+[secrets] INF no leaks found
+[changed] fatal: invalid revision range ..9f3c2d1
+[changed] no changed directories
+[unit-tests] # tests 41
+[unit-tests] # pass 41
+[slow-audit] auditor: timed out after 300s
+pipeline #88 success

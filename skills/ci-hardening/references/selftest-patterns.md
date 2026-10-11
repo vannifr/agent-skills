@@ -14,7 +14,9 @@ part1='AKIA'; part2='IOSFODNN7EXAMPLE'
 printf 'key = "%s%s"\n' "$part1" "$part2" > "$tmp/planted.txt"
 ```
 
-Run the scanner on `$tmp` with a JSON report. Assert on the **finding in
+Run the scanner on `$tmp` with a JSON report, using the repository's own
+scanner config when it has one: an allowlist that excludes everything would
+otherwise disable the real scan while the self-test stays green. Assert on the **finding in
 the report** (e.g. grep for `"RuleID"`), not on the exit code: a tool crash
 also exits non-zero and would make a broken scanner look healthy.
 
@@ -31,8 +33,9 @@ names the rule.
 
 ## Test-count ratchet
 
-In a temp repository, delete a test without a `Test-Removal:` trailer and
-assert the ratchet fails; repeat with the trailer and assert it passes.
+In a temp repository, delete a test without the waiver (e.g. a commit
+trailer) and assert the ratchet fails; repeat with the waiver and assert it
+passes.
 Also assert it fails hard (not skips) when the base reference is missing.
 
 ## Rules
@@ -48,15 +51,18 @@ Also assert it fails hard (not skips) when the base reference is missing.
 
 ## Expected-count pitfalls (history scanners)
 
-- A history scanner may skip commits without added lines (delete-only
-  commits), so derive the expected count from commits with at least one
-  added line (`git log --numstat`), not from all commits.
+- A history scanner skips commits without added lines (delete-only) and
+  binary-only commits. Derive the expected count from commits with at least
+  one added non-binary line (`git log --numstat`, where binary files show
+  `-`), and test that logic on a temp repository holding a text, a
+  binary-only and a delete-only commit.
 - It scans all refs by default, so the logged count can exceed the count on
-  HEAD: use "at least" (`-ge`), never equality.
+  HEAD: use "at least", never equality. Measure the floor in a fresh clone
+  with only the default branch, not in a working repository.
 - Use a unique commit marker in `git log` parsing; `@` collides with hunk
   headers (`@@`) when patches are printed.
-- Compute the expected count in the CI image: a local shell hook can
-  rewrite `git log` output and give a different number.
+- A shell wrapper or hook may truncate or rewrite `git log` output; compute
+  counts with the raw command, ideally in the CI image.
 
 ## Reproduce a vacuous diff scan mechanically
 

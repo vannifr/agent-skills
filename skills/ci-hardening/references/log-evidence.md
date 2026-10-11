@@ -9,7 +9,7 @@ a red flag". Add rows for your own stack.
 
 | Tool class | Evidence line | Red flag |
 |---|---|---|
-| Secret scanner (e.g. gitleaks) | "N commits scanned" with N > 0; a full-history run equals the commit count | "0 commits scanned", "no leaks found" without a count. "1 commit" is legitimate for a range scan, but then a full-history scan must exist elsewhere |
+| Secret scanner (e.g. gitleaks) | "N commits scanned" with N at least the commits with added non-binary lines in the range | "0 commits scanned", "no leaks found" without a count. "1 commit" is legitimate for a range scan, but then a full-history scan must exist elsewhere |
 | Shell linter (e.g. shellcheck) | the file list or a count equal to the `git ls-files` shell files | fewer files than the repository has |
 | Bats | TAP plan `1..N` with N equal to the expected test count | missing plan, N lower than the ratchet baseline |
 | Node test runner (`node --test`) | `# pass N` and `# fail 0`, N > 0 | `# tests 0` |
@@ -39,12 +39,15 @@ count is above zero **and** the log has no error lines (`ERR`, `fatal`,
 Rules of thumb:
 - Quote the line with the pipeline number; do not paraphrase.
 - Compare the count against an independent source (`git ls-files | wc -l`,
-  `git rev-list --count HEAD`), not against the tool's own idea of its input.
+  the commits in the range), not against the tool's own idea of its input;
+  for history scanners use a lower bound, never equality (see
+  selftest-patterns.md).
 - A count that is correct today can fall to zero tomorrow (a moved
   directory, a shallow clone): put the "> 0" check in the pipeline itself.
-- When the independent count has known exceptions (e.g. commits without a
-  diff that a history scanner skips), encode the exception in the check
-  rather than loosening it, and assert the clone is complete separately.
+- When the independent count has known exceptions (commits without added
+  non-binary lines that a history scanner skips), encode the exception in
+  the check rather than loosening it, and assert the clone is complete
+  separately.
 
 ## Pull the evidence from every step in one go
 

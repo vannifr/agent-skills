@@ -1,6 +1,6 @@
 ---
 name: ci-local-parity
-description: Use when setting up, auditing or repairing a project's CI pipeline together with local verification — ensures the local verify command covers everything CI checks, adds pre-commit/pre-push hooks that enforce this, and keeps trunk-based development honest (small commits, frequent pushes, CI checked per push). Load before creating or changing a CI pipeline file, before adding a quality gate (coverage, static analysis, security scan), and whenever a CI gate fails that local checks passed — including a single failing coverage or quality gate, not only a full pipeline setup.
+description: Use when setting up a project's CI pipeline together with local verification, or auditing or repairing local/CI parity — ensures the local verify command covers everything CI checks, adds pre-commit/pre-push hooks that enforce this, and keeps trunk-based development honest (small commits, frequent pushes, CI checked per push). Load before creating or changing a CI pipeline file, before adding a quality gate (coverage, static analysis, security scan), and whenever a CI gate fails that local checks passed — including a single failing coverage or quality gate, not only a full pipeline setup.
 ---
 
 # CI/local parity: the local gate must truly cover everything CI checks

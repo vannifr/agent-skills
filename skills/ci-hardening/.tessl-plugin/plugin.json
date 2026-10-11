@@ -1,6 +1,6 @@
 {
   "name": "vannifr/ci-hardening",
-  "description": "Use when auditing or tightening an existing CI pipeline — checks that every gate really verifies something (non-zero counts in the log, a must-fail proof), covers every file, runs strictly, and is pinned and ratcheted. Not for setting up a pipeline (ci-local-parity).",
+  "description": "Use when auditing, reviewing or tightening an existing CI pipeline (e.g. Woodpecker, GitHub Actions, GitLab CI), when guarding the pipeline file itself with a test, or when asked to make CI \"stricter\", \"more reliable\" or \"trustworthy\" — checks that every gate really verifies something (non-zero counts in the log, a must-fail proof), covers every file, runs at a strict level, and is pinned and ratcheted. Also use when a gate has been green for a long time without ever catching anything. Not for setting up a new pipeline or closing local/CI drift — that is ci-local-parity.",
   "skills": [
     "."
   ],

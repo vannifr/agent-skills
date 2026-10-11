@@ -23,17 +23,19 @@ parser and asserts the rules below.
 
 ## First set of guards
 
-- Every image has a version tag or a digest, never `latest` (the clone
-  image included).
+- Every image is pinned by digest (a tag alone is a finding), the clone
+  image included.
 - Dependencies refer only to existing steps and contain no cycle.
 - A step that consumes coverage or generated files waits (transitively) for
   every producer.
 - An important check (a live verification) is not downstream of an advisory
   or scan step; otherwise a failing scan skips it.
-- Every step has the project's path filter, or is on an explicit exception
-  list in the test.
+- Every step except the security gates (secret scan, audit) has the
+  project's path filter, or is on an explicit exception list in the test.
 - `failure: ignore` only through an allowlist with a reason, plus a
-  time-bound test that fails once the deadline has passed.
+  time-bound test that fails once the deadline has passed. That test turns
+  trunk red on a date without any code change: say so in its message and
+  name the entry.
 - Every project script path used in a command exists (account for a `cd` on
   an earlier line to avoid false positives).
 - Image tag and tool version agree (e.g. a browser-test image equals the
@@ -45,19 +47,11 @@ parser and asserts the rules below.
 
 ## Rules that came out of using it
 
-- Look digests and versions up in the registry; never guess. Compare a
-  local image ID against the digest.
+- Look digests and versions up in the registry; never guess.
 - Prove a new blocking gate fails on a deliberate violation first. Scanners
-  complement each other (one saw an advisory in a lockfile another missed);
-  do not replace one with another.
-- Retry only the network part (a database download), never the scan
-  itself, or a real finding is repeated and delayed.
-- Keep local test-runner settings (workers, retries) close to CI; prove a
-  suspected flake with a stress run on the old commit before changing a
-  test or its config.
-- Regenerating a lockfile with a different package-manager version can drop
-  fields; change it with one targeted line and verify with a dry-run
-  install.
+  complement each other; do not replace one with another.
+- Retry only the network part (a database download), never the scan itself,
+  or a real finding is repeated and delayed.
 
 ## Evidence and done
 

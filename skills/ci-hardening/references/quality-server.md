@@ -1,0 +1,19 @@
+# Quality-server gates (e.g. SonarQube)
+
+Only relevant when the pipeline posts analyses to an analysis server.
+
+- **Wait for the gate.** The step must fail on a non-OK quality gate (e.g. a
+  wait-for-quality-gate setting), not only print the status.
+- **Scope vs the repository.** The source list must include every code
+  directory that is tracked; compare it with `git ls-files`. Excluding the
+  test directory means tests are never analysed.
+- **New-code definition.** "No new issues" only works when the analysis can
+  see history (full clone) and the previous analysis.
+- **Concurrency.** When local pre-push and CI post to the same project,
+  analyses collide ("date of analysis cannot be older than the last known
+  analysis"). Use a separate project key for local runs.
+- **After mechanical changes.** After a formatter or autofix run, re-run
+  the gate: formatters can move an inline suppression away from the line it
+  covers and resurface an old finding as new code.
+- **Degradation.** A local check that skips with a warning when the server
+  or scanner is missing is acceptable only when CI blocks on the same gate.

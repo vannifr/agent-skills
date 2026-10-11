@@ -1,0 +1,4 @@
+{
+  "description": "Review-only request on a pipeline with a vacuous change detection, a path filter over the secret scan and an unexplained ignored step",
+  "include": ["./inputs"]
+}

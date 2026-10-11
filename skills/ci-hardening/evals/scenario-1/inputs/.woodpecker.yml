@@ -1,0 +1,27 @@
+when:
+  - event: push
+    path:
+      exclude: ["docs/**", "*.md"]
+
+steps:
+  - name: secrets
+    image: ghcr.io/example/gitleaks:latest
+    commands:
+      - gitleaks git --no-banner
+
+  - name: changed
+    image: node:22-alpine
+    commands:
+      - sh scripts/changed-dirs.sh > changed.txt
+
+  - name: unit-tests
+    image: node:22-alpine
+    commands:
+      - npm ci
+      - npm test
+
+  - name: slow-audit
+    image: ghcr.io/example/auditor:2.1
+    failure: ignore
+    commands:
+      - auditor scan .

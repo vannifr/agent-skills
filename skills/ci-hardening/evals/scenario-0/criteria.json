@@ -4,23 +4,23 @@
   "checklist": [
     {
       "name": "Zero-count gate found",
-      "description": "The audit points at the secret-scan log line showing 0 commits scanned (shallow/partial clone) and treats that step as unproven despite being green. It fixes the clone depth or history and requires a count above zero.",
-      "max_score": 22
+      "description": "The audit points at the secret-scan log line showing 0 commits scanned (shallow/partial clone) and treats that step as unproven despite being green, and also flags the test step's `# tests 0` (tests that cannot fail). It fixes the clone depth or history and requires a count above zero.",
+      "max_score": 18
     },
     {
       "name": "Coverage compared mechanically",
-      "description": "The audit compares the lint step's file list with the files the repository contains and finds the files it misses (hooks/helper scripts), fixing it with a glob or file-list derived from version control rather than a hand-kept list.",
+      "description": "The audit compares the lint step's file list with the files the repository contains and finds the files it misses (hooks/helper scripts), fixing it with a glob or file-list derived from version control rather than a hand-kept list. It notes that the missed file contains a real finding (the unquoted `rm -rf $TARGET/*`), not just a coverage number.",
       "max_score": 18
     },
     {
       "name": "Silent fallbacks removed",
       "description": "The audit flags `|| true` / `2>/dev/null` / continue-on-error on a path that disables a check including the install-and-ignore `apk add ... || true` that can hide a missing tool, and makes the step fail hard on a tool error.",
-      "max_score": 16
+      "max_score": 14
     },
     {
       "name": "Must-fail proof added",
       "description": "The audit adds a self-test that runs in CI: a planted violation (secret assembled at runtime, tracked env file or lint error) that the gate must fail on, asserting on the finding in the report rather than only the exit code, plus the clean case passing.",
-      "max_score": 22
+      "max_score": 20
     },
     {
       "name": "Supply chain pinned with real values",
@@ -31,6 +31,11 @@
       "name": "Evidence as before/after numbers",
       "description": "The report states before/after in numbers (files covered, commits scanned, images pinned n/m) and cites CI log evidence per gate; gates without a must-fail proof are reported as unproven.",
       "max_score": 12
+    },
+    {
+      "name": "Severity ladder applied",
+      "description": "Every finding carries a severity (high/medium/low) with a concrete failure scenario, and every zero-count gate that exits 0 is rated high.",
+      "max_score": 8
     }
   ]
 }
