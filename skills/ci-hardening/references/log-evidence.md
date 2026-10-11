@@ -16,6 +16,11 @@ a red flag". Add rows for your own stack.
 | Code-quality server (e.g. SonarQube) | `QUALITY GATE STATUS: PASSED` plus the new-code condition values | analysis submitted but no gate status fetched |
 | Python linter/formatter (e.g. ruff) | files checked/formatted count, rule families selected | "All checks passed" with no count, default rules only |
 | Python test runner (e.g. pytest) | "N passed" with coverage % against a floor | N below the floor file, coverage with no floor |
+| Secret scanner in directory mode | no commit count exists, so a separate history scan is required | directory mode as the only secret scan |
+| Static analyzer in quiet mode (e.g. semgrep `--quiet`) | a rules/files count or a summary line | quiet output with no summary |
+| Lighthouse-style audit | the score per category and the tool version | greeting or help text only, exit 0 |
+| Load test (e.g. k6) | check/threshold results with counts | thresholds undefined, so nothing can fail |
+| E2E or accessibility run | pass count, and the job fails on serious findings | findings logged but the step still exits 0 |
 | Container/config linters | a printed file count or finding list | header line only, no output |
 | Dependency audit | the number of packages/lockfiles scanned | scanned 0 lockfiles |
 

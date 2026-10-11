@@ -21,7 +21,8 @@ closing local/CI drift, use `ci-local-parity` first.
    does the last green run relate to HEAD? Did a scheduled run ever
    succeed? Are the local hooks really active
    (`git config --show-origin --get-all core.hooksPath`; a value of
-   `/dev/null` means every local gate is off)?
+   `/dev/null` means every local gate is off)? A default branch that is
+   already red is reported as its own finding at the top of the report.
 
 1. **Inventory.** Read the scripts the pipeline calls, not only the
    pipeline file: a wrapper often decides what really runs, and a
@@ -67,6 +68,9 @@ or a server are marked "n/a (not auditable read-only)".
 - [ ] Does a wrapper script exit 0 with a warning when its tool is missing
       from the image? That is acceptable locally only with a blocking CI
       counterpart; in CI it must fail.
+- [ ] Does the step run the intended binary? A package runner can resolve
+      the name to an unrelated package that prints a greeting and exits 0.
+      Require a tool-specific evidence line (tool version, score, count).
 - [ ] Does every step print something countable? A step whose log is empty
       on success is unproven; add a count line.
 - [ ] Does a step fail hard on a tool error, not only on a finding?
@@ -110,6 +114,9 @@ or a server are marked "n/a (not auditable read-only)".
 - [ ] Do diff-based scans have the previous commit available (shallow or
       partial clone defeats them)? Is a range built from a possibly empty
       variable (`${PREV:-}..HEAD`) guarded for first pushes and force pushes?
+- [ ] Does change detection (which files or directories changed, built
+      from a commit range) behave? An invalid range followed by "nothing
+      changed" makes every downstream gate vacuous, not only secret scans.
 - [ ] For a range scan, does the logged count equal
       `git rev-list --count PREV..SHA`? An invalid range ("invalid revision
       range", an empty `PREV`) is never "legitimately 1 commit"; it is a
@@ -136,6 +143,10 @@ or a server are marked "n/a (not auditable read-only)".
       difference deliberate and written down?
 
 **Pipeline shape**
+- [ ] Is any gate, above all the secret scan, behind a pipeline-level path
+      filter (`path: exclude`) or an event filter? A docs-only commit then
+      triggers no run at all. Verify with a docs-only commit: the run list
+      must show a run.
 - [ ] Do cheap blocking gates (secret scans) run first, with later steps
       depending on them, and does the quality-server step wait on the test
       and vulnerability steps it reports on?
@@ -153,6 +164,9 @@ or a server are marked "n/a (not auditable read-only)".
       reference is missing, not skip silently.
 - [ ] With several test suites, is there a floor per suite (or one
       combined floor stated explicitly)?
+- [ ] Are scripts copied between sibling repositories ("single source"
+      scripts) identical? Diff them as an audit step; silent divergence
+      means one repository runs an older, weaker gate.
 - [ ] Is there a parity test that parses the CI file and checks it against
       the local verify command?
 
@@ -194,3 +208,11 @@ verified" with the reason.
 
 CI-specific pitfalls (clone depth, credentials, variable escaping, linting
 the pipeline file): [woodpecker.md](references/woodpecker.md).
+
+## What good looks like
+
+A reference shape to compare against: every image pinned by digest; a gate
+script that fails when a tool is missing instead of skipping; coverage
+floors per file glob, not one global number; the quality gate proven red at
+least once on a deliberate violation (quote the run numbers); a scan that
+logs its input count and exits non-zero on an error line.
