@@ -84,14 +84,17 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      advisory or finding underneath), read the details (severity, attack
      vector), look for an override path (resolver override, lockfile-only
      fix, pinned transitive version), fix, document. Never weaken the gate;
-     an ignore comes last, with a reason and an expiry.
+     an ignore comes last, with a reason and an expiry. A recurring recipe
+     for a red dependency audit: [dependency-audit.md](references/dependency-audit.md).
    - Verify each commit landed (`git log -1`, clean `git status`), check its
      author is the intended commit identity, and report the hash actually
      pushed (a rebase changes it). With bots or parallel sessions pushing,
      rebase onto the remote first; if a rebase fails on someone else's
      uncommitted changes and nothing new is on the remote, push without it.
 4. **Evidence report** in one place: pushed hash, CI run number, the quoted
-   log lines, before/after numbers (see Report form), never "improved".
+   log lines, before/after numbers (see Report form), never "improved". Take
+   the evidence from the run that contains the hash: with auto-cancel on
+   quick successive pushes a run can end `killed`, which is no evidence.
 
 ## Checklist
 
@@ -143,7 +146,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 - [ ] Does the quality gate demand "no new issues" and a coverage floor on
       new code?
 - [ ] Is every allowlist entry documented with a reason and an expiry? One
-      without is itself a finding (low to medium).
+      without is itself a finding (low to medium), and so is an entry the
+      audit tool itself reports as unnecessary (clean the list periodically).
 
 **Clone and history**
 - [ ] Do diff-based scans have the previous commit available (shallow or
