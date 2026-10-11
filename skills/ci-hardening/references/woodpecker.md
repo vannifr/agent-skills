@@ -51,3 +51,11 @@ Written for Woodpecker; the same questions apply to other CI systems.
   invalid range as "run everything", not "nothing changed".
 - **Pipeline-level `when: path: exclude`** skips the whole pipeline,
   secret scan included; put path filters on individual steps instead.
+- **Variable names:** the previous commit is `CI_PREV_COMMIT_SHA`. A
+  variable like `CI_COMMIT_BEFORE` does not exist; it expands to empty and
+  silently turns the diff branch into dead code that always takes the
+  "first push" path.
+- **Fetch every step log of a run into files:** list the step names with
+  `pipeline ps <repo> <number>`, then
+  `for step in <names>; do woodpecker-cli pipeline log show <repo> <number> "$step" > "logs/$step.txt"; done`
+  and grep the files.

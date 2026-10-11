@@ -60,3 +60,12 @@ done
 
 Inventory template: step | claim | log evidence (quoted) | files seen vs
 `git ls-files` | must-fail proof | gap.
+
+## Shell files the CI globs miss
+
+List files that are shell by shebang, not by extension, and compare with
+what the lint step covers:
+
+```sh
+git grep -lIE '^#!.*(sh|bash)' -- ':!*.md'
+```

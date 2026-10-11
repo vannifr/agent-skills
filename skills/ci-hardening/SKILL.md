@@ -40,10 +40,18 @@ closing local/CI drift, use `ci-local-parity` first.
    or parity test is heavy for a small content repo) or cannot be audited
    read-only (needs history or a quality server). Record each gap with a
    severity and one concrete failure scenario ("a leaked key in commit N
-   would pass because the scan sees 0 commits"). Severity: **high** = the
-   gate cannot fail (vacuous, silently skipped; a gate that scanned 0
-   items and exited 0 is always high, even when the tool itself is pinned); **medium** = partial
-   coverage, unproven, or unpinned; **low** = strictness and hygiene.
+   would pass because the scan sees 0 commits"). Severity ladder:
+
+   | Level | Meaning | Examples |
+   |---|---|---|
+   | high | the gate cannot fail | 0 items scanned and exit 0 (always high, even with a pinned tool); silently skipped; tool crash passes |
+   | medium | partial or unproven | 1 of N commits scanned; no must-fail proof; unpinned image; half the files linted |
+   | low | strictness and hygiene | default rule set; advisory step with a written reason that is not the only check of a critical property |
+
+   Edge cases: a local-only gate (e.g. a live-site test) is "n/a" with a
+   reason; when the last green run is a scheduled run, compare with the
+   last green push run on the default branch; without a checkout, audit
+   from a read-only clone in a scratch directory.
 3. **Tighten in small commits**, one gate per commit. After each push,
    fetch the CI log for that exact commit and quote the evidence line.
    - Order for a gate fix: copy or write the check script, point the CI
@@ -182,6 +190,9 @@ or a server are marked "n/a (not auditable read-only)".
       filter (`path: exclude`) or an event filter? A docs-only commit then
       triggers no run at all. Verify with a docs-only commit: the run list
       must show a run.
+- [ ] Does a blocking, flaky external-network gate (e.g. a link check) run
+      before the secret scan? Its failure then skips every later security
+      step. Put network gates last or non-blocking with a written reason.
 - [ ] Do cheap blocking gates (secret scans) run first, with later steps
       depending on them, and does the quality-server step wait on the test
       and vulnerability steps it reports on?

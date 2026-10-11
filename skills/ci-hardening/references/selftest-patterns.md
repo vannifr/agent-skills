@@ -57,3 +57,15 @@ Also assert it fails hard (not skips) when the base reference is missing.
   headers (`@@`) when patches are printed.
 - Compute the expected count in the CI image: a local shell hook can
   rewrite `git log` output and give a different number.
+
+## Reproduce a vacuous diff scan mechanically
+
+Prove the failure on a depth-1 clone instead of trusting the log:
+
+```sh
+git clone --depth=1 file://"$PWD" "$tmp/shallow"
+cd "$tmp/shallow" && <scanner> <range scan over PREV..HEAD>
+```
+
+The scan must fail or report a count above zero. If it exits 0 with
+"0 scanned", the gate is vacuous in CI for the same reason.
