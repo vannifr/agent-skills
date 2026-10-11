@@ -46,6 +46,15 @@ also run the gate against an assertion that cannot hold (a score above the
 maximum) and require that it fails. A tool resolved to the wrong package, or
 a gate that reads no report, then fails instead of printing a greeting.
 
+## Prove the guards of a gate script without the real tool
+
+The checks around a scanner (shallow or partial clone, 0 scanned, a count
+below the lower bound, a blind scanner) can be tested with a stub scanner on
+the PATH: it prints a "N commits scanned" line, and reports a finding only
+when it sees the planted file. Each guard then gets a test that provokes
+exactly that failure, so the guards themselves are proven, next to the
+self-test that proves the scan.
+
 ## Rules
 
 - Self-tests run in CI and locally, from one script.

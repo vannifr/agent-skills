@@ -28,7 +28,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    succeed? Are local hooks really active
    (`git config --show-origin --get-all core.hooksPath`; `/dev/null` means
    every local gate is off)? A default branch that is already red is its own
-   finding at the top of the report.
+   finding at the top of the report. Findings go stale while an audit stays
+   open (a scheduled run fires, someone pushes): re-check the schedule and
+   `HEAD..origin/<default>` right before fixing.
 1. **Inventory.** Read the scripts the pipeline calls, not only the pipeline
    file: a wrapper decides what really runs, and a non-strict mode can make a
    skipped tool exit 0. For each step write down what it claims, what its
@@ -75,11 +77,17 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      self-test run with the repository's own config.
    - If a wrapper script exists, let the CI step call the new check directly
      and keep the wrapper branch only as local parity (no dead CI branch).
+     A guard the wrapper already had is replaced by the new script, and its
+     old tests move with it; they are not left behind as duplicate logic.
+   - Replacing a gate means extending its parity or guard tests, never
+     loosening them: replace the assertions of the old structure by stricter
+     ones, say so in the commit, and never remove an assertion to get green.
    - A new gate script must fall inside the coverage of the existing lint
      step: compare the glob's count with `git ls-files` right away.
    - Pre-flight: run the other existing gates (above all the dependency
-     audit) locally, and again after adding a tool dependency for a new gate
-     (it drags in its own advisories) so the gate commit does not turn red for an unrelated
+     audit and the new-code quality gate) locally, and again after adding a
+     tool dependency for a new gate (it drags in its own advisories); new
+     tests in the repository's own suite can trip quality rules too so the gate commit does not turn red for an unrelated
      reason. For a red audit one lookup decides the route: patched version
      available (fix-available field, advisory's first-patched version) means
      override or update; none means a documented ignore.
