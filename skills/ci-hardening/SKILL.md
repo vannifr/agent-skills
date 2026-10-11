@@ -43,6 +43,19 @@ closing local/CI drift, use `ci-local-parity` first.
    coverage, unproven, or unpinned; **low** = strictness and hygiene.
 3. **Tighten in small commits**, one gate per commit. After each push,
    fetch the CI log for that exact commit and quote the evidence line.
+   - Order for a gate fix: copy or write the check script, point the CI
+     step at it (plus the clone fix), run it locally in the exact CI image
+     (override the user to root and mark the workspace as a safe
+     directory), then push. Worked example for a secret scan:
+     [secret-scan.sh](references/secret-scan.sh).
+   - When a wrapper script already exists, let the CI step call the new
+     check directly and keep the wrapper branch only as local parity;
+     otherwise a dead CI branch stays behind.
+   - Verify every commit with `git log` and `git status` and never pipe a
+     commit's output through a filter: a hook failure vanishes, the commit
+     does not happen, and the staged files land in the next commit.
+   - In repositories with bots that push (dependency updates), pull with
+     rebase before pushing.
 4. **Evidence report.** Before/after in numbers (files covered, commits
    scanned, pinned images n/m, tests, strictness level), never "improved".
 

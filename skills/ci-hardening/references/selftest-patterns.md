@@ -41,3 +41,7 @@ Also assert it fails hard (not skips) when the base reference is missing.
 - The clean run must also pass: assert both the failing and the passing
   case, otherwise a gate that always fails looks proven.
 - Never commit the planted violation to the real tree.
+- The self-test's own log line (e.g. "selftest ok: clean passes, planted
+  secret reported") is the must-fail proof in CI: it re-runs on every push.
+  A real leak turning a pipeline red once is nice evidence, not a
+  requirement.
