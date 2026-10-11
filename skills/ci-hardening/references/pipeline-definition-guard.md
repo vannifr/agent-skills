@@ -15,7 +15,12 @@ parser and asserts the rules below.
    installed packages).
 3. Write the guard test and let it **fail first** on the current state;
    quote the number of red tests as proof that the guard really guards.
-   Only then fix the definition.
+   Stronger: run the new guard against the previous version of the pipeline
+   file (a mutation check) and show that it fails. Only then fix the
+   definition.
+   A guard must not compare against a file outside the repository (a copy in
+   a home directory): in CI such a test skips silently. Put that comparison
+   in the evidence report instead.
 4. Fix in small commits, push, fetch the real run and quote the status per
    step. A green local run is not proof.
 5. Lint the pipeline file in the pre-commit hook when it is staged; when

@@ -65,7 +65,9 @@ below the lower bound, a blind scanner) can be tested with a stub scanner on
 the PATH: it prints a "N commits scanned" line, and reports a finding only
 when it sees the planted file. Each guard then gets a test that provokes
 exactly that failure, so the guards themselves are proven, next to the
-self-test that proves the scan.
+self-test that proves the scan. The pattern is language independent (it
+has been written in Python, Node and bats): the stub keeps its state in the
+test's own temporary directory.
 
 ## Baseline recipe (secret scanner)
 
@@ -83,6 +85,10 @@ the scanner config is one line instead of one baseline each.
 - The clean run must also pass: assert both the failing and the passing
   case, otherwise a gate that always fails looks proven.
 - Never commit the planted violation to the real tree.
+- Tests that run `git init` or `git commit` themselves must be isolated when
+  a git hook starts the suite: use their own temporary directory and unset
+  the git environment variables the hook exports (e.g. `env -u GIT_DIR -u
+  GIT_INDEX_FILE`).
 - The self-test's own log line (e.g. "selftest ok: clean passes, planted
   secret reported") is the must-fail proof in CI: it re-runs on every push.
   A real leak turning a pipeline red once is nice evidence, not a

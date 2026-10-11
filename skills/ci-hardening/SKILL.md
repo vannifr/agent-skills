@@ -120,6 +120,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    the evidence from the run that contains the hash and exactly that gate
    (an earlier run may still hold the old, broken version): with auto-cancel
    on quick successive pushes a run can end `killed`, which is no evidence.
+   Take every number in a commit message or report from the run, never an
+   estimate: a wrong figure in a pushed commit cannot be corrected.
 
 ## Checklist
 
