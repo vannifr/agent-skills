@@ -17,6 +17,12 @@ closing local/CI drift, use `ci-local-parity` first.
 
 ## Workflow
 
+0. **Orientation (first, cheap).** Is the default branch green now, and how
+   does the last green run relate to HEAD? Did a scheduled run ever
+   succeed? Are the local hooks really active
+   (`git config --show-origin --get-all core.hooksPath`; a value of
+   `/dev/null` means every local gate is off)?
+
 1. **Inventory.** Read the scripts the pipeline calls, not only the
    pipeline file: a wrapper often decides what really runs, and a
    non-strict mode can make a skipped tool exit 0 (check how the strict
@@ -96,6 +102,11 @@ or a server are marked "n/a (not auditable read-only)".
       new code?
 
 **Clone and history**
+- [ ] Do gates that scan an input really have input? Examples: a
+      vulnerability scan that finds no supported manifest (only dev
+      dependencies, no lockfile), a link checker whose skip pattern leaves 0
+      links, a linter whose `files` list covers 1 of 18 source files. Log
+      count of inputs > 0 and compare with `git ls-files`.
 - [ ] Do diff-based scans have the previous commit available (shallow or
       partial clone defeats them)? Is a range built from a possibly empty
       variable (`${PREV:-}..HEAD`) guarded for first pushes and force pushes?
@@ -162,6 +173,12 @@ or a server are marked "n/a (not auditable read-only)".
       for local runs.
 
 ## Report form
+
+Start with a standard summary table: images pinned n/m, files linted vs
+`git ls-files` per language (shell, config, container), commits scanned vs
+commits in range, gates with a must-fail proof n/m, floors present.
+Local gates that CI lacks (and the reverse) are parity findings: hand them
+to `ci-local-parity` instead of fixing them here.
 
 Per gate: claim, evidence line from the log (quoted), must-fail proof
 (commit or pipeline number), gap, fix commit. End with the before/after

@@ -11,9 +11,13 @@ Written for Woodpecker; the same questions apply to other CI systems.
   file is substituted at parse time, usually to an empty string.
 - **Lint the pipeline file** before pushing: `woodpecker-cli lint
   .woodpecker.yml`.
+- **Symptom of the missing credentials:** `could not read Username` in the
+  log, followed by a green step because the fetch ended in `|| true`.
 - **Fetch log evidence** for a finished pipeline:
   `woodpecker-cli pipeline log show <repo> <number> <step>`; the step name
-  is required, so list the steps first (`pipeline show <repo> <number>`).
+  is required. Older CLI versions' `pipeline show` does not list steps:
+  take the names from the pipeline file; `--output table=<columns>` selects
+  columns in list commands.
 - **Pin by digest.** Look the digest up in the registry (e.g. `skopeo
   inspect docker://<image>:<tag>`); never type a plausible-looking hash.
 - **Secret-fetching steps failing with an auth error** and no code cause

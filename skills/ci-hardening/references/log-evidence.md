@@ -26,6 +26,11 @@ Red flags that look like success:
 - A fallback chain where step A fails and fallback B scans 0 items
   (`A 2>/dev/null || B`): exit 0, zero coverage.
 
+Mandatory check per scan step, also when the step exits 0: the "scanned"
+count is above zero **and** the log has no error lines (`ERR`, `fatal`,
+`could not read Username`, `invalid revision range`). Count them with
+`grep -c`; an error line next to a green status is a failed scan.
+
 Rules of thumb:
 - Quote the line with the pipeline number; do not paraphrase.
 - Compare the count against an independent source (`git ls-files | wc -l`,
