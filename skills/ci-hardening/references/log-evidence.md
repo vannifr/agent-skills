@@ -19,6 +19,13 @@ a red flag". Add rows for your own stack.
 | Container/config linters | a printed file count or finding list | header line only, no output |
 | Dependency audit | the number of packages/lockfiles scanned | scanned 0 lockfiles |
 
+Red flags that look like success:
+- `stderr is not empty`, `invalid revision range` or a fetch error printed
+  by a step that still exits 0: the tool failed and a fallback or an
+  ignored status hid it.
+- A fallback chain where step A fails and fallback B scans 0 items
+  (`A 2>/dev/null || B`): exit 0, zero coverage.
+
 Rules of thumb:
 - Quote the line with the pipeline number; do not paraphrase.
 - Compare the count against an independent source (`git ls-files | wc -l`,

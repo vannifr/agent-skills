@@ -31,7 +31,8 @@ closing local/CI drift, use `ci-local-parity` first.
    read-only (needs history or a quality server). Record each gap with a
    severity and one concrete failure scenario ("a leaked key in commit N
    would pass because the scan sees 0 commits"). Severity: **high** = the
-   gate cannot fail (vacuous, silently skipped); **medium** = partial
+   gate cannot fail (vacuous, silently skipped; a gate that scanned 0
+   items and exited 0 is always high, even when the tool itself is pinned); **medium** = partial
    coverage, unproven, or unpinned; **low** = strictness and hygiene.
 3. **Tighten in small commits**, one gate per commit. After each push,
    fetch the CI log for that exact commit and quote the evidence line.
@@ -39,7 +40,9 @@ closing local/CI drift, use `ci-local-parity` first.
    scanned, pinned images n/m, tests, strictness level), never "improved".
 
 **Audit-only mode:** when asked only to review, stop after step 2 and
-report the gaps with fixes proposed, not applied; items that need history
+report the gaps with fixes proposed, not applied. A historical red run
+counts as must-fail proof only when it failed for that gate's reason;
+otherwise the gate is "unproven"; items that need history
 or a server are marked "n/a (not auditable read-only)".
 
 ## Checklist
@@ -74,13 +77,15 @@ or a server are marked "n/a (not auditable read-only)".
 
 **Coverage**
 - [ ] Is every file of every type covered? Compare the step's glob or file
-      list against `git ls-files` mechanically; hand-kept lists inside
+      list against `git ls-files` mechanically (extensionless files such as
+      git hooks escape an `*.sh` glob: compare the glob's count with the
+      `git ls-files` count per file type); hand-kept lists inside
       scripts (a compile list, a test file list) drift when a file is added.
 - [ ] Are vendored, generated and tooling directories excluded explicitly
       and centrally, so "every file" means every file the team owns?
 - [ ] Are non-code languages linted too (container files, YAML, JSON,
-      pipeline files, shell), and is any lint config actually wired into the
-      active hook path rather than sitting unused?
+      pipeline files, shell), and is every lint or test config actually
+      wired into a step or the active hook path rather than sitting unused?
 - [ ] Are hooks, init/bootstrap scripts, templates and helper scripts
       included, not only the main source tree?
 
@@ -94,6 +99,10 @@ or a server are marked "n/a (not auditable read-only)".
 - [ ] Do diff-based scans have the previous commit available (shallow or
       partial clone defeats them)? Is a range built from a possibly empty
       variable (`${PREV:-}..HEAD`) guarded for first pushes and force pushes?
+- [ ] For a range scan, does the logged count equal
+      `git rev-list --count PREV..SHA`? An invalid range ("invalid revision
+      range", an empty `PREV`) is never "legitimately 1 commit"; it is a
+      failed scan that exited 0.
 - [ ] Is there also a full-history scan (scheduled or on the default
       branch)? A range scan legitimately scans few commits, but then the
       full history is never covered.
@@ -123,7 +132,8 @@ or a server are marked "n/a (not auditable read-only)".
       advisories without a commit, and does the scheduled run include the
       gates and not only unrelated jobs? Verify the schedule fired once.
 - [ ] Does the analysis scope (e.g. a quality server's source list) include
-      every code directory that exists in the repository?
+      every code directory that exists in the repository? Compare it with
+      the tracked directories.
 
 **Regression**
 - [ ] Is there a test-count ratchet (a falling count only with an explicit

@@ -36,3 +36,8 @@ Written for Woodpecker; the same questions apply to other CI systems.
   written reason, otherwise it is a gate that cannot fail.
 - **Look up digests in a loop:**
   `for i in <image:tag> ...; do skopeo inspect --format '{{.Digest}}' docker://$i; done`
+- **Shallow clone without credentials is the most common failure:** a range
+  scan built from `CI_PREV_COMMIT_SHA` fails ("invalid revision range") or
+  scans 0 commits, and a fallback then checks an empty staged diff. Fix the
+  clone (see above), then make the wrapper count what it scanned and fail
+  when the count is 0 or differs from `git rev-list --count PREV..SHA`.
