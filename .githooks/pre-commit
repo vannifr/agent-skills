@@ -8,4 +8,4 @@ else
     echo "WARN: gitleaks niet geïnstalleerd -- secret scan overgeslagen (CI dekt dit)."
 fi
 
-node --test scripts/*.test.mjs
+node scripts/test-floor.mjs

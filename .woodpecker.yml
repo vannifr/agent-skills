@@ -29,7 +29,7 @@ steps:
     commands:
       # site-revision script tests spawn python3 and its http.server.
       - apk add --no-cache python3
-      - node --test scripts/*.test.mjs
+      - node scripts/test-floor.mjs
 
   - name: structure-lint
     image: node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
@@ -42,7 +42,6 @@ steps:
       # node:22-alpine has no git; without it the diff below fails and the
       # review never ran.
       - apk add --no-cache git
-      - git fetch --depth=2 origin 2>/dev/null || true
       - npm install -g @tessl/cli@0.109.0
       - |
         BEFORE_SHA=$(git rev-parse HEAD~1 2>/dev/null || echo "")

@@ -8,5 +8,5 @@ else
     echo "WARN: shellcheck not installed -- skipped locally (CI blocks on it)."
 fi
 
-node --test scripts/*.test.mjs
+node scripts/test-floor.mjs
 node scripts/structure-lint.mjs
