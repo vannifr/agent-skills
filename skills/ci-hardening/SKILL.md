@@ -62,7 +62,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      push. Worked example for a secret scan, with its self-test:
      [secret-scan.sh](references/secret-scan.sh).
    - Before putting a scan on full history, run it locally and triage the
-     hits (real, or a variable reference). A baseline entry is only for a
+     hits (real, or a variable reference). The same false positive on a
+     variable reference in several repositories is better handled by one
+     scanner-config rule than by repeated baseline entries. A baseline entry is only for a
      demonstrable false positive, with the reason in the commit. A baseline
      is a limited, documented exception: apply it to the real scan only,
      never to the self-test; generate it with redaction like the scan, and
@@ -199,9 +201,18 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 - [ ] Does the quality-server step wait on the test and vulnerability steps
       it reports on, and does its scope include every code directory? More:
       [quality-server.md](references/quality-server.md).
+- [ ] Does the deploy step depend on every blocking gate (secret scan,
+      env guard, audit, quality gate)? A deploy that does not wait for them
+      ships what the gates would have stopped.
+- [ ] Does every step have an upper bound on its runtime (a timeout)? A step
+      that can hang for tens of minutes is a gap (low to medium).
 - [ ] Does a vulnerability scan also run on a schedule, and does the
-      scheduled run include the gates and not only unrelated jobs? Verify
-      the schedule fired once.
+      scheduled run include the gates and not only unrelated jobs? A
+      scheduled gate is proven only by a run with the schedule event on a
+      commit that contains the fix (a restart reuses the old commit). When
+      that is impossible (no manual trigger, schedule not due), report "not
+      verified" with the reason; an optional manual event on the scheduled
+      pipeline makes it provable.
 
 **Regression**
 - [ ] Is there a test-count floor or ratchet (a falling count only with an

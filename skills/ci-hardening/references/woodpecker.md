@@ -35,6 +35,11 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **Scheduled runs** use `event: cron`; confirm one ever ran with
   `woodpecker-cli pipeline ls <repo> --event cron` (older CLI versions have
   no cron subcommand to list or trigger schedules).
+- **A restart reuses the old commit.** Restarting a scheduled run after a
+  fix does not test the fix; trigger a new run on the fixed commit.
+- **A hanging or network-failed step:** stop the run and restart it
+  (`pipeline stop` / `pipeline start <repo> <number>`), after first proving
+  that the gate you changed was already green. Give such steps a timeout.
 - **Advisory steps:** list every step with `failure: ignore`; each needs a
   written reason.
 - **Secret-fetching steps failing with an auth error** and no code cause
