@@ -124,3 +124,32 @@ test('fails on a #fragment link whose file does not exist', () => {
   assert.match(result.output, /broken relative link/);
   rmSync(root, { recursive: true, force: true });
 });
+
+const VALID_SKILL = '---\nname: example-skill\ndescription: A valid example skill for testing.\n---\n\n# Example\n';
+
+test('fails on invalid JSON inside a skill directory', () => {
+  const root = makeFixture(VALID_SKILL, { 'evals/scenario-0/criteria.json': '{ "broken": ' });
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /invalid JSON/);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('fails when plugin.json name does not match the skill directory', () => {
+  const root = makeFixture(VALID_SKILL, {
+    '.tessl-plugin/plugin.json': JSON.stringify({ name: 'ws/other-skill', skills: ['.'] }),
+  });
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /"name" must be/);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('passes with valid JSON and a matching plugin.json name', () => {
+  const root = makeFixture(VALID_SKILL, {
+    '.tessl-plugin/plugin.json': JSON.stringify({ name: 'ws/example-skill', skills: ['.'] }),
+  });
+  const result = runLint(root);
+  assert.equal(result.code, 0);
+  rmSync(root, { recursive: true, force: true });
+});

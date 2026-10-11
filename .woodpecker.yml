@@ -18,6 +18,12 @@ steps:
       - sh scripts/secret-scan.sh selftest
       - sh scripts/secret-scan.sh
 
+  - name: shellcheck
+    image: koalaman/shellcheck-alpine:v0.10.0@sha256:5921d946dac740cbeec2fb1c898747b6105e585130cc7f0602eec9a10f7ddb63
+    commands:
+      - apk add --no-cache git
+      - git ls-files -z '*.sh' '.githooks/*' ':!:skills/*/evals/*' | xargs -0 shellcheck -S style
+
   - name: structure-tests
     image: node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
     commands:

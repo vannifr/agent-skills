@@ -3,7 +3,7 @@
 set -e
 
 if command -v gitleaks >/dev/null 2>&1; then
-    gitleaks protect --staged -v .
+    gitleaks git --pre-commit --staged --redact --no-banner
 else
     echo "WARN: gitleaks niet geïnstalleerd -- secret scan overgeslagen (CI dekt dit)."
 fi

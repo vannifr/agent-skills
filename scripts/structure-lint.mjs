@@ -3,7 +3,7 @@
 // Checks: frontmatter present with name+description, SKILL.md line limit,
 // relative links in the body resolve to real files, no placeholder markers.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join, resolve, basename } from 'node:path';
 
 const SKILLS_DIR = 'skills';
 const MAX_LINES = 500;
@@ -69,6 +69,36 @@ function checkSkill(skillDir) {
   }
 }
 
+function jsonFiles(dir) {
+  const found = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) found.push(...jsonFiles(full));
+    else if (entry.name.endsWith('.json')) found.push(full);
+  }
+  return found;
+}
+
+function checkJson(skillDir) {
+  for (const file of jsonFiles(skillDir)) {
+    try {
+      JSON.parse(readFileSync(file, 'utf8'));
+    } catch (err) {
+      errors.push(`${file}: invalid JSON (${err.message})`);
+    }
+  }
+  const pluginPath = join(skillDir, '.tessl-plugin', 'plugin.json');
+  if (existsSync(pluginPath)) {
+    try {
+      const plugin = JSON.parse(readFileSync(pluginPath, 'utf8'));
+      if (!/^[^/]+\/[^/]+$/.test(plugin.name || '') || plugin.name.split('/')[1] !== basename(skillDir)) {
+        errors.push(`${pluginPath}: "name" must be "<workspace>/${basename(skillDir)}", found "${plugin.name}"`);
+      }
+    } catch {
+    }
+  }
+}
+
 if (!existsSync(SKILLS_DIR)) {
   console.log(`No "${SKILLS_DIR}/" directory found — nothing to lint.`);
   process.exit(0);
@@ -85,6 +115,7 @@ if (skillDirs.length === 0) {
 
 for (const name of skillDirs) {
   checkSkill(join(SKILLS_DIR, name));
+  checkJson(join(SKILLS_DIR, name));
 }
 
 if (errors.length > 0) {

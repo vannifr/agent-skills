@@ -2,5 +2,11 @@
 # CI/lokaal-parity: structure lint + tests.
 set -e
 
+if command -v shellcheck >/dev/null 2>&1; then
+    git ls-files -z '*.sh' '.githooks/*' ':!:skills/*/evals/*' | xargs -0 shellcheck -S style
+else
+    echo "WARN: shellcheck not installed -- skipped locally (CI blocks on it)."
+fi
+
 node --test scripts/*.test.mjs
 node scripts/structure-lint.mjs
