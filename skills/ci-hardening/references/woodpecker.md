@@ -51,6 +51,10 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **Lint the pipeline file** before pushing: `woodpecker-cli lint
   .woodpecker.yml`. It accepts what that CLI version accepts; a pipeline can
   pass lint locally and still fail on a newer or older server.
+- **Test a step in its exact CI image** with the user overridden to root and
+  the workspace bind-mounted: add
+  `git config --global --add safe.directory <path>` first, or git refuses
+  to read the mounted repository.
 - **Pin by digest.** Look digests up in the registry, never type a
   plausible-looking hash:
   `for i in <image:tag> ...; do skopeo inspect --format '{{.Digest}}' docker://$i; done`

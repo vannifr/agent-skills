@@ -27,7 +27,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    and how does the last green run relate to HEAD? Did a scheduled run ever
    succeed? Are local hooks really active
    (`git config --show-origin --get-all core.hooksPath`; `/dev/null` means
-   every local gate is off)? A default branch that is already red is its own
+   every local gate is off, so CI is the only reliable gate until fixed;
+   test hook logic by running the scripts directly)? A default branch that is already red is its own
    finding at the top of the report. Findings go stale while an audit stays
    open (a scheduled run fires, someone pushes): re-check the schedule and
    `HEAD..origin/<default>` right before fixing.
@@ -180,8 +181,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       scan that exited 0, never "legitimately 1 commit".
 - [ ] Is there also a full-history scan (scheduled or on the default
       branch)? A range scan legitimately scans few commits, but then the
-      full history is never covered. Test the floor in a fresh single-branch
-      clone: other refs and local state change the count.
+      full history is never covered. Take the proof from the CI run, not
+      from a local count: a local clone can hold extra remote branches and
+      other refs that CI never sees, so the numbers differ.
 
 **Supply chain**
 - [ ] Are images and plugins pinned by digest, with the real value looked up
@@ -209,6 +211,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 - [ ] Does the quality-server step wait on the test and vulnerability steps
       it reports on, and does its scope include every code directory? More:
       [quality-server.md](references/quality-server.md).
+- [ ] Does the gate also run on the pull-request path when the repository
+      uses pull requests? Without a provable PR run (or in a trunk-only
+      repository) report "PR path: not verified" with the reason.
 - [ ] Does the deploy step depend on every blocking gate (secret scan,
       env guard, audit, quality gate)? A deploy that does not wait for them
       ships what the gates would have stopped.

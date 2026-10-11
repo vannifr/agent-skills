@@ -45,6 +45,18 @@ parser and asserts the rules below.
   with a hint, so an unavailable source does not surface as an unrelated
   key error.
 
+## Template: guard for the secret-scan step
+
+A small test that proved reusable across repositories and test languages:
+assert that the clone block sets full history (`depth: 0`, `partial:
+false`) with a digest-pinned clone plugin, that the scan image is
+digest-pinned, that the step runs the exact intended commands (self-test
+first, then the scan), that it contains no `|| true`, no staged-only or
+previous-commit-variable mode, and that the script holds its guards
+(shallow, partial, zero scanned, count below the lower bound). Strip YAML
+comments before the negative assertions; a comment that mentions a
+forbidden word otherwise raises a false alarm.
+
 ## Rules that came out of using it
 
 - Look digests and versions up in the registry; never guess.
