@@ -65,7 +65,10 @@ first, then the scan), that it contains no `|| true`, no staged-only or
 previous-commit-variable mode, and that the script holds its guards
 (shallow, partial, zero scanned, count below the lower bound). Strip YAML
 comments before the negative assertions; a comment that mentions a
-forbidden word otherwise raises a false alarm.
+forbidden word otherwise raises a false alarm. Extract the step's block
+(from its name to the next step) and compare its command list for equality
+with the expected list; cut the block at the commands key's end when the
+step has no filter section after it.
 
 ## Rules that came out of using it
 

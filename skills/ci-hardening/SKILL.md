@@ -194,7 +194,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       branch)? A range scan legitimately scans few commits, but then the
       full history is never covered. Take the proof from the CI run, not
       from a local count: a local clone can hold extra remote branches and
-      other refs that CI never sees, so the numbers differ.
+      other refs (even a notes ref counts as a commit to a history scanner)
+      that CI never sees, so the numbers differ; the minimum belongs to the
+      CI clone itself.
 
 **Supply chain**
 - [ ] Are images and plugins pinned by digest, with the real value looked up
@@ -212,7 +214,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 - [ ] Is any gate, above all the secret scan, behind a pipeline-level path
       or event filter? A docs-only commit then triggers no run. When moving
       the filter to step level, check that every other step keeps its own
-      exclude and that steps depending on a skipped step behave as intended. Read the
+      exclude and that steps depending on a skipped step behave as intended. With no path filter present, the item is "n/a".
+      Read the
       filter and verify with a real documentation change (the run's step
       list must show only the gate steps); a noise commit to trunk is not
       acceptable, so without a real change and the owner's consent report

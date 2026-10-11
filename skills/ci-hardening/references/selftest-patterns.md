@@ -20,10 +20,15 @@ otherwise disable the real scan while the self-test stays green. Assert on the *
 the report** (e.g. grep for `"RuleID"`), not on the exit code: a tool crash
 also exits non-zero and would make a broken scanner look healthy.
 
-## Tracked environment file
+## Tracked sensitive files
 
-Create a throwaway repository, `git add` a `.env`, and assert the
-"no env files tracked" check fails on it.
+Create a throwaway repository, `git add` a set of planted files, and assert
+the guard reports each one by name. Cover more than `.env`: environment
+files (except an example file), browser profile and cookie files, session
+and storage-state files, token files. Keep an explicit exception list for
+scripts that legitimately carry such words in their name. The guard must
+also fail when it finds 0 tracked files at all (a blind guard), and its
+success line should state how many tracked files it checked.
 
 ## Deliberate lint error
 
