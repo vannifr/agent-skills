@@ -77,7 +77,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      the scanner loads by itself: review it like a baseline, and let the
      self-test run with the repository's own config.
    - If a wrapper script exists, let the CI step call the new check directly
-     and keep the wrapper branch only as local parity (no dead CI branch). Remove
+     and keep the wrapper branch only as local parity (no dead CI branch); a
+     staged-only local hook may stay as a fast complement as long as CI scans
+     the full history. Remove
      the wrapper's other superseded paths too (a previous-commit range
      branch, a `--full` mode, a staged-only fallback), not just the CI one.
      A guard the wrapper already had is replaced by the new script, and its
@@ -142,7 +144,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 - [ ] Does a wrapper script or a git hook exit 0 with a warning when its
       tool is missing (`command -v tool || exit 0`)? Acceptable locally only
       with a blocking CI counterpart; in CI it must fail, and a hook that is
-      the only local barrier should fail too.
+      the only local barrier should fail too. Test a hook-run self-test
+      under a simulated hook environment (`GIT_DIR` exported) and prove that
+      the real repository stays untouched.
 - [ ] Is every advisory step (`failure: ignore`, `allow_failure`) listed
       with a written reason? Otherwise it is a gate that cannot fail.
 - [ ] Does the step run the intended binary? A package runner can resolve

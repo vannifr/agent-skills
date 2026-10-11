@@ -18,6 +18,8 @@ Written for Woodpecker; the same questions apply to other CI systems.
   revision range" followed by "no changes" is vacuous. An invalid range
   means "run everything"; begin equal to end (a restart) with 0 changed
   files is a legitimate no-op, and the step should log it as such.
+- **Branch names in examples:** a `when: branch:` copied from an example
+  must match the repository's default branch (`main` or `master`).
 - **Variable names:** the previous commit is `CI_PREV_COMMIT_SHA` (empty on
   a first or forced push). A variable like `CI_COMMIT_BEFORE` does not
   exist; it expands to empty and turns the diff branch into dead code that

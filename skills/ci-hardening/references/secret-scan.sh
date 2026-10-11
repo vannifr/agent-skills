@@ -32,6 +32,9 @@ scan() {
 }
 
 selftest() {
+    for v in $(git rev-parse --local-env-vars); do
+        unset "$v"
+    done
     SCAN_BASELINE=
     SCAN_CONFIG=
     [ ! -f .gitleaks.toml ] || SCAN_CONFIG="$(pwd)/.gitleaks.toml"

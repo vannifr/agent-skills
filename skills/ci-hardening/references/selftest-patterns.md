@@ -85,10 +85,16 @@ the scanner config is one line instead of one baseline each.
 - The clean run must also pass: assert both the failing and the passing
   case, otherwise a gate that always fails looks proven.
 - Never commit the planted violation to the real tree.
-- Tests that run `git init` or `git commit` themselves must be isolated when
-  a git hook starts the suite: use their own temporary directory and unset
-  the git environment variables the hook exports (e.g. `env -u GIT_DIR -u
-  GIT_INDEX_FILE`).
+- A self-test or test that runs `git init` or `git commit` itself must be
+  isolated when a git hook starts it. A hook exports `GIT_DIR` and other
+  `GIT_*` variables; without isolation the "temporary" commands act on the
+  real repository (seen: extra planted commits, and `core.bare` flipped to
+  true so `git status` failed). Unset them first (in shell: `for v in $(git
+  rev-parse --local-env-vars); do unset "$v"; done`) and use a temporary
+  directory. Prove it with a test that starts the self-test with `GIT_DIR`
+  and `GIT_INDEX_FILE` pointing at a real scratch repository and asserts
+  that its config, commit count and refs are unchanged (a stub scanner on
+  the PATH keeps that test free of the real tool).
 - The self-test's own log line (e.g. "selftest ok: clean passes, planted
   secret reported") is the must-fail proof in CI: it re-runs on every push.
   A real leak turning a pipeline red once is nice evidence, not a
