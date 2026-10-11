@@ -94,7 +94,9 @@ the scanner config is one line instead of one baseline each.
   directory. Prove it with a test that starts the self-test with `GIT_DIR`
   and `GIT_INDEX_FILE` pointing at a real scratch repository and asserts
   that its config, commit count and refs are unchanged (a stub scanner on
-  the PATH keeps that test free of the real tool).
+  the PATH keeps that test free of the real tool). Inside the self-test,
+  asserting that `git rev-parse --show-toplevel` equals the temporary
+  directory catches a leak early.
 - The self-test's own log line (e.g. "selftest ok: clean passes, planted
   secret reported") is the must-fail proof in CI: it re-runs on every push.
   A real leak turning a pipeline red once is nice evidence, not a

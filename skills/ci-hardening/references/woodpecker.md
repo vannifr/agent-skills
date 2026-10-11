@@ -74,4 +74,6 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **Fetch every step log of a run into files, then grep the files:**
   `for step in <names>; do woodpecker-cli pipeline log show <repo> <number> "$step" > "logs/$step.txt"; done`
   The CLI may print a version-warning JSON line into the stream; filter it
-  out before grepping.
+  out before grepping. For very short steps the CLI (or an API wrapper) can
+  return an empty log: fetch again or read the step in the web UI before
+  concluding that a step logged nothing.

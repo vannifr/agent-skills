@@ -212,7 +212,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 - [ ] Are images and plugins pinned by digest, with the real value looked up
       from the registry, never invented?
 - [ ] Is the tool version in CI equal to the local one, pinned in a lockfile
-      or requirements file rather than installed unpinned? Run a new gate
+      or requirements file rather than installed unpinned? A gate running in
+      a minimal tool image must not lean on tools that image lacks (git, a
+      package manager): test it in that exact image. Run a new gate
       first locally in the exact CI image: linter rules differ per release.
 - [ ] Do floating specs exist: `>=` ranges without a lockfile, `npx --yes
       <tool>`, binaries fetched by `curl` without a checksum, git-URL
@@ -256,8 +258,10 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 **Regression**
 - [ ] Is there a test-count floor or ratchet (a falling count only with an
       explicit waiver such as a commit trailer or editing the floor file in
-      the same commit), per suite when there are several? In CI it must fail
-      hard when its base is missing, not skip silently.
+      the same commit), per suite when there are several? Count passed plus
+      skipped, and add a separate ceiling for skipped tests (silent skips
+      hide a shrinking suite). In CI it must fail hard when its base is
+      missing, not skip silently.
 - [ ] Are scripts copied between sibling repositories identical? Compare them with `cmp` (a wrapper may rewrite `diff`
       output);
       silent divergence means one repository runs an older, weaker gate.
