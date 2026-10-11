@@ -31,7 +31,11 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **Declare dependencies** (`depends_on`) so cheap blocking gates run first
   and reporting steps wait for the results they report on.
 - **Path filters on individual steps only.** A pipeline-level
-  `when: path: exclude` skips the whole pipeline, secret scan included.
+  `when: path: exclude` skips the whole pipeline, secret scan included. A
+  YAML anchor (a list under a `variables:` key, referenced with an alias on
+  the heavy steps) avoids repeating an identical filter on many steps.
+  Verify with the step list of a run for a real documentation change
+  (`pipeline ps`): only the gate steps should have run.
 - **Scheduled runs** use `event: cron`; confirm one ever ran with
   `woodpecker-cli pipeline ls <repo> --event cron` (older CLI versions have
   no cron subcommand to list or trigger schedules).

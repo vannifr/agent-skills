@@ -62,6 +62,16 @@ when it sees the planted file. Each guard then gets a test that provokes
 exactly that failure, so the guards themselves are proven, next to the
 self-test that proves the scan.
 
+## Baseline recipe (secret scanner)
+
+Generate it once with redaction (`<scanner> git --redact --report-format
+json --report-path <baseline-file> .`), triage every entry (placeholders such
+as `YOUR_API_KEY` in vendored documentation are false positives; anything
+else is a real finding to rotate, not to baseline), keep the reason in the
+commit, and review it like an allowlist. When the same vendored directory
+produces the entries in several repositories, excluding that directory in
+the scanner config is one line instead of one baseline each.
+
 ## Rules
 
 - Self-tests run in CI and locally, from one script.

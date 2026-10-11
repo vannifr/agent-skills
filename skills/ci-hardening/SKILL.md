@@ -152,6 +152,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       list with `git ls-files` per file type (extensionless files such as git
       hooks escape an `*.sh` glob). Hand-kept lists inside scripts (a compile
       list, a test file list) drift when a file is added.
+- [ ] Do test suites exist that run nowhere in CI or in a hook? A suite
+      outside the gate is a coverage gap; list each with its test count.
 - [ ] Does the repository track file types the scanner cannot inspect
       (office documents, PDFs, spreadsheets, images with text)? Report it as
       a coverage finding: convert to text before the scan, or an explicit
@@ -211,8 +213,10 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       or event filter? A docs-only commit then triggers no run. When moving
       the filter to step level, check that every other step keeps its own
       exclude and that steps depending on a skipped step behave as intended. Read the
-      filter; verifying with a docs-only commit pushes to trunk, so do that
-      only with the owner's consent, otherwise report "not verified".
+      filter and verify with a real documentation change (the run's step
+      list must show only the gate steps); a noise commit to trunk is not
+      acceptable, so without a real change and the owner's consent report
+      "not verified".
 - [ ] Do cheap blocking gates (secret scans) run first, with later steps
       depending on them? Does a flaky external-network gate (a link check)
       run before them, so its failure skips every later security step?
@@ -241,7 +245,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       explicit waiver such as a commit trailer or editing the floor file in
       the same commit), per suite when there are several? In CI it must fail
       hard when its base is missing, not skip silently.
-- [ ] Are scripts copied between sibling repositories identical? Diff them;
+- [ ] Are scripts copied between sibling repositories identical? Compare them with `cmp` (a wrapper may rewrite `diff`
+      output);
       silent divergence means one repository runs an older, weaker gate.
 - [ ] Is there a parity test that parses the CI file and checks it against
       the local verify command?
