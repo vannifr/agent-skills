@@ -1,0 +1,4 @@
+{
+  "description": "Audit a pipeline whose gates are all green but several check nothing",
+  "include": ["./inputs"]
+}

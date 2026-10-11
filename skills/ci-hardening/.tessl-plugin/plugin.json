@@ -1,0 +1,8 @@
+{
+  "name": "vannifr/ci-hardening",
+  "description": "Use when auditing or tightening an existing CI pipeline — checks that every gate really verifies something (non-zero counts in the log, a must-fail proof), covers every file, runs strictly, and is pinned and ratcheted. Not for setting up a pipeline (ci-local-parity).",
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}

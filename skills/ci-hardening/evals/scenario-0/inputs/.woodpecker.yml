@@ -1,0 +1,13 @@
+steps:
+  secrets:
+    image: ghcr.io/example/gitleaks:latest
+    commands:
+      - gitleaks detect --no-banner || true
+  lint:
+    image: ghcr.io/example/shellcheck:latest
+    commands:
+      - shellcheck scripts/build.sh scripts/deploy.sh
+  test:
+    image: ghcr.io/example/node:20
+    commands:
+      - node --test 2>/dev/null

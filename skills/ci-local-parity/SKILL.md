@@ -305,6 +305,13 @@ per step, and the gate values (test count, coverage %, quality-gate or
 audit result). When a gate is new, also show it failing once on a
 deliberate violation.
 
+## Auditing or tightening an existing pipeline
+
+This skill ensures local and CI check the same things. It does not ask
+whether each gate really checks anything (non-zero counts, must-fail
+proof, coverage of every file, strictness). For audits and tightening use
+`ci-hardening`.
+
 ## What this doesn't replace
 
 This skill is about the **verification chain** (local ↔ CI), not about
