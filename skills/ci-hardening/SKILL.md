@@ -17,7 +17,10 @@ closing local/CI drift, use `ci-local-parity` first.
 
 ## Workflow
 
-0. **Orientation (first, cheap).** Is the default branch green now, and how
+0. **Orientation (first, cheap).** Fetch and look at
+   `git log HEAD..origin/<default>` before starting: another session or a
+   bot may have pushed the same fix minutes ago. Is the default branch
+   green now, and how
    does the last green run relate to HEAD? Did a scheduled run ever
    succeed? Are the local hooks really active
    (`git config --show-origin --get-all core.hooksPath`; a value of
@@ -55,7 +58,12 @@ closing local/CI drift, use `ci-local-parity` first.
      commit's output through a filter: a hook failure vanishes, the commit
      does not happen, and the staged files land in the next commit.
    - In repositories with bots that push (dependency updates), pull with
-     rebase before pushing.
+     rebase before pushing. A rebase changes the hash: report the hash that
+     was actually pushed and find the CI run by that hash.
+   - A gate that turns red on a new advisory is working. Do not weaken it:
+     look for an override path first (a resolver override or pinned
+     transitive version), read the advisory details (severity, attack
+     vector) and only then weigh an explicit, documented ignore.
 4. **Evidence report.** Before/after in numbers (files covered, commits
    scanned, pinned images n/m, tests, strictness level), never "improved".
 

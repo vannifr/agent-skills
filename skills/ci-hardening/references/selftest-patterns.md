@@ -45,3 +45,15 @@ Also assert it fails hard (not skips) when the base reference is missing.
   secret reported") is the must-fail proof in CI: it re-runs on every push.
   A real leak turning a pipeline red once is nice evidence, not a
   requirement.
+
+## Expected-count pitfalls (history scanners)
+
+- A history scanner may skip commits without added lines (delete-only
+  commits), so derive the expected count from commits with at least one
+  added line (`git log --numstat`), not from all commits.
+- It scans all refs by default, so the logged count can exceed the count on
+  HEAD: use "at least" (`-ge`), never equality.
+- Use a unique commit marker in `git log` parsing; `@` collides with hunk
+  headers (`@@`) when patches are printed.
+- Compute the expected count in the CI image: a local shell hook can
+  rewrite `git log` output and give a different number.

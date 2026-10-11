@@ -43,12 +43,12 @@ fi
 
 [ "$(git rev-parse --is-shallow-repository)" = false ] || { echo "FAIL: shallow clone, history incomplete"; exit 1; }
 [ -z "$(git config --get remote.origin.partialclonefilter || true)" ] || { echo "FAIL: partial clone, history incomplete"; exit 1; }
-expected=$(git log --format='@%H' --name-only | awk '/^@/{if(c&&f)n++; c=1; f=0; next} NF{f=1} END{if(c&&f)n++; print n+0}')
+expected=$(git log --format='COMMIT %H' --numstat | awk '/^COMMIT /{if(c&&f)n++; c=1; f=0; next} NF&&$1!="0"{f=1} END{if(c&&f)n++; print n+0}')
 scan .
 [ "$SCAN_RC" -eq 0 ] || exit "$SCAN_RC"
 if [ -z "$SCAN_SCANNED" ] || [ "$SCAN_SCANNED" -le 0 ]; then
     echo "FAIL: scanner reported no commits scanned"
     exit 1
 fi
-[ "$SCAN_SCANNED" -ge "$expected" ] || { echo "FAIL: scanned $SCAN_SCANNED, expected at least $expected commits with changes (shallow or partial clone?)"; exit 1; }
+[ "$SCAN_SCANNED" -ge "$expected" ] || { echo "FAIL: scanned $SCAN_SCANNED, expected at least $expected commits with added lines (shallow or partial clone?)"; exit 1; }
 echo "secret scan covered $SCAN_SCANNED commits (at least $expected expected)"
