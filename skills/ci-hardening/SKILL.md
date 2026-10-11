@@ -68,10 +68,16 @@ closing local/CI drift, use `ci-local-parity` first.
      `git log HEAD..origin/<default>`; when nothing new is there, push
      without a rebase. A rebase changes the hash: report the hash that
      was actually pushed and find the CI run by that hash.
-   - A gate that turns red on a new advisory is working. Do not weaken it:
-     look for an override path first (a resolver override or pinned
-     transitive version), read the advisory details (severity, attack
-     vector) and only then weigh an explicit, documented ignore.
+   - Pre-flight before a gate push: run the other existing gates (above
+     all the dependency audit) locally, so the gate commit does not turn
+     red for an unrelated reason.
+   - A new working gate exposes existing debt. When the pipeline turns red
+     after a gate push, first separate cause: your change or a new
+     advisory or finding underneath? Then: read the details (severity,
+     attack vector), look for an override path (a resolver override, a
+     lockfile-only fix, a pinned transitive version), fix, and document
+     the result. Never weaken the gate; an explicit ignore comes last,
+     with a reason and an expiry.
 4. **Evidence report.** Before/after in numbers (files covered, commits
    scanned, pinned images n/m, tests, strictness level), never "improved".
 
