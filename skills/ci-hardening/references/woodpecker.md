@@ -40,6 +40,10 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **A hanging or network-failed step:** stop the run and restart it
   (`pipeline stop` / `pipeline start <repo> <number>`), after first proving
   that the gate you changed was already green. Give such steps a timeout.
+- **Phantom workflow slots:** a step that stays "running" with no container
+  while a restart stays "pending", and the agent log shows `task not found`,
+  means the agent's workflow capacity is held by phantoms. Restart the agent,
+  stop the orphaned run, start it again.
 - **Advisory steps:** list every step with `failure: ignore`; each needs a
   written reason.
 - **Secret-fetching steps failing with an auth error** and no code cause

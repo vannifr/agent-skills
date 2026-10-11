@@ -105,7 +105,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      rebase onto the remote first. If the working directory is dirty or
      behind (someone else's work in progress), do the change in a temporary
      detached worktree of the remote default branch and push from there,
-     leaving the checkout untouched; clean up afterwards (container output in
+     leaving the checkout untouched (read `git log -- <pipeline file>` and
+     `git status` first, and stage explicitly, when another session edits the
+     same file); clean up afterwards (container output in
      the scratch area may be root-owned).
 4. **Evidence report** in one place: pushed hash, CI run number, the quoted
    log lines, before/after numbers (see Report form), never "improved". Take

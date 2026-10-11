@@ -24,7 +24,9 @@ parser and asserts the rules below.
 ## First set of guards
 
 - Every image is pinned by digest (a tag alone is a finding), the clone
-  image included.
+  image included. When the repository still has many tag-only images, use a
+  two-level ratchet: the test requires at least a version tag now, and
+  digest-only via an explicit exception list that only shrinks.
 - Dependencies refer only to existing steps and contain no cycle.
 - A step that consumes coverage or generated files waits (transitively) for
   every producer.
@@ -32,6 +34,7 @@ parser and asserts the rules below.
   or scan step; otherwise a failing scan skips it.
 - Every step except the security gates (secret scan, audit) has the
   project's path filter, or is on an explicit exception list in the test.
+  Schedule-only steps are a valid third category on that list.
 - `failure: ignore` only through an allowlist with a reason, plus a
   time-bound test that fails once the deadline has passed. That test turns
   trunk red on a date without any code change: say so in its message and
@@ -44,6 +47,13 @@ parser and asserts the rules below.
 - A secret source the pipeline depends on (e.g. a vault) has a health check
   with a hint, so an unavailable source does not surface as an unrelated
   key error.
+
+## Write the guard tests so the quality gate accepts them
+
+The guard tests are code too and go through the quality server. Keep one
+simple assertion per test, no early return, no compound assertion and no
+`assert False`; put the logic in a helper (e.g. an `is_pinned(image)`
+function) and assert its result once.
 
 ## Template: guard for the secret-scan step
 
@@ -63,7 +73,12 @@ forbidden word otherwise raises a false alarm.
 - Prove a new blocking gate fails on a deliberate violation first. Scanners
   complement each other; do not replace one with another.
 - Retry only the network part (a database download), never the scan itself,
-  or a real finding is repeated and delayed.
+  or a real finding is repeated and delayed. Some scanners need the database
+  step and the scan step to share one cache directory, or the scan step
+  refuses to skip the update on a first run.
+- Keep local test-runner settings (workers, retries) close to CI; prove a
+  suspected flake with a stress run on the old commit in a worktree before
+  changing a test or its config.
 
 ## Evidence and done
 
