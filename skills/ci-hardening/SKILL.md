@@ -239,6 +239,14 @@ or a server are marked "n/a (not auditable read-only)".
       be older than the last known analysis"). Fix: a separate project key
       for local runs.
 
+## Guarding the pipeline definition
+
+The pipeline file itself is code without a safety net; lint only checks
+syntax. A guard test in the normal test suite (dependency graph, image
+pins, producers before consumers, ignore allowlist with deadline) catches
+what shows up otherwise only after a push: see
+[pipeline-definition-guard.md](references/pipeline-definition-guard.md).
+
 ## Report form
 
 Start with a standard summary table: images pinned n/m, files linted vs
