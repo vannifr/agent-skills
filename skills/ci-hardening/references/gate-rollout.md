@@ -44,7 +44,10 @@ A copy goes stale. After every change to the reference:
    wrapper, for the real scan only, and check that the log shows
    `baseline: <path> (N entries)`; without the baseline the scan reports the
    known hits again.
-5. A repository with a rule register or parity test needs the register
+5. When rebasing onto a peer's gate commit and a shared test list
+   conflicts, check the new test files of that commit (`git show --stat`)
+   for their own git helper and include them in the isolation test.
+   A repository with a rule register or parity test needs the register
    change in the same commit, or its verify run turns red.
 6. A cheap drift measurement is a sweep that runs `cmp` of every copy
    against each reference version (the current one and the previous one).

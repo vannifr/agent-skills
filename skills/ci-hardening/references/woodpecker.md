@@ -101,6 +101,9 @@ Written for Woodpecker; the same questions apply to other CI systems.
   than the CLI: for example the repository as `owner/name`, a run `number`,
   and a step id taken from the run's details. Read the tool schema before
   the first call.
+- **Wait for a run with a loop or a background command**, not a bare
+  `sleep`: some agent environments block it. Poll until the run's status is
+  final (pending and running both mean wait).
 - **A large log may come back as a file** instead of text (API or MCP
   wrappers): search it with a script run in isolated mode instead of
   printing it.

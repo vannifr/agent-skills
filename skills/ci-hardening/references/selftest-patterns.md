@@ -108,14 +108,20 @@ the scanner config is one line instead of one baseline each.
   core.bare`, `git -C $s rev-list --all --count` and `git -C $s
   for-each-ref | sha1sum`, run `GIT_DIR=$s/.git GIT_INDEX_FILE=$s/.git/index
   sh scripts/secret-scan.sh selftest`, then assert that all three are
-  unchanged. Mutation proof: the test fails against the old script.
+  unchanged. Also record a hash of `.git/config` and of the index: a script that only
+  runs `git config` leaks into the config without changing commits or refs.
+  Mutation proof: the test fails against the old script; a fixture that
+  already scrubbed legitimately gives no red mutation, which is a valid
+  per-file outcome and not a test defect.
 - Damage check after such a leak, as its own evidence item per repository
   (a sync does not show it): `core.bare` is false, no `user.*` section that
   the repository did not have in its config, and no commits with the exact
   subjects the self-test uses (`git log --all --grep='^planted$'
   --grep='^clean$'`; a loose `clean` grep gives false alarms). `git fsck
   --lost-found` always lists dangling stash and amend leftovers, so it is no
-  signal without a look at their content. Also check
+  signal without a look at their content. After removing stray `user.*`
+  keys the effective identity falls back to the global one: check it, and
+  commit with an explicit inline identity. Also check
   `git config --local --list | grep -E '^user\.'`: restoring `core.bare`
   can leave a stray `user.name` or `user.email` behind. A worktree shares
   the repository config with the main checkout and other worktrees, so that
