@@ -63,7 +63,10 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      at it (plus the clone fix), run it locally in the exact CI image
      (override the user to root, mark the workspace a safe directory), then
      push. Worked example for a secret scan, with its self-test:
-     [secret-scan.sh](references/secret-scan.sh).
+     [secret-scan.sh](references/secret-scan.sh). A copy of a reference
+     script goes stale: after every change to the reference, find the copies
+     (`git grep -l <script name>` per repository), compare them with `cmp`
+     and sync the deviating ones, one commit per repository.
    - Before putting a scan on full history, run it locally and triage the
      hits (real, or a variable reference). The same false positive on a
      variable reference in several repositories is better handled by one
@@ -143,8 +146,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       (e.g. `git --version`) instead.
 - [ ] Does a wrapper script or a git hook exit 0 with a warning when its
       tool is missing (`command -v tool || exit 0`)? Acceptable locally only
-      with a blocking CI counterpart; in CI it must fail, and a hook that is
-      the only local barrier should fail too. Test a hook-run self-test
+      with a blocking CI counterpart (the boundary is whether one exists);
+      in CI it must fail, and a hook that is the only barrier should fail
+      too. Test a hook-run self-test
       under a simulated hook environment (`GIT_DIR` exported) and prove that
       the real repository stays untouched.
 - [ ] Is every advisory step (`failure: ignore`, `allow_failure`) listed

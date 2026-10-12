@@ -59,7 +59,14 @@ A guard that needs a YAML parser may not have one: Python's standard library
 has none, so test the YAML text with regular expressions or add the parser
 as a test dependency. A small alpine-based test image may lack git, which
 the guard tests need: install it in the test step (that is within the scope
-of the gate fix).
+of the gate fix). A slim language image without git cannot run guard tests
+that drive a stub scanner against real git repositories: put those guards in
+a shell script and run it in the image of the scanner step (which has git),
+with a parity assertion that the step really calls it.
+
+A parity test should not carry a list of documented exceptions for a gate
+that has just been repaired: look the entries up and delete them, so that the
+parity is exact.
 
 ## Write the guard tests so the quality gate accepts them
 
