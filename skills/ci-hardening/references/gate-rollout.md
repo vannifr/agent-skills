@@ -36,7 +36,9 @@ A copy goes stale. After every change to the reference:
 
 1. `git grep -l <script name>` per repository, compare each copy with `cmp`
    and sync the deviating ones, one commit per repository.
-2. Start with `git ls-tree origin/<default> <script path>`: no copy means a
+2. Never use a local remote-tracking ref as the source (it can trail):
+   read the default branch with `git ls-remote --symref <url> HEAD` (it may
+   be `master`) and compare against the remote. Start with `git ls-tree origin/<default> <script path>`: no copy means a
    new gate with its own order of work, not a sync.
 3. Per repository first run the step 0 orientation (hooks path included).
 4. A repository with its own baseline lookup inside the script migrates to
@@ -83,6 +85,12 @@ baseline, and the self-test runs with the repository's own config.
 
 ## Pre-flight and debt
 
+- A new test that calls `git` fails in a slim test image without it, so run
+  new tests in the exact step image before the push. Per repository choose:
+  install git in the step, or run the behaviour test in the scanner image
+  (which has git) and keep only assertions in the slim one.
+- Read numbers (a floor, a ratchet count) from the repository, not from an
+  earlier message.
 - Run the other existing gates (above all the dependency audit and the
   new-code quality gate) locally before the push, and again after adding a
   tool dependency for the new gate (it drags in its own advisories). New
@@ -111,6 +119,9 @@ baseline, and the self-test runs with the repository's own config.
 
 ## Commit hygiene
 
+- A repository rule that forbids commits or pushes by delegated agents
+  conflicts with delegation: the orchestrator states explicitly in the
+  instruction that the agent may push, and the report says so.
 - Verify each commit landed (`git log -1`, clean `git status`), check that
   its author is the intended commit identity (older commits stay as they
   are; never rewrite shared history for it), and report the hash actually

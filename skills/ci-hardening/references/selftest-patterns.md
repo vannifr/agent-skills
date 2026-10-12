@@ -135,6 +135,9 @@ the scanner config is one line instead of one baseline each.
   autouse fixture or the runner's environment). A fixture leak shows in the
   mutation proof as a setup error rather than an assertion failure: a
   non-zero exit with no passing test is the proof.
+- The error-line guard of the script matches `' (ERR|FTL) '` with a
+  leading space: a stub must write its error line with a timestamp prefix
+  (`10:00AM ERR ...`) or the guard does not trigger.
 - The self-test's own log line (e.g. "selftest ok: clean passes, planted
   secret reported") is the must-fail proof in CI: it re-runs on every push.
   A real leak turning a pipeline red once is nice evidence, not a

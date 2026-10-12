@@ -62,7 +62,10 @@ the guard tests need: install it in the test step (that is within the scope
 of the gate fix). A slim language image without git cannot run guard tests
 that drive a stub scanner against real git repositories: put those guards in
 a shell script and run it in the image of the scanner step (which has git),
-with a parity assertion that the step really calls it.
+with a parity assertion that the step really calls it. A path-stub guard
+that needs only `sh` and `grep` also runs in the existing slim step without
+changing the pipeline. A pinned list of expected commands forces a new guard
+to get its own step; do not change the pin.
 
 A parity test should not carry a list of documented exceptions for a gate
 that has just been repaired: look the entries up and delete them, so that the

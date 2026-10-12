@@ -101,8 +101,10 @@ Written for Woodpecker; the same questions apply to other CI systems.
   than the CLI: for example the repository as `owner/name`, a run `number`,
   and a step id taken from the run's details. Read the tool schema before
   the first call.
-- **Wait for a run with a loop or a background command**, not a bare
-  `sleep`: some agent environments block it. Poll until the run's status is
+- **Wait for a run with a foreground `until` loop or a background run**,
+  not a bare `sleep` (some agent environments block it) and not a
+  background subshell that dies at the end of the call (it leaves an empty
+  log). Poll until the run's status is
   final (pending and running both mean wait).
 - **A large log may come back as a file** instead of text (API or MCP
   wrappers): search it with a script run in isolated mode instead of
@@ -112,4 +114,7 @@ Written for Woodpecker; the same questions apply to other CI systems.
   The CLI may print a version-warning JSON line into the stream; filter it
   out before grepping. For very short steps the CLI (or an API wrapper) can
   return an empty log: fetch again or read the step in the web UI before
-  concluding that a step logged nothing.
+  concluding that a step logged nothing. Right after a run ends the
+  log can still be empty while the run already reports success: ask again
+  later, it is no evidence gap. Judge "is CI hanging" by the run status,
+  not by the clock: an agent host's clock can be hours off.

@@ -103,7 +103,8 @@ versus `git ls-files`; which images are unpinned. Then walk the checklist.
       tool is missing (`command -v tool || exit 0`)? Acceptable locally only
       with a blocking CI counterpart (the boundary is whether one exists);
       in CI it must fail, and a hook that is the only barrier should fail
-      too.
+      too. Enabling, testing and degrading hooks:
+      [local-hooks.md](references/local-hooks.md).
 - [ ] Is every self-test and test that runs `git init` or `commit` isolated
       from a git hook environment (`GIT_DIR` exported)? That includes the
       repository's own test fixtures
