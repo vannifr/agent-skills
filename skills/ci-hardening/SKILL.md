@@ -84,7 +84,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      `GITLEAKS_BASELINE` variable: set it in the CI step and in the local
      wrapper, for the real scan only, and check that the log shows
      `baseline: <path> (N entries)`; without the baseline the scan reports
-     the known hits again.
+     the known hits again. A repository with a rule register or parity
+     test needs the register change in the same commit, or its verify run
+     turns red.
    - Before putting a scan on full history, run it locally and triage the
      hits (real, or a variable reference). The same false positive on a
      variable reference in several repositories is better handled by one

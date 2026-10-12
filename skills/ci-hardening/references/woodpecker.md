@@ -81,6 +81,10 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **Step names:** `woodpecker-cli pipeline ps <repo> <number>` (in older CLI
   versions `pipeline show` does not list steps; take them from the pipeline
   file). `--output table=<columns>` selects columns in list commands.
+- **Do not fetch the log of a running step** (an API or MCP call returns
+  the whole noisy log): poll the step states of the run and fetch one log
+  after it has finished. A loaded workstation can stretch a run by tens of
+  minutes.
 - **Fetch every step log of a run into files, then grep the files:**
   `for step in <names>; do woodpecker-cli pipeline log show <repo> <number> "$step" > "logs/$step.txt"; done`
   The CLI may print a version-warning JSON line into the stream; filter it

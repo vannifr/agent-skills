@@ -4,6 +4,13 @@ Only relevant when the pipeline posts analyses to an analysis server.
 
 - **Wait for the gate.** The step must fail on a non-OK quality gate (e.g. a
   wait-for-quality-gate setting), not only print the status.
+- **Print the failing conditions.** On a non-OK gate the step must print
+  each failing condition (metric key, actual value, threshold, status; the
+  `conditions[]` of the project-status API response), not only the overall
+  status: otherwise nobody can tell from the log why it is red, and the gate
+  is "unproven" diagnostically (medium to low). The thresholds themselves
+  are project configuration; they need one source of truth (a runbook or a
+  server export) and the pipeline must not be able to lower them silently.
 - **Scope vs the repository.** The source list must include every code
   directory that is tracked; compare it with `git ls-files`. Excluding the
   test directory means tests are never analysed.

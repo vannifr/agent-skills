@@ -113,7 +113,12 @@ the scanner config is one line instead of one baseline each.
   can leave a stray `user.name` or `user.email` behind. A worktree shares
   the repository config with the main checkout and other worktrees, so that
   damage reaches peer sessions too. An isolation-test fixture must not
-  inherit a user section: assert that no local `user.*` key appears.
+  inherit a user section: assert that no local `user.*` key appears. A
+  helper alone is not enough: product code under test that calls git itself
+  also inherits `GIT_*`, so scrub the variables for the whole suite (an
+  autouse fixture or the runner's environment). A fixture leak shows in the
+  mutation proof as a setup error rather than an assertion failure: a
+  non-zero exit with no passing test is the proof.
 - The self-test's own log line (e.g. "selftest ok: clean passes, planted
   secret reported") is the must-fail proof in CI: it re-runs on every push.
   A real leak turning a pipeline red once is nice evidence, not a
