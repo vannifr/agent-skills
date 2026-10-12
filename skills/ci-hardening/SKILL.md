@@ -31,7 +31,17 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    test hook logic by running the scripts directly)? A default branch that is already red is its own
    finding at the top of the report. Findings go stale while an audit stays
    open (a scheduled run fires, someone pushes): re-check the schedule and
-   `HEAD..origin/<default>` right before fixing.
+   `HEAD..origin/<default>` right before fixing. Triage a red default
+   branch from the failed step (`pipeline ps`) before adopting the
+   hypothesis of an earlier report; a flaky step shows as the same commit
+   red in one run and green in the next. To locate a silently aborted test,
+   diff the CI log against a local run in the exact image.
+   Repository governance wins over this skill: look for protected paths
+   (`git grep -n -i protected` in the agent rules and governance docs). When
+   the pipeline, hooks or gate scripts are protected (operator signing), a
+   blocked commit is an outcome, not an obstacle: deliver a patch plus a
+   handover note, do not bypass the block, and report the finding as
+   "operator-gated", separate from "unproven".
 1. **Inventory.** Read the scripts the pipeline calls, not only the pipeline
    file: a wrapper decides what really runs, and a non-strict mode can make a
    skipped tool exit 0. For each step write down what it claims, what its

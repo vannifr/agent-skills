@@ -31,7 +31,11 @@ Written for Woodpecker; the same questions apply to other CI systems.
 ## Shape
 
 - **Declare dependencies** (`depends_on`) so cheap blocking gates run first
-  and reporting steps wait for the results they report on.
+  and reporting steps wait for the results they report on. Note that
+  `depends_on` on one step makes every step without it run in parallel, not
+  in file order; to keep a flaky external gate from skipping anything,
+  either order the steps sequentially in the file and guard "external gate
+  last" with a test, or give every step a `depends_on`.
 - **Path filters on individual steps only.** A pipeline-level
   `when: path: exclude` skips the whole pipeline, secret scan included. A
   YAML anchor (a list under a `variables:` key, referenced with an alias on
