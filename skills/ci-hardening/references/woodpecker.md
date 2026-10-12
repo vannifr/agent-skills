@@ -97,6 +97,10 @@ Written for Woodpecker; the same questions apply to other CI systems.
   the whole noisy log): poll the step states of the run and fetch one log
   after it has finished. A loaded agent host can stretch a run by tens of
   minutes.
+- **Wrappers of the CI API (MCP servers) can use other parameter names**
+  than the CLI: for example the repository as `owner/name`, a run `number`,
+  and a step id taken from the run's details. Read the tool schema before
+  the first call.
 - **A large log may come back as a file** instead of text (API or MCP
   wrappers): search it with a script run in isolated mode instead of
   printing it.

@@ -46,14 +46,18 @@ A copy goes stale. After every change to the reference:
    known hits again.
 5. A repository with a rule register or parity test needs the register
    change in the same commit, or its verify run turns red.
-6. After a script change, decide explicitly whether the existing copies
+6. A cheap drift measurement is a sweep that runs `cmp` of every copy
+   against each reference version (the current one and the previous one).
+   Report which ref was measured: a working tree and a local origin ref can
+   trail when a fetch fails without credentials.
+7. After a script change, decide explicitly whether the existing copies
    follow and in which order: the new rules are stricter and can surface an
    error line that was hidden, so this is a behaviour change per repository
    and the owner's choice. Repositories with a protected pipeline get a
    patch, not a commit. A repository's own parity test that guards the
    script's content follows the script in the same commit and is never
    weakened; find these tests with `git grep -l <script name> -- tests`.
-7. Check the damage per repository as its own evidence item (see the damage
+8. Check the damage per repository as its own evidence item (see the damage
    check in [selftest-patterns.md](selftest-patterns.md)); a sync does not
    show it.
 
@@ -119,4 +123,9 @@ baseline, and the self-test runs with the repository's own config.
   file pointing to an absolute host path, so it fails as a bind mount, and a
   full-history scan in an image reports it as not a repository. A build in
   it needs its own install, not a symlinked dependency directory. Test in a
-  fresh `git clone file://` with the changed files copied in.
+  fresh `git clone file://` with the changed files copied in. A local
+  default branch can trail `origin/<default>` (which already has the gate
+  commit), so a clone of the working repository can miss it: fetch the
+  remote-tracking ref explicitly (`git fetch file://<repo>
+  refs/remotes/origin/<default>:refs/heads/<name>`) or clone over the
+  remote.

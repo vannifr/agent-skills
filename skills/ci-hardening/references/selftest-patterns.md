@@ -120,7 +120,10 @@ the scanner config is one line instead of one baseline each.
   can leave a stray `user.name` or `user.email` behind. A worktree shares
   the repository config with the main checkout and other worktrees, so that
   damage reaches peer sessions too. An isolation-test fixture must not
-  inherit a user section: assert that no local `user.*` key appears. A
+  inherit a user section: assert that no local `user.*` key appears. Cover
+  the global-config variant too: through `GIT_CONFIG_GLOBAL` set a failing
+  pre-commit hook and `commit.gpgsign=true` and require that the self-test
+  still passes (a second mutation proof next to the `GIT_DIR` leak). A
   helper alone is not enough: product code under test that calls git itself
   also inherits `GIT_*`, so scrub the variables for the whole suite (an
   autouse fixture or the runner's environment). A fixture leak shows in the
