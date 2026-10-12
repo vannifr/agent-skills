@@ -14,6 +14,10 @@ part1='AKIA'; part2='IOSFODNN7EXAMPLE'
 printf 'key = "%s%s"\n' "$part1" "$part2" > "$tmp/planted.txt"
 ```
 
+The planted value in the bundled script is built the same way, in two
+parts. If a scanner still flags the script itself, allow that one path in
+the scanner config; do not add it to a baseline.
+
 Run the scanner on `$tmp` with a JSON report, using the repository's own
 scanner config when it has one: an allowlist that excludes everything would
 otherwise disable the real scan while the self-test stays green. Assert on the **finding in

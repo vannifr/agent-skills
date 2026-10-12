@@ -19,6 +19,11 @@ with its self-test: [secret-scan.sh](secret-scan.sh).
   superseded paths too (a previous-commit range branch, a `--full` mode, a
   staged-only fallback). A guard the wrapper already had is replaced by the
   new script and its old tests move with it.
+- Commit order: every commit must be green on its own. A gate commit must
+  not call a guard script that only exists in the next commit; the call and
+  its parity assertion belong in the commit that adds the guard.
+- A wrapper that runs a tool under a gate label must pass the `selftest`
+  argument through too, so the label covers the self-test as well.
 - Replacing a gate means extending its parity or guard tests, never
   loosening them: replace the assertions of the old structure by stricter
   ones, say so in the commit, and never remove an assertion to get green.
@@ -76,6 +81,16 @@ baseline, and the self-test runs with the repository's own config.
   tool dependency for the new gate (it drags in its own advisories). New
   tests in the repository's own suite can trip quality rules too: the gate
   commit must not turn red for an unrelated reason.
+- Run the formatter check on every new file, config files included, and
+  chain the verification commands with `&&` so the first failure stops the
+  chain: a gate commit once went red because a format check sat in a chain
+  that kept going.
+- When the default branch trails automated dependency merges that had no CI
+  run, check whether the red cause was already there before your change (for
+  example a lockfile whose platform fields make an install skip a native
+  package in one image family).
+- A package manager's auto-fix can crash on an older release: try the
+  current major in a one-off runner before concluding that there is no fix.
 - For a red audit one lookup decides the route: a patched version available
   (fix-available field, the advisory's first-patched version) means override
   or update; none means a documented ignore. Recipe:

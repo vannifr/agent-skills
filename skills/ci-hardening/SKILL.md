@@ -38,6 +38,9 @@ versus `git ls-files`; which images are unpinned. Then walk the checklist.
    fixed; test hook logic by running the scripts directly)? Findings go
    stale while an audit stays open (a scheduled run fires, someone pushes):
    re-check the schedule and `HEAD..origin/<default>` right before fixing.
+   Also read the role and commit rules in the agent rules (for example
+   "the orchestrator commits, executing agents never do"); when in doubt
+   have the owner confirm who may commit.
    Repository governance wins over this skill: when the pipeline, hooks or
    gate scripts are protected, a blocked commit is an outcome ("operator-gated"), not
    an obstacle: [protected-pipelines.md](references/protected-pipelines.md).

@@ -97,6 +97,9 @@ Written for Woodpecker; the same questions apply to other CI systems.
   the whole noisy log): poll the step states of the run and fetch one log
   after it has finished. A loaded agent host can stretch a run by tens of
   minutes.
+- **A large log may come back as a file** instead of text (API or MCP
+  wrappers): search it with a script run in isolated mode instead of
+  printing it.
 - **Fetch every step log of a run into files, then grep the files:**
   `for step in <names>; do woodpecker-cli pipeline log show <repo> <number> "$step" > "logs/$step.txt"; done`
   The CLI may print a version-warning JSON line into the stream; filter it
