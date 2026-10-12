@@ -81,8 +81,7 @@ A small test that proved reusable across repositories and test languages:
 assert that the clone block sets full history (`depth: 0`, `partial:
 false`) with a digest-pinned clone plugin, that the scan image is
 digest-pinned, that the step runs the exact intended commands (self-test
-first, then the scan), that it contains no `|| true` (except `$(git config --get ... || true)`
-inside the reference script, or the guard fails on the reference itself), no staged-only or
+first, then the scan), that it contains no `|| true`, no staged-only or
 previous-commit-variable mode, and that the script holds its guards
 (shallow, partial, zero scanned, count below the lower bound). Strip YAML
 comments before the negative assertions; a comment that mentions a

@@ -40,20 +40,27 @@ Written for Woodpecker; the same questions apply to other CI systems.
   `when: path: exclude` skips the whole pipeline, secret scan included. A
   YAML anchor (a list under a `variables:` key, referenced with an alias on
   the heavy steps) avoids repeating an identical filter on many steps.
-  Verify with the step list of a run for a real documentation change
-  (`pipeline ps`): only the gate steps should have run.
+  Check that every other step keeps its own exclude and that steps
+  depending on a skipped step behave as intended. Verify with the step list
+  of a run for a real documentation change (`pipeline ps`): only the gate
+  steps should have run. A noise commit to trunk is not acceptable: without
+  a real change and the owner's consent report "not verified".
 - **Scheduled runs** use `event: cron`; confirm one ever ran with
   `woodpecker-cli pipeline ls <repo> --event cron` (older CLI versions have
-  no cron subcommand to list or trigger schedules).
+  no cron subcommand to list or trigger schedules). A scheduled gate is
+  proven only by a run with the schedule event on a commit that contains the
+  fix; when that is impossible (no manual trigger, schedule not due) report
+  "not verified" with the reason. An optional manual event on the scheduled
+  pipeline makes it provable.
 - **A restart reuses the old commit.** Restarting a scheduled run after a
   fix does not test the fix; trigger a new run on the fixed commit.
 - **A hanging or network-failed step:** stop the run and restart it
   (`pipeline stop` / `pipeline start <repo> <number>`), after first proving
   that the gate you changed was already green. Give such steps a timeout.
-- **Phantom workflow slots:** a step that stays "running" with no container
-  while a restart stays "pending", and the agent log shows `task not found`,
-  means the agent's workflow capacity is held by phantoms. Restart the agent,
-  stop the orphaned run, start it again.
+- **Orphaned workflow slots:** a step that stays "running" with no
+  container while a restart stays "pending" can mean the agent's capacity is
+  held by orphaned tasks (check the agent log). Restart the agent, stop the
+  orphaned run, start it again.
 - **Advisory steps:** list every step with `failure: ignore`; each needs a
   written reason.
 - **Secret-fetching steps failing with an auth error** and no code cause
@@ -74,7 +81,12 @@ Written for Woodpecker; the same questions apply to other CI systems.
 - **Test a step in its exact CI image** with the user overridden to root and
   the workspace bind-mounted: add
   `git config --global --add safe.directory <path>` first, or git refuses
-  to read the mounted repository.
+  to read the mounted repository. Run every new or changed CI script there
+  with real input and every scenario it handles: a script that passes
+  locally can crash in a minimal image that lacks git or a package manager,
+  and linter rules differ per release. A guard test can encode the
+  requirement per image family (a slim image installs what the script
+  needs), and the script should degrade visibly rather than crash.
 - **Pin by digest.** Look digests up in the registry, never type a
   plausible-looking hash:
   `for i in <image:tag> ...; do skopeo inspect --format '{{.Digest}}' docker://$i; done`
@@ -83,7 +95,7 @@ Written for Woodpecker; the same questions apply to other CI systems.
   file). `--output table=<columns>` selects columns in list commands.
 - **Do not fetch the log of a running step** (an API or MCP call returns
   the whole noisy log): poll the step states of the run and fetch one log
-  after it has finished. A loaded workstation can stretch a run by tens of
+  after it has finished. A loaded agent host can stretch a run by tens of
   minutes.
 - **Fetch every step log of a run into files, then grep the files:**
   `for step in <names>; do woodpecker-cli pipeline log show <repo> <number> "$step" > "logs/$step.txt"; done`

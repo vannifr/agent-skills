@@ -69,7 +69,8 @@ while [ "$#" -gt 0 ]; do
   esac
   shift
 done
-echo "1 commits scanned."
+echo "1:23AM INF \${STUB_COUNT:-1} commits scanned."
+[ -z "\${STUB_LOG_LINE:-}" ] || echo "\$STUB_LOG_LINE"
 if [ -f "$dir/planted.txt" ]; then
   echo '[{"RuleID":"stub"}]' > "$report"
   exit 1
@@ -93,6 +94,7 @@ test('the self-test leaves the real repository untouched when it runs under a gi
     git(real, 'config', '--local', '--get', 'core.bare').trim(),
     git(real, 'rev-list', '--all', '--count').trim(),
     git(real, 'for-each-ref').trim(),
+    git(real, 'config', '--local', '--list').split('\n').filter((l) => l.startsWith('user.')).length,
   ].join('|');
   const before = snapshot();
   const hookEnv = cleanEnv({
@@ -105,4 +107,129 @@ test('the self-test leaves the real repository untouched when it runs under a gi
   rmSync(base, { recursive: true, force: true });
   assert.match(out, /selftest ok/);
   assert.equal(after, before);
+});
+
+function stubBin() {
+  const base = mkdtempSync(join(tmpdir(), 'secret-scan-stub-'));
+  const bin = join(base, 'bin');
+  mkdirSync(bin);
+  writeFileSync(join(bin, 'gitleaks'), STUB_GITLEAKS);
+  chmodSync(join(bin, 'gitleaks'), 0o755);
+  return { base, bin };
+}
+
+function runScan(cwd, extra = {}) {
+  const { base, bin } = stubBin();
+  let status = 0;
+  let out = '';
+  try {
+    out = execFileSync('sh', [SCRIPT], {
+      cwd,
+      env: cleanEnv({ PATH: `${bin}:${process.env.PATH}`, ...extra }),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+  } catch (error) {
+    status = error.status;
+    out = `${error.stdout}${error.stderr}`;
+  }
+  rmSync(base, { recursive: true, force: true });
+  return { status, out };
+}
+
+function twoCommitRepo() {
+  const dir = mkdtempSync(join(tmpdir(), 'secret-scan-guard-'));
+  git(dir, 'init', '-q');
+  for (const name of ['a', 'b']) {
+    writeFileSync(join(dir, `${name}.txt`), `${name}\n`);
+    git(dir, 'add', '.');
+    git(dir, 'commit', '-q', '-m', name);
+  }
+  return dir;
+}
+
+test('a full clone with enough scanned commits passes', () => {
+  const dir = twoCommitRepo();
+  const { status, out } = runScan(dir, { STUB_COUNT: '2' });
+  rmSync(dir, { recursive: true, force: true });
+  assert.equal(status, 0, out);
+  assert.match(out, /secret scan covered 2 commits \(at least 2 expected\)/);
+});
+
+test('the shallow guard fails on a shallow clone', () => {
+  const src = twoCommitRepo();
+  const dir = mkdtempSync(join(tmpdir(), 'secret-scan-shallow-'));
+  execFileSync('git', ['clone', '-q', '--depth', '1', `file://${src}`, join(dir, 'c')], { env: cleanEnv() });
+  const { status, out } = runScan(join(dir, 'c'), { STUB_COUNT: '2' });
+  rmSync(src, { recursive: true, force: true });
+  rmSync(dir, { recursive: true, force: true });
+  assert.notEqual(status, 0);
+  assert.match(out, /shallow clone/);
+});
+
+test('the partial guard fails on a partial clone', () => {
+  const dir = twoCommitRepo();
+  git(dir, 'config', 'remote.origin.partialclonefilter', 'tree:0');
+  const { status, out } = runScan(dir, { STUB_COUNT: '2' });
+  rmSync(dir, { recursive: true, force: true });
+  assert.notEqual(status, 0);
+  assert.match(out, /partial clone/);
+});
+
+test('a directory that is not a repository is reported as such, not as shallow', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'secret-scan-norepo-'));
+  const { status, out } = runScan(dir, { GIT_CEILING_DIRECTORIES: tmpdir() });
+  rmSync(dir, { recursive: true, force: true });
+  assert.notEqual(status, 0);
+  assert.match(out, /FAIL: not a git repository/);
+});
+
+test('zero scanned commits fails', () => {
+  const dir = twoCommitRepo();
+  const { status, out } = runScan(dir, { STUB_COUNT: '0' });
+  rmSync(dir, { recursive: true, force: true });
+  assert.notEqual(status, 0);
+  assert.match(out, /no commits scanned/);
+});
+
+test('a count below the lower bound fails', () => {
+  const dir = twoCommitRepo();
+  const { status, out } = runScan(dir, { STUB_COUNT: '1' });
+  rmSync(dir, { recursive: true, force: true });
+  assert.notEqual(status, 0);
+  assert.match(out, /expected at least 2/);
+});
+
+test('an error line in the scanner log fails even when the exit code is 0', () => {
+  const dir = twoCommitRepo();
+  const { status, out } = runScan(dir, { STUB_COUNT: '2', STUB_LOG_LINE: '1:23AM ERR Could not load baseline' });
+  rmSync(dir, { recursive: true, force: true });
+  assert.notEqual(status, 0);
+  assert.match(out, /error line/);
+});
+
+test('a missing baseline file fails', () => {
+  const dir = twoCommitRepo();
+  const { status, out } = runScan(dir, { STUB_COUNT: '2', GITLEAKS_BASELINE: join(dir, 'missing.json') });
+  rmSync(dir, { recursive: true, force: true });
+  assert.notEqual(status, 0);
+  assert.match(out, /baseline .* not readable/);
+});
+
+test('the self-test ignores a global hooks path and commit signing', () => {
+  const { base, bin } = stubBin();
+  const dir = mkdtempSync(join(tmpdir(), 'secret-scan-global-'));
+  const config = join(dir, 'gitconfig');
+  writeFileSync(config, `[core]\n\thooksPath = ${join(dir, 'hooks')}\n[commit]\n\tgpgsign = true\n[gpg]\n\tprogram = false\n`);
+  mkdirSync(join(dir, 'hooks'));
+  writeFileSync(join(dir, 'hooks', 'pre-commit'), '#!/bin/sh\nexit 1\n');
+  chmodSync(join(dir, 'hooks', 'pre-commit'), 0o755);
+  const out = execFileSync('sh', [SCRIPT, 'selftest'], {
+    cwd: dir,
+    env: cleanEnv({ PATH: `${bin}:${process.env.PATH}`, GIT_CONFIG_GLOBAL: config }),
+    encoding: 'utf8',
+  });
+  rmSync(base, { recursive: true, force: true });
+  rmSync(dir, { recursive: true, force: true });
+  assert.match(out, /selftest ok/);
 });

@@ -135,13 +135,13 @@ the scanner config is one line instead of one baseline each.
   `-`), and test that logic on a temp repository holding a text, a
   binary-only and a delete-only commit.
 - It scans all refs by default, so the logged count can exceed the count on
-  HEAD: use "at least", never equality. Measure the floor in a fresh clone
-  with only the default branch, not in a working repository.
+  HEAD: use "at least", never equality. The script computes the floor in the
+  CI clone itself; to reproduce it locally use a fresh clone with only the
+  default branch. A local clone can hold extra remote branches and notes
+  refs that CI never sees, so local numbers differ: take the proof from the
+  CI run.
 - Use a unique commit marker in `git log` parsing; `@` collides with hunk
   headers (`@@`) when patches are printed.
-- The CI clone can count one commit more than a local `expected-count`
-  (the gate commit itself, or commits fetched later). The floor is a lower
-  bound, so a higher scan count is not drift.
 - A shell wrapper or hook may truncate or rewrite `git log` output; compute
   counts with the raw command, ideally in the CI image.
 

@@ -49,6 +49,23 @@ Rules of thumb:
   the check rather than loosening it, and assert the clone is complete
   separately.
 
+## Triage a red default branch
+
+Start from the failed step (`pipeline ps`), not from the hypothesis of an
+earlier report: a flaky step shows as the same commit red in one run and
+green in the next. To locate a silently aborted test, diff the CI log
+against a local run in the exact image.
+
+## Tie the run to the commit
+
+Link a run to a commit by its sha (JSON output or the API), never by the
+commit message. The CLI table does not show the sha. Take the evidence from
+the run that contains the hash and exactly that gate: an earlier run may
+still hold the old, broken version, a run can end `killed` through
+auto-cancel on quick successive pushes (no evidence), and a red or failed
+earlier step in a sequential pipeline makes the later gate steps `skipped`
+(no evidence for them yet).
+
 ## Pull the evidence from every step in one go
 
 List the step names first (the pipeline info command of your CI CLI), then
