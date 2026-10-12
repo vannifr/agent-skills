@@ -1,0 +1,4 @@
+gitleaks step:
+INF 1 commits scanned.
+INF scan completed in 12ms
+INF no leaks found

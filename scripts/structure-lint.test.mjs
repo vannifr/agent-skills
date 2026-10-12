@@ -153,3 +153,36 @@ test('passes with valid JSON and a matching plugin.json name', () => {
   assert.equal(result.code, 0);
   rmSync(root, { recursive: true, force: true });
 });
+
+const VALID = '---\nname: example-skill\ndescription: A valid example skill for testing.\n---\n\n# Example\n\n';
+
+test('fails when a reference file is not linked from anywhere', () => {
+  const root = makeFixture(`${VALID}See [a](references/a.md).\n`, {
+    'references/a.md': '# A\n',
+    'references/orphan.md': '# Orphan\n',
+  });
+  const result = runLint(root);
+  rmSync(root, { recursive: true, force: true });
+  assert.equal(result.code, 1);
+  assert.match(result.output, /references\/orphan\.md.*not linked/);
+});
+
+test('a reference linked only from another reference is reachable', () => {
+  const root = makeFixture(`${VALID}See [a](references/a.md).\n`, {
+    'references/a.md': '# A\n\nSee [b](b.md).\n',
+    'references/b.md': '# B\n',
+  });
+  const result = runLint(root);
+  rmSync(root, { recursive: true, force: true });
+  assert.equal(result.code, 0, result.output);
+});
+
+test('fails on a broken relative link inside a reference file', () => {
+  const root = makeFixture(`${VALID}See [a](references/a.md).\n`, {
+    'references/a.md': '# A\n\nSee [gone](missing.md).\n',
+  });
+  const result = runLint(root);
+  rmSync(root, { recursive: true, force: true });
+  assert.equal(result.code, 1);
+  assert.match(result.output, /a\.md.*broken relative link "missing\.md"/);
+});

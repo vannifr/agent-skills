@@ -21,6 +21,11 @@ closing local/CI drift, use `ci-local-parity` first; hand parity findings
 **Default to audit-only** (steps 0-2, report, stop) unless the user asked
 for changes. Pushing to the default branch needs the owner's go-ahead.
 
+**Highest yield first** when time is short: how many items each scan step
+logged (0 or 1 means vacuous); whether the secret scan has a self-test and
+full history; whether hooks are active; which files the lint steps skip
+versus `git ls-files`; which images are unpinned. Then walk the checklist.
+
 0. **Orientation (cheap).** Fetch, then `git log origin/<default>..HEAD`
    (unpushed commits of others) and `git log HEAD..origin/<default>`
    (someone may have pushed the same fix). Is the default branch green now,

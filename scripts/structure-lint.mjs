@@ -3,7 +3,7 @@
 // Checks: frontmatter present with name+description, SKILL.md line limit,
 // relative links in the body resolve to real files, no placeholder markers.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { join, resolve, basename } from 'node:path';
+import { join, resolve, basename, dirname } from 'node:path';
 
 const SKILLS_DIR = 'skills';
 const MAX_LINES = 500;
@@ -57,16 +57,39 @@ function checkSkill(skillDir) {
     }
   }
 
-  const linkPattern = /\]\(([^)]+)\)/g;
-  let linkMatch;
-  while ((linkMatch = linkPattern.exec(content)) !== null) {
-    const target = linkMatch[1];
-    if (/^https?:\/\//.test(target) || target.startsWith('#')) continue;
-    const targetPath = resolve(skillDir, target.split('#')[0]);
-    if (!existsSync(targetPath)) {
-      errors.push(`${skillMdPath}: broken relative link "${target}" (resolved to ${targetPath})`);
+  const linked = new Set();
+  const markdownFiles = [skillMdPath, ...markdownIn(join(skillDir, 'references'))];
+  for (const file of markdownFiles) {
+    const body = file === skillMdPath ? content : readFileSync(file, 'utf8');
+    const linkPattern = /\]\(([^)]+)\)/g;
+    let linkMatch;
+    while ((linkMatch = linkPattern.exec(body)) !== null) {
+      const target = linkMatch[1];
+      if (/^https?:\/\//.test(target) || target.startsWith('#')) continue;
+      const targetPath = resolve(dirname(file), target.split('#')[0]);
+      if (!existsSync(targetPath)) {
+        errors.push(`${file}: broken relative link "${target}" (resolved to ${targetPath})`);
+      } else if (file !== targetPath) {
+        linked.add(targetPath);
+      }
     }
   }
+  for (const file of markdownFiles.slice(1)) {
+    if (!linked.has(resolve(file))) {
+      errors.push(`${file}: reference file is not linked from SKILL.md or another reference`);
+    }
+  }
+}
+
+function markdownIn(dir) {
+  if (!existsSync(dir)) return [];
+  const found = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) found.push(...markdownIn(full));
+    else if (entry.name.endsWith('.md')) found.push(full);
+  }
+  return found;
 }
 
 function jsonFiles(dir) {

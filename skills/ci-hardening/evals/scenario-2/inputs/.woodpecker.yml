@@ -1,0 +1,9 @@
+steps:
+  - name: gitleaks
+    image: zricethezav/gitleaks:v8.30.0
+    commands:
+      - gitleaks detect --source . --redact -v
+  - name: tests
+    image: node:22
+    commands:
+      - npm test
