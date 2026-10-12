@@ -66,7 +66,13 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      [secret-scan.sh](references/secret-scan.sh). A copy of a reference
      script goes stale: after every change to the reference, find the copies
      (`git grep -l <script name>` per repository), compare them with `cmp`
-     and sync the deviating ones, one commit per repository.
+     and sync the deviating ones, one commit per repository. Per repository
+     first run the step 0 orientation (hooks path included). A repository
+     with its own baseline lookup inside the script migrates to the
+     `GITLEAKS_BASELINE` variable: set it in the CI step and in the local
+     wrapper, for the real scan only, and check that the log shows
+     `baseline: <path> (N entries)`; without the baseline the scan reports
+     the known hits again.
    - Before putting a scan on full history, run it locally and triage the
      hits (real, or a variable reference). The same false positive on a
      variable reference in several repositories is better handled by one
@@ -119,9 +125,13 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      leaving the checkout untouched (read `git log -- <pipeline file>` and
      `git status` first, and stage explicitly, when another session edits the
      same file); clean up afterwards (container output in
-     the scratch area may be root-owned).
+     the scratch area may be root-owned). A worktree does not work as a
+     bind-mounted test directory (its `.git` file points to an absolute host
+     path): use a fresh `git clone file://` with the changed files copied in.
 4. **Evidence report** in one place: pushed hash, CI run number, the quoted
-   log lines, before/after numbers (see Report form), never "improved". Take
+   log lines, before/after numbers (see Report form), never "improved". Tie
+   the run to the commit by its sha (JSON output or the API), never by the
+   commit message. Take
    the evidence from the run that contains the hash and exactly that gate
    (an earlier run may still hold the old, broken version): with auto-cancel
    on quick successive pushes a run can end `killed`, which is no evidence.
