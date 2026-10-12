@@ -96,7 +96,19 @@ the scanner config is one line instead of one baseline each.
   that its config, commit count and refs are unchanged (a stub scanner on
   the PATH keeps that test free of the real tool). Inside the self-test,
   asserting that `git rev-parse --show-toplevel` equals the temporary
-  directory catches a leak early.
+  directory catches a leak early. Reusable form, in any test language:
+  make a scratch repository with one commit, record `git -C $s config
+  core.bare`, `git -C $s rev-list --all --count` and `git -C $s
+  for-each-ref | sha1sum`, run `GIT_DIR=$s/.git GIT_INDEX_FILE=$s/.git/index
+  sh scripts/secret-scan.sh selftest`, then assert that all three are
+  unchanged. Mutation proof: the test fails against the old script.
+- Damage check after such a leak, as its own evidence item per repository
+  (a sync does not show it): `core.bare` is false, no `user.*` section that
+  the repository did not have in its config, and no commits with the exact
+  subjects the self-test uses (`git log --all --grep='^planted$'
+  --grep='^clean$'`; a loose `clean` grep gives false alarms). `git fsck
+  --lost-found` always lists dangling stash and amend leftovers, so it is no
+  signal without a look at their content.
 - The self-test's own log line (e.g. "selftest ok: clean passes, planted
   secret reported") is the must-fail proof in CI: it re-runs on every push.
   A real leak turning a pipeline red once is nice evidence, not a

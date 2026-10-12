@@ -128,6 +128,10 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      the scratch area may be root-owned). A worktree does not work as a
      bind-mounted test directory (its `.git` file points to an absolute host
      path): use a fresh `git clone file://` with the changed files copied in.
+     A worktree is for commit and push, not a test environment: in it `.git`
+     is a file, so a full-history scan in the image fails as a shallow
+     clone, and a build in it needs its own install, not a symlinked
+     dependency directory.
 4. **Evidence report** in one place: pushed hash, CI run number, the quoted
    log lines, before/after numbers (see Report form), never "improved". Tie
    the run to the commit by its sha (JSON output or the API), never by the
