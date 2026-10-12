@@ -214,7 +214,12 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
 - [ ] Is the tool version in CI equal to the local one, pinned in a lockfile
       or requirements file rather than installed unpinned? A gate running in
       a minimal tool image must not lean on tools that image lacks (git, a
-      package manager): test it in that exact image. Run a new gate
+      package manager). Run every new or changed CI script, with real input
+      and every scenario it handles, in the exact image of its step before
+      pushing: a script that passes locally can crash in the step image. A
+      guard test can encode the requirement per image family (a slim image
+      installs what the script needs), and the script should degrade visibly
+      rather than crash. Run a new gate
       first locally in the exact CI image: linter rules differ per release.
 - [ ] Do floating specs exist: `>=` ranges without a lockfile, `npx --yes
       <tool>`, binaries fetched by `curl` without a checksum, git-URL

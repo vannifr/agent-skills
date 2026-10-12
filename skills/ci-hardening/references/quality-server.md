@@ -15,5 +15,9 @@ Only relevant when the pipeline posts analyses to an analysis server.
 - **After mechanical changes.** After a formatter or autofix run, re-run
   the gate: formatters can move an inline suppression away from the line it
   covers and resurface an old finding as new code.
+- **Unset configuration.** A local check skipped silently because a
+  variable (e.g. the server URL) is not set in the shell is a parity gap:
+  give the hook a default value so it runs, and expect it to catch new
+  violations, including in the guard tests themselves.
 - **Degradation.** A local check that skips with a warning when the server
   or scanner is missing is acceptable only when CI blocks on the same gate.
