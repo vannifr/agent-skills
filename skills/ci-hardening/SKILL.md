@@ -41,7 +41,12 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    the pipeline, hooks or gate scripts are protected (operator signing), a
    blocked commit is an outcome, not an obstacle: deliver a patch plus a
    handover note, do not bypass the block, and report the finding as
-   "operator-gated", separate from "unproven".
+   "operator-gated", separate from "unproven". The handover has a fixed
+   form: patches in apply order (`git am`), the verification per sha, and
+   which anchor, secret or watchdog the operator updates afterwards (print
+   a manifest diff to a file, never to the terminal). Check that the files
+   that decide the gate (scan script, wrapper, drill) are under the anchor
+   too; if not, a weakening can slip past it: report that as a finding.
 1. **Inventory.** Read the scripts the pipeline calls, not only the pipeline
    file: a wrapper decides what really runs, and a non-strict mode can make a
    skipped tool exit 0. For each step write down what it claims, what its

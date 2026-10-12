@@ -67,7 +67,10 @@ when it sees the planted file. Each guard then gets a test that provokes
 exactly that failure, so the guards themselves are proven, next to the
 self-test that proves the scan. The pattern is language independent (it
 has been written in Python, Node and bats): the stub keeps its state in the
-test's own temporary directory.
+test's own temporary directory. The stub must not grep its own source for a
+token prefix (a fixture script containing `ghp_` reported a false secret):
+match a complete token pattern. Docker or drill output (dependency
+directories) can be root-owned and stays in the scratch area.
 
 ## Baseline recipe (secret scanner)
 
