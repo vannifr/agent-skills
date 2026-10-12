@@ -76,7 +76,9 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
      [secret-scan.sh](references/secret-scan.sh). A copy of a reference
      script goes stale: after every change to the reference, find the copies
      (`git grep -l <script name>` per repository), compare them with `cmp`
-     and sync the deviating ones, one commit per repository. Per repository
+     and sync the deviating ones, one commit per repository. Start with
+     `git ls-tree origin/<default> <script path>`: no copy means a new gate
+     with its own order of work, not a sync. Per repository
      first run the step 0 orientation (hooks path included). A repository
      with its own baseline lookup inside the script migrates to the
      `GITLEAKS_BASELINE` variable: set it in the CI step and in the local
@@ -147,6 +149,8 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
    the run to the commit by its sha (JSON output or the API), never by the
    commit message. Take
    the evidence from the run that contains the hash and exactly that gate
+   (a red or failed earlier step in a sequential pipeline makes the gate
+   steps after it `skipped`: then there is no evidence for them yet)
    (an earlier run may still hold the old, broken version): with auto-cancel
    on quick successive pushes a run can end `killed`, which is no evidence.
    Take every number in a commit message or report from the run, never an
@@ -174,7 +178,12 @@ for changes. Pushing to the default branch needs the owner's go-ahead.
       in CI it must fail, and a hook that is the only barrier should fail
       too. Test a hook-run self-test
       under a simulated hook environment (`GIT_DIR` exported) and prove that
-      the real repository stays untouched.
+      the real repository stays untouched. The repository's own test suite
+      is the same leak path: look for fixtures that run `git init` or
+      `commit` with the inherited environment
+      (`grep -rnE 'git.*(init|commit)' tests/`), and compare `core.bare`,
+      `rev-list --all --count` and `.git/config` before and after the first
+      commit attempt in the real repository.
 - [ ] Is every advisory step (`failure: ignore`, `allow_failure`) listed
       with a written reason? Otherwise it is a gate that cannot fail.
 - [ ] Does the step run the intended binary? A package runner can resolve

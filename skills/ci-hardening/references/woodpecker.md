@@ -62,6 +62,12 @@ Written for Woodpecker; the same questions apply to other CI systems.
 
 ## Tooling
 
+- **In a sandbox** the CLI may lose its server variables or credentials
+  (use the CI system's API or MCP server instead), docker may only run
+  outside it, and a hook that reads a secrets file (a `lint` that loads
+  `.env`) or fetches over an https remote without credentials fails there:
+  run the sync test in a fresh clone without that file, and expect that the
+  commit or push needs the owner's shell.
 - **Lint the pipeline file** before pushing: `woodpecker-cli lint
   .woodpecker.yml`. It accepts what that CLI version accepts; a pipeline can
   pass lint locally and still fail on a newer or older server.

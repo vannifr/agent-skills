@@ -108,7 +108,12 @@ the scanner config is one line instead of one baseline each.
   subjects the self-test uses (`git log --all --grep='^planted$'
   --grep='^clean$'`; a loose `clean` grep gives false alarms). `git fsck
   --lost-found` always lists dangling stash and amend leftovers, so it is no
-  signal without a look at their content.
+  signal without a look at their content. Also check
+  `git config --local --list | grep -E '^user\.'`: restoring `core.bare`
+  can leave a stray `user.name` or `user.email` behind. A worktree shares
+  the repository config with the main checkout and other worktrees, so that
+  damage reaches peer sessions too. An isolation-test fixture must not
+  inherit a user section: assert that no local `user.*` key appears.
 - The self-test's own log line (e.g. "selftest ok: clean passes, planted
   secret reported") is the must-fail proof in CI: it re-runs on every push.
   A real leak turning a pipeline red once is nice evidence, not a
