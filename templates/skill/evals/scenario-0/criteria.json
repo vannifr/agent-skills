@@ -1,0 +1,11 @@
+{
+  "context": "<What behaviour this scenario separates: what an agent without the skill gets wrong.>",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "<Criterion>",
+      "description": "<Observable behaviour that a judge can check in the output. Scores add up to 100.>",
+      "max_score": 100
+    }
+  ]
+}

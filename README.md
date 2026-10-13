@@ -59,6 +59,10 @@ simulation (same scenarios, run with and without the skill, scored blind),
 recorded in `skills/<name>/evals/simulation.md`. `structure-lint` enforces
 it; see CONTRIBUTING.md.
 
+A new skill starts from [`templates/skill/`](templates/skill/) and must meet
+the "Definition of done for a public skill" in CONTRIBUTING.md: English only,
+generic, a recorded registry overlap check, and the simulation record.
+
 Results and methodology: [docs.tessl.io/improving-your-skills/evaluate-skill-quality-using-scenarios](https://docs.tessl.io/improving-your-skills/evaluate-skill-quality-using-scenarios).
 
 ## Contributing

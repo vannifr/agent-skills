@@ -1,0 +1,4 @@
+{
+  "description": "<one line: what the scenario tests>",
+  "include": ["./inputs"]
+}

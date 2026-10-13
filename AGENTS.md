@@ -11,3 +11,4 @@
 
 - Before changing a skill based on an evaluation, retrospective or review, follow CONTRIBUTING.md "Evaluating a skill and processing feedback": triage every point into skill / project-host / drop first, and don't publish as part of it.
 - Every skill needs a valid `evals/simulation.md` (local RED-GREEN simulation) before `tessl eval run` or publication; `structure-lint` enforces it. Do not add a skill to `scripts/simulation-exempt.txt`.
+- A skill is public from its first commit: English only, generic (no names, hosts, domains or figures from one run), a registry overlap record in `evals/overlap.md`, and every row of CONTRIBUTING.md "Definition of done for a public skill". Start from `templates/skill/`.

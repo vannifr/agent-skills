@@ -2,7 +2,9 @@
 // Structure-only skill lint — no secrets required, safe to run on fork PRs.
 // Checks: frontmatter present with name+description, SKILL.md line limit,
 // relative links in the body resolve to real files, no placeholder markers,
-// and a local simulation record (evals/simulation.md) per skill unless exempt.
+// English-only and generic text (no personal paths or e-mail addresses),
+// and a local simulation record plus a registry overlap record
+// (evals/simulation.md, evals/overlap.md) per skill unless exempt.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve, basename, dirname } from 'node:path';
 
@@ -10,6 +12,20 @@ const SKILLS_DIR = 'skills';
 const MAX_LINES = 500;
 const EXEMPT_FILE = join('scripts', 'simulation-exempt.txt');
 const PLACEHOLDER_PATTERNS = [/\bTBD\b/, /\bTODO\b/, /\bFIXME\b/, /\[fill in/i, /\[placeholder/i];
+
+const NON_ENGLISH = [
+  ['dutch', ['het', 'een', 'niet', 'voor', 'met', 'zijn', 'wordt', 'ook', 'naar', 'maar', 'deze', 'geen', 'worden', 'heeft', 'moet', 'bij', 'dit', 'een']],
+  ['french', ['les', 'des', 'une', 'pour', 'avec', 'dans', 'est', 'pas', 'sur', 'sont', 'nous', 'vous', 'qui', 'que']],
+  ['german', ['der', 'und', 'nicht', 'ist', 'das', 'ein', 'eine', 'mit', 'für', 'auf', 'wird', 'sind']],
+];
+const NON_ENGLISH_MIN_HITS = 8;
+const NON_ENGLISH_MIN_RATIO = 0.03;
+const NOT_GENERIC = [
+  [/\/home\/[a-z][\w.-]*/i, 'a personal path (/home/...)'],
+  [/\/Users\/[A-Za-z][\w.-]*/, 'a personal path (/Users/...)'],
+  [/~\/projects\b/, 'a personal path (~/projects)'],
+  [/[\w.+-]+@(?!example\.(com|org|net)\b)[\w-]+\.[\w.-]+/, 'an e-mail address'],
+];
 
 const errors = [];
 
@@ -79,6 +95,36 @@ function checkSkill(skillDir) {
   for (const file of markdownFiles.slice(1)) {
     if (!linked.has(resolve(file))) {
       errors.push(`${file}: reference file is not linked from SKILL.md or another reference`);
+    }
+  }
+}
+
+function proseFiles(skillDir) {
+  const found = [join(skillDir, 'SKILL.md'), ...markdownIn(join(skillDir, 'references'))];
+  const evalsDir = join(skillDir, 'evals');
+  if (existsSync(evalsDir)) {
+    for (const file of markdownIn(evalsDir)) {
+      if (!file.split(/[\\/]/).includes('inputs')) found.push(file);
+    }
+  }
+  return found.filter((f) => existsSync(f));
+}
+
+function checkLanguageAndGeneric(skillDir) {
+  for (const file of proseFiles(skillDir)) {
+    const text = readFileSync(file, 'utf8');
+    const words = text.toLowerCase().replace(/```[\s\S]*?```/g, ' ').match(/[a-zà-ÿ]+/g) || [];
+    for (const [language, list] of NON_ENGLISH) {
+      const set = new Set(list);
+      const hits = words.filter((w) => set.has(w)).length;
+      if (hits >= NON_ENGLISH_MIN_HITS && hits / words.length >= NON_ENGLISH_MIN_RATIO) {
+        errors.push(`${file}: not English (${hits} ${language} function words in ${words.length}); skills are written in English`);
+        break;
+      }
+    }
+    for (const [pattern, label] of NOT_GENERIC) {
+      const m = text.match(pattern);
+      if (m) errors.push(`${file}: not generic, contains ${label}: "${m[0]}"`);
     }
   }
 }
@@ -156,6 +202,21 @@ function simulationProblems(skillDir) {
   return problems;
 }
 
+function overlapProblems(skillDir) {
+  const recordPath = join(skillDir, 'evals', 'overlap.md');
+  if (!existsSync(recordPath)) return [`${recordPath}: missing (search the registry first, see CONTRIBUTING.md)`];
+  const record = readFileSync(recordPath, 'utf8');
+  const problems = [];
+  for (const field of ['date', 'query', 'closest']) {
+    if (!new RegExp(`^${field}:\\s*\\S`, 'm').test(record)) problems.push(`${recordPath}: missing "${field}:" line`);
+  }
+  const different = record.match(/^different:\s*(.+)$/m);
+  if (!different || different[1].trim().split(/\s+/).length < 8) {
+    problems.push(`${recordPath}: "different:" must be a sentence of at least 8 words that stays true after reading the closest match`);
+  }
+  return problems;
+}
+
 function checkSimulations(names) {
   const exempt = existsSync(EXEMPT_FILE)
     ? readFileSync(EXEMPT_FILE, 'utf8').split('\n').map((l) => l.trim()).filter(Boolean)
@@ -171,6 +232,7 @@ function checkSimulations(names) {
       if (problems.length === 0) errors.push(`${name}: remove from ${EXEMPT_FILE}, the simulation record is valid`);
     } else {
       for (const problem of problems) errors.push(problem.startsWith(SKILLS_DIR) ? problem : `${name}: ${problem}`);
+      for (const problem of overlapProblems(join(SKILLS_DIR, name))) errors.push(problem);
     }
   }
 }
@@ -192,6 +254,7 @@ if (skillDirs.length === 0) {
 for (const name of skillDirs) {
   checkSkill(join(SKILLS_DIR, name));
   checkJson(join(SKILLS_DIR, name));
+  checkLanguageAndGeneric(join(SKILLS_DIR, name));
 }
 
 checkSimulations(skillDirs);

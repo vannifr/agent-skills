@@ -52,7 +52,35 @@
    fails a skill without a valid record; only skills listed in
    `scripts/simulation-exempt.txt` (a shrinking list of skills that
    predate the rule) are excused. Never add a new skill to that list.
-6. Run `node scripts/structure-lint.mjs` locally before opening a PR.
+6. Search the registry and write `evals/overlap.md` (see "Check for overlap first"). Same rule: never add a new skill to the exempt list.
+7. Check every row of "Definition of done for a public skill", then run `node scripts/structure-lint.mjs` locally before opening a PR.
+
+## Definition of done for a public skill
+
+A skill in `skills/` is public from the first commit, and a skill sent to
+the Tessl registry is installable by anyone. Both need the same bar. Start
+from [`templates/skill/`](templates/skill/) (`SKILL.md`, a scenario, the
+simulation record and the overlap record) and copy it to `skills/<name>/`.
+
+| # | Criterion | Checked by |
+|---|---|---|
+| 1 | Written in English: `SKILL.md`, references, scenarios and records. No other language, not even in headings. Quoted visitor or user speech in another language is allowed as a short quote only. | `structure-lint` (function-word density per file), reviewer |
+| 2 | Generic: no names of people, clients, projects, hosts, domains or brands from one run; no personal paths or e-mail addresses; no real figures or page titles; tools and vendors as one "e.g." per category, never a requirement. A retrospective contributes the lesson, never its specifics. | `structure-lint` (paths, e-mail), reviewer (everything else) |
+| 3 | Frontmatter `name` equals the directory; `description` starts with "Use when", names the trigger phrases and the nearest skill it is *not* for. | `structure-lint`, reviewer |
+| 4 | `SKILL.md` at most 500 lines, detail in linked `references/`; no broken or orphaned links; no `TODO`/`TBD`. | `structure-lint` |
+| 5 | A skill that changes a project defines **done**: committed, CI green for that commit, verified live, "not verified" reported with a reason. A report-only skill says it changes nothing. | reviewer |
+| 6 | At least one `evals/scenario-N/` that an agent without the skill gets wrong; the task never names the skill. | `structure-lint`, `tessl eval lint` |
+| 7 | Local RED-GREEN simulation recorded in `evals/simulation.md`, with the skill beating the baseline in every scenario. | `structure-lint` |
+| 8 | Registry overlap checked and recorded in `evals/overlap.md`: the `tessl search` queries, the closest match and one sentence that stays true after reading it. No such sentence, no publication. | `structure-lint` (record exists and is complete), reviewer (the sentence) |
+| 9 | CI green for the exact commit that adds or changes the skill, checked per sha. | pipeline |
+
+Sending it to Tessl comes after all of this, never instead of it, and only
+with the owner's explicit approval: `tessl skill lint`, then
+`tessl review run` (at least 80, costs credits), then `tessl eval run`
+(costs credits), then `--dry-run`, then `--public`; commit the manifest and
+add the README row. See "Publishing a skill to Tessl" for each command.
+Skills that predate criteria 7 and 8 are listed in
+`scripts/simulation-exempt.txt`; that list only shrinks.
 
 ## Updating an existing skill's behavior
 

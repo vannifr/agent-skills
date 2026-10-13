@@ -203,8 +203,12 @@ test('a skill without a local simulation record fails unless it is exempt', () =
   rmSync(root, { recursive: true, force: true });
 });
 
+const OVERLAP = (extra = '') =>
+  `# Registry overlap\n\ndate: 2026-10-13\nquery: example topic words\nclosest: someone/example-match\ndifferent: This skill does X on Y while the closest match only does Z on W.\n${extra}`;
+const FULL = { ...SCENARIO, 'evals/simulation.md': RECORD(), 'evals/overlap.md': OVERLAP() };
+
 test('a skill with a valid simulation record passes without an exemption', () => {
-  const root = makeFixture(VALID_SKILL, { ...SCENARIO, 'evals/simulation.md': RECORD() }, { exempt: false });
+  const root = makeFixture(VALID_SKILL, FULL, { exempt: false });
   const result = runLint(root);
   assert.equal(result.code, 0, result.output);
   rmSync(root, { recursive: true, force: true });
@@ -253,4 +257,64 @@ test('an exemption for a skill that does not exist fails', () => {
   assert.equal(result.code, 1);
   assert.match(result.output, /ghost-skill: listed in scripts\/simulation-exempt\.txt but no such skill/);
   rmSync(root, { recursive: true, force: true });
+});
+
+test('a non-exempt skill without an overlap record fails', () => {
+  const root = makeFixture(VALID_SKILL, { ...SCENARIO, 'evals/simulation.md': RECORD() }, { exempt: false });
+  const result = runLint(root);
+  rmSync(root, { recursive: true, force: true });
+  assert.equal(result.code, 1);
+  assert.match(result.output, /evals\/overlap\.md: missing/);
+});
+
+test('an overlap record without date, query, closest or a real difference fails', () => {
+  const bad = '# Registry overlap\n\ndifferent: too short\n';
+  const root = makeFixture(VALID_SKILL, { ...SCENARIO, 'evals/simulation.md': RECORD(), 'evals/overlap.md': bad }, { exempt: false });
+  const result = runLint(root);
+  rmSync(root, { recursive: true, force: true });
+  assert.equal(result.code, 1);
+  assert.match(result.output, /missing "date:"/);
+  assert.match(result.output, /missing "query:"/);
+  assert.match(result.output, /missing "closest:"/);
+  assert.match(result.output, /"different:" must be a sentence/);
+});
+
+const DUTCH = 'Dit is een skill voor het toetsen van een website. Het is niet bedoeld voor een andere taak, maar wordt ook gebruikt voor de eerste indruk. Er zijn geen uitzonderingen, want de regels worden met zorg toegepast. Deze tekst heeft een duidelijke taal en kan niet in het Engels gelezen worden.';
+
+test('Dutch text in SKILL.md fails the English-only rule', () => {
+  const root = makeFixture(`${VALID}${DUTCH}\n`);
+  const result = runLint(root);
+  rmSync(root, { recursive: true, force: true });
+  assert.equal(result.code, 1);
+  assert.match(result.output, /SKILL\.md: not English/);
+});
+
+test('French text in a reference file fails the English-only rule', () => {
+  const french = 'Cette compétence est pour les sites qui sont dans une phase où les équipes ne savent pas ce que nous voulons. Les règles des équipes sont avec une portée que vous pouvez lire dans les pages qui sont sur le site. Nous avons une liste pour les pages que vous avez dans une revue qui est pas courte.';
+  const root = makeFixture(`${VALID}See [a](references/a.md).\n`, { 'references/a.md': `# A\n\n${french}\n` });
+  const result = runLint(root);
+  rmSync(root, { recursive: true, force: true });
+  assert.equal(result.code, 1);
+  assert.match(result.output, /a\.md: not English/);
+});
+
+test('English prose with a few foreign quoted words passes, and eval inputs are not checked', () => {
+  const body = `${VALID}The persona says "dit is een test" once, which is a quote and not the language of this skill. The rest is written in plain English and stays short.\n`;
+  const root = makeFixture(body, { 'evals/scenario-0/inputs/page.md': DUTCH });
+  const result = runLint(root);
+  rmSync(root, { recursive: true, force: true });
+  assert.equal(result.code, 0, result.output);
+});
+
+test('personal paths and e-mail addresses fail the generic rule, example addresses pass', () => {
+  const bad = makeFixture(`${VALID}Read /home/someone/projects/site and write to me@private.org.\n`);
+  const r1 = runLint(bad);
+  rmSync(bad, { recursive: true, force: true });
+  assert.equal(r1.code, 1);
+  assert.match(r1.output, /not generic.*\/home\//);
+  assert.match(r1.output, /not generic.*e-mail address/);
+  const ok = makeFixture(`${VALID}Mail someone@example.com about it.\n`);
+  const r2 = runLint(ok);
+  rmSync(ok, { recursive: true, force: true });
+  assert.equal(r2.code, 0, r2.output);
 });
