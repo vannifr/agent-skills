@@ -54,6 +54,12 @@ Written for Woodpecker; the same questions apply to other CI systems.
   pipeline makes it provable.
 - **A restart reuses the old commit.** Restarting a scheduled run after a
   fix does not test the fix; trigger a new run on the fixed commit.
+- **A dependency install in parallel steps that share a directory** can
+  fail with a missing-file error: an infrastructure flake. Restart the same
+  sha and keep the cause separate; a repeat is structural.
+- **`woodpecker-cli repo secret update`** does not read `@-` as stdin and
+  needs `--event`: pass `--value @<file>` and the existing events (`repo
+  secret show`).
 - **A hanging or network-failed step:** stop the run and restart it
   (`pipeline stop` / `pipeline start <repo> <number>`), after first proving
   that the gate you changed was already green. Give such steps a timeout.

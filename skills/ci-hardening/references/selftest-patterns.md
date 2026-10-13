@@ -135,6 +135,14 @@ the scanner config is one line instead of one baseline each.
   autouse fixture or the runner's environment). A fixture leak shows in the
   mutation proof as a setup error rather than an assertion failure: a
   non-zero exit with no passing test is the proof.
+- A stub test that matches on an error message must assert the script's own
+  `FAIL:` prefix: git's own `fatal: not a git repository` once let a mutated
+  script pass. Add a blind-scanner stub (finds nothing even on the planted
+  file) as well, or "planted must fail" stays unproven.
+- A guard test must not skip when it runs as root (`getuid() === 0`): CI
+  usually runs as root, so the test then never runs there and only a
+  skip-ceiling gate notices. Use a path that is unreadable for root too (a
+  missing file) instead of `chmod 000`.
 - The error-line guard of the script matches `' (ERR|FTL) '` with a
   leading space: a stub must write its error line with a timestamp prefix
   (`10:00AM ERR ...`) or the guard does not trigger.

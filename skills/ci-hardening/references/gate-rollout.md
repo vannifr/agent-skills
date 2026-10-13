@@ -30,6 +30,15 @@ with its self-test: [secret-scan.sh](secret-scan.sh).
   Adding a guard test can require a change to the test step itself (a tool
   the guard needs in the image); that stays within the scope of the gate fix.
 
+## Integrating into a repository with an already hardened gate
+
+First record per guard what the script covers and what stays
+repository-specific. Replace only the full-history step; keep the range scan
+and the restart handling. A parity test that demands a subcommand is replaced
+by stricter pins (commands, order, digest, checksum), never removed. A
+shellcheck or lint count from `git ls-files` ignores a script that is not
+staged yet: count after `git add`.
+
 ## Copies of a reference script across repositories
 
 A copy goes stale. After every change to the reference:
@@ -119,6 +128,9 @@ baseline, and the self-test runs with the repository's own config.
 
 ## Commit hygiene
 
+- A handover or sync script never uses `git add -A` and never runs in a
+  working directory where a peer has uncommitted files: work in a fresh
+  clone, stage explicit paths and check the number of staged files.
 - A repository rule that forbids commits or pushes by delegated agents
   conflicts with delegation: the orchestrator states explicitly in the
   instruction that the agent may push, and the report says so.
