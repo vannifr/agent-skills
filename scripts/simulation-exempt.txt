@@ -1,4 +1,3 @@
-ci-hardening
 ci-local-parity
 cross-browser-render-check
 load-test-bootstrap
