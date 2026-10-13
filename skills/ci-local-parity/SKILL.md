@@ -168,6 +168,13 @@ Activate with: `git config core.hooksPath .githooks`, preferably via a
 `pnpm hooks:install` script so it doesn't stay a manual, easily-forgotten
 step.
 
+**Hooks in a restricted agent environment.** When a hook cannot run there
+(sockets, a secrets file, global git config), do not disable it and do not
+skip tests silently. The owner may accept a bounded relaxation of "local
+equals CI": confirm it with the owner, report what failed only in the
+restricted environment, and run those checks outside it for the proof. CI
+stays the authority. Details: `ci-hardening`, `references/local-hooks.md`.
+
 **Gitleaks belongs in `pre-commit`, not again in `pre-push`.** At push
 time there's normally nothing staged, so `gitleaks git --pre-commit --staged`
 in `pre-push` is a sham check that always reports "0 commits scanned."

@@ -52,6 +52,19 @@ Written for Woodpecker; the same questions apply to other CI systems.
   fix; when that is impossible (no manual trigger, schedule not due) report
   "not verified" with the reason. An optional manual event on the scheduled
   pipeline makes it provable.
+- **A scheduled gate that never finishes is unproven.** List the runs of the
+  schedule and check their status: `killed` on the repository time-out
+  counts as no run (seen: three of three runs killed). A schedule in YAML
+  without a run proves nothing, and the run list of an API or MCP is paged
+  and often has no timestamps, so count runs per event instead of reading
+  the first page. The schedules themselves come from the CLI's cron
+  listing, not from the YAML.
+- **The first finished run of a gate that used to be killed exposes the
+  existing findings.** Decide beforehand whether the step stays blocking or
+  becomes advisory, and plan the repair: fixing the time-out does not fix
+  the findings. Splitting the work over parallel steps (sharding) needs a
+  parity test: every input exactly once, the sum equal to the unsharded
+  count, and a log line per shard with its share (`shard i/n: K items`).
 - **A restart reuses the old commit.** Restarting a scheduled run after a
   fix does not test the fix; trigger a new run on the fixed commit.
 - **A dependency install in parallel steps that share a directory** can

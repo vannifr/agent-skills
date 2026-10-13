@@ -3,6 +3,12 @@
 Seen in the same shape across several repositories. Example commands are for
 a JavaScript package manager; the order applies to any ecosystem.
 
+A scanner that can never fail is the first check: a filesystem or image
+vulnerability scan without a non-zero exit code on findings (for example
+trivy without `--exit-code 1` and a severity filter) is a report, not a
+gate (seen in most pipelines that had one). Plant a known-vulnerable
+dependency in a scratch copy and see the step fail.
+
 1. Read each advisory (severity, attack vector, runtime or dev-only) and look
    up whether a patched version exists (the audit's fix-available field, the
    advisory's first-patched version, or an advisory database).

@@ -207,7 +207,10 @@ versus `git ls-files`; which images are unpinned. Then walk the checklist.
 - [ ] Does a vulnerability scan also run on a schedule, including the gates
       and not only unrelated jobs? A scheduled gate is proven only by a run
       with the schedule event on a commit that contains the fix; otherwise
-      "not verified" ([woodpecker.md](references/woodpecker.md)).
+      "not verified". A run that ends `killed` on the time-out is no run, and
+      a scanner without a failing exit code on findings is a report, not a
+      gate ([woodpecker.md](references/woodpecker.md),
+      [dependency-audit.md](references/dependency-audit.md)).
 
 **Regression**
 - [ ] Is there a test-count floor or ratchet (a falling count only with an

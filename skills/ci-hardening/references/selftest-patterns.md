@@ -92,6 +92,9 @@ the scanner config is one line instead of one baseline each.
 - The clean run must also pass: assert both the failing and the passing
   case, otherwise a gate that always fails looks proven.
 - Never commit the planted violation to the real tree.
+- Do not name a pinned hash or digest in a test `secret`, `token` or `key`:
+  a secret scanner flags the line (generic-api-key). Run the full scan on a
+  scratch commit with the new files before handing them over.
 - A self-test or test that runs `git init` or `git commit` itself must be
   isolated when a git hook starts it. A hook exports `GIT_DIR` and other
   `GIT_*` variables; without isolation the "temporary" commands act on the

@@ -10,7 +10,7 @@ a red flag". Add rows for your own stack.
 | Tool class | Evidence line | Red flag |
 |---|---|---|
 | Secret scanner (e.g. gitleaks) | "N commits scanned" with N at least the commits with added non-binary lines in the range | "0 commits scanned", "no leaks found" without a count. "1 commit" is legitimate for a range scan, but then a full-history scan must exist elsewhere |
-| Shell linter (e.g. shellcheck) | the file list or a count equal to the `git ls-files` shell files | fewer files than the repository has |
+| Shell linter (e.g. shellcheck) | the file list or a count equal to the `git ls-files` shell files | fewer files than the repository has. Count with `git ls-files` and leave out vendored and tool directories; a `# shellcheck disable` comment without any shellcheck step in CI is a signal |
 | Bats | TAP plan `1..N` with N equal to the expected test count | missing plan, N lower than the ratchet baseline |
 | Node test runner (`node --test`) | `# pass N` and `# fail 0`, N > 0 | `# tests 0` |
 | Code-quality server (e.g. SonarQube) | `QUALITY GATE STATUS: PASSED` plus the new-code condition values | analysis submitted but no gate status fetched |

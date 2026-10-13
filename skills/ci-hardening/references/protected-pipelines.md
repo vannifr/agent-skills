@@ -24,6 +24,13 @@ compute the anchor manifest independently of the repository code that the
 patch changes; show upstream changes before any repository code runs; after
 signing, check the parent and the patch id.
 
+A push to a repository where a peer is active can be rejected during a
+verification that takes minutes. The script then fetches, checks that
+upstream does not touch the patched files, rebases and signs again, and
+re-checks signature, parent and patch id; at most three attempts. The local
+verification then ran on an older base, so CI on the pushed sha stays the
+proof.
+
 Also check that the files that decide the gate (scan script, wrapper,
 sabotage drill) are under the same protection. If they are not, a weakening
 can slip past it: report that as a finding.
