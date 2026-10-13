@@ -36,6 +36,15 @@ steps:
     commands:
       - node scripts/structure-lint.mjs
 
+  - name: docs-check
+    image: alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+    commands:
+      - apk add --no-cache python3
+      - python3 -I scripts/docs-check/check_repo_docs.py
+    when:
+      - event: push
+        branch: main
+
   - name: tessl-review
     image: node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
     commands:

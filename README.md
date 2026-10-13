@@ -73,3 +73,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+Agent instructions: `AGENTS.md`.

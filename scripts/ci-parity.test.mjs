@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 const ci = readFileSync('.woodpecker.yml', 'utf8');
 const hooks = readFileSync('.githooks/pre-push', 'utf8');
 
-const SHARED_GATES = ['node scripts/structure-lint.mjs', 'node scripts/test-floor.mjs', 'shellcheck -S style'];
+const SHARED_GATES = ['node scripts/structure-lint.mjs', 'node scripts/test-floor.mjs', 'shellcheck -S style', 'python3 -I scripts/docs-check/check_repo_docs.py'];
 
 for (const gate of SHARED_GATES) {
   test(`gate "${gate}" runs in CI and in the pre-push hook`, () => {

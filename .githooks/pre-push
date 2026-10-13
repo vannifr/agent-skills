@@ -10,3 +10,4 @@ fi
 
 node scripts/test-floor.mjs
 node scripts/structure-lint.mjs
+python3 -I scripts/docs-check/check_repo_docs.py

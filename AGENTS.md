@@ -12,3 +12,11 @@
 - Before changing a skill based on an evaluation, retrospective or review, follow CONTRIBUTING.md "Evaluating a skill and processing feedback": triage every point into skill / project-host / drop first, and don't publish as part of it.
 - Every skill needs a valid `evals/simulation.md` (local RED-GREEN simulation) before `tessl eval run` or publication; `structure-lint` enforces it. Do not add a skill to `scripts/simulation-exempt.txt`.
 - A skill is public from its first commit: English only, generic (no names, hosts, domains or figures from one run), a registry overlap record in `evals/overlap.md`, and every row of CONTRIBUTING.md "Definition of done for a public skill". Start from `templates/skill/`.
+
+## Agent working rules
+
+- The global working rules (session goal, mandate, learning loop, open-question format, cross-session communication) live in `~/.claude/CLAUDE.md` and the `goal` skill; do not copy them into this file.
+- Formulate a goal with criteria that a command can check before substantial work; stop and write an open decision for a user-owned decision or a high-impact assumption without evidence.
+- End a task with the lessons learned and an approval report, as the global rules describe.
+- Other Claude sessions can work on this machine: check `ListAgents` before editing a repo another session changes.
+- Repository conventions are checked by `scripts/docs-check/check_repo_docs.py` (AGENTS.md, CLAUDE.md, README.md); keep `AGENTS.md` under 200 lines and put long procedures in a document or skill.
