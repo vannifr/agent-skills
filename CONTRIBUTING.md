@@ -88,9 +88,17 @@ skill changes outcomes, and to collect concrete friction:
    - One run per variant is a signal, not proof. Don't quote the score
      as a measurement.
 
+Make it a RED-GREEN check: the without-skill run should miss criteria
+(RED), the with-skill run should meet them (GREEN). A baseline that
+already passes means the scenario is too easy or leaks its answer. Run
+GREEN on the weakest model you want the skill to work on as well as the
+strongest, since the uplift shows most on the weaker one. Record the
+per-criterion result in the commit message or the PR, not in the repo.
+
 **Official (costs credits)** — `tessl eval run ./skills/<name>` before a
 publish that changes behavior; see "Updating an existing skill's
-behavior" above.
+behavior" above. The local comparison always comes first: fix what it
+shows, then spend credits once on the official run.
 
 ### 2. Triage every feedback point
 
@@ -193,7 +201,10 @@ before publishing.
 
 If this publish accompanies a *behavior* change, add/update
 `skills/<name>/evals/` first per "Updating an existing skill's behavior"
-above — a quality score only says the skill reads well.
+above — a quality score only says the skill reads well. Then run the local
+RED-GREEN comparison from "Evaluating a skill and processing feedback" on
+every scenario, fix what it shows, and only then run `tessl eval run`. The
+credits buy the official score, not the first look.
 
 ### 3. Publish
 
