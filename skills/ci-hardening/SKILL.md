@@ -20,6 +20,8 @@ closing local/CI drift, use `ci-local-parity` first; hand parity findings
 
 **Default to audit-only** (steps 0-2, report, stop) unless the user asked
 for changes. Pushing to the default branch needs the owner's go-ahead.
+Audit-only still delivers each fix as a ready-to-apply patch (a diff or a
+file), never as prose; "you may edit" is permission, not a request.
 
 **Highest yield first** when time is short: how many items each scan step
 logged (0 or 1 means vacuous); whether the secret scan has a self-test and
@@ -61,7 +63,7 @@ versus `git ls-files`; which images are unpinned. Then walk the checklist.
    | Level | Meaning | Examples |
    |---|---|---|
    | high | the gate cannot fail | 0 items scanned and exit 0 (always high, even with a pinned tool); silently skipped; a tool crash passes |
-   | medium | partial or unproven | 1 of N commits scanned; no must-fail proof; unpinned image; half the files linted |
+   | medium | partial or unproven | 1 of N commits scanned (high when no full-history scan exists anywhere); no must-fail proof; unpinned image; half the files linted |
    | low | strictness and hygiene | default rule set; advisory step with a written reason that is not the only check of a critical property |
 
    Edge cases: a local-only gate (e.g. a live-site test) is "n/a" with a
@@ -98,7 +100,9 @@ versus `git ls-files`; which images are unpinned. Then walk the checklist.
       install-and-ignore (`<install tool> || true`, which can hide that the
       image lacks the installer or the tool). Assert what the step needs
       (e.g. `git --version`) instead. A scanner that logs an error line must
-      fail even when its exit code is 0.
+      fail even when its exit code is 0. Run the same hunt over your own
+      patch before reporting: a fix that adds `2>/dev/null || echo 1` has
+      only moved the gap.
 - [ ] Does a wrapper script or a git hook exit 0 with a warning when its
       tool is missing (`command -v tool || exit 0`)? Acceptable locally only
       with a blocking CI counterpart (the boundary is whether one exists);
@@ -240,8 +244,10 @@ per language (shell, config, container), commits scanned n vs the scan's own
 expected lower bound m (never vs `git rev-list --all`), gates with a
 must-fail proof n/m, floors present.
 
-Per gate: claim, evidence line from the log (quoted), must-fail proof (commit
-or run number), gap, fix commit. End with before/after numbers and what
+Per gate: claim, evidence line from the log (quoted), status (proven,
+unproven, n/a or not verified, always one of these words), must-fail proof
+(commit or run number), gap, fix commit. A finding that needs an operator
+carries both labels: unproven and operator-gated. End with before/after numbers and what
 remains open. A gate with no must-fail proof is "unproven", not passing.
 
 A reference shape to compare with: every image pinned by digest; a gate

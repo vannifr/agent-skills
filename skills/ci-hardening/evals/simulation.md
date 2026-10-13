@@ -24,3 +24,10 @@ scan rated medium), the patch delivered inline instead of as a patch file,
 and on the weaker model the word "unproven" and the owner's consent for a
 push-to-verify were missing. Not changed in the skill: one run each is too
 little to justify a rule.
+
+Second round, same date: four wording changes in SKILL.md (severity high when
+no full-history scan exists, fixes delivered as patches even when audit-only,
+a fixed status word per gate, the silent-fallback hunt applied to the agent's
+own patch). Haiku re-run, scored blind against its first run: 73, 93, 77
+against 68, 94, 77. Within the noise of one run per variant; the changes did
+not hurt and no more is claimed.
