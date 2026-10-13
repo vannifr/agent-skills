@@ -37,7 +37,7 @@ tessl install vannifr/ci-local-parity
 plugin exposes every skill under `skills/`):
 ```
 /plugin marketplace add vannifr/agent-skills
-/plugin install agent-skills@agent-skills
+/plugin install agent-skills@vannifr-skills
 ```
 
 **Manually** — clone this repo and point your tool at it:

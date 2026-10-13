@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "agent-skills",
+  "name": "vannifr-skills",
   "description": "Generic, eval-tested agent skills for CI, quality audits and site work",
   "owner": {
     "name": "vannifr"
