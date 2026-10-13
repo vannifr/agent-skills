@@ -31,3 +31,12 @@ a fixed status word per gate, the silent-fallback hunt applied to the agent's
 own patch). Haiku re-run, scored blind against its first run: 73, 93, 77
 against 68, 94, 77. Within the noise of one run per variant; the changes did
 not hurt and no more is claimed.
+
+Final regression, 2026-10-13, after rounds 45 and 46 of peer feedback (new
+wording on trivy gates, quality-server conditions, skipped steps, trust anchor
+updates): with-skill runs of the final SKILL.md, sonnet, one run each, scored
+blind by opus against a fresh baseline run. Scenario 0: 95 with skill against
+65 baseline. Scenario 1: 100 against 70. Scenario 2 was not re-run: the run
+did not finish in time. The with-skill runs lost points on the zero-count
+gate not being labelled unproven in one audit and on a missing severity in
+another; both are the weaknesses seen before, within noise of one run.

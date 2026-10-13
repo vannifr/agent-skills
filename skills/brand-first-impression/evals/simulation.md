@@ -36,3 +36,14 @@ is a signal, not a measurement. The gain sits in one criterion: the persona
 prompts of round 1 restated the norm (audience term and the "not legal
 advice" exclusion), the round-2 prompts were scrubbed against a norm term
 list. Scenarios 0 and 2 were not re-run after the second round.
+
+Final regression, 2026-10-13, after the feedback of runs 5 to 7 and the
+independent re-check of the project-local register (about twenty wording
+changes in SKILL.md and its references): with-skill runs of the final
+SKILL.md, sonnet, one run each, scored blind by opus against the baseline
+outputs of the first round. Scenario 0: 99 with skill against 81 baseline.
+Scenario 1: 92 against 34. Scenario 2: 95 against 82. The scorers differ
+from the first round, so the baseline numbers are not identical; the
+direction is the same in every scenario. Remaining weak spots: one persona
+prompt still carried the word "co-owner" while the plan said to replace it,
+and the primary CTA was called absent only "if confirmed" by a scroll test.
