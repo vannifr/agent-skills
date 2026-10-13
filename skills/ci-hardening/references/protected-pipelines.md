@@ -31,6 +31,17 @@ re-checks signature, parent and patch id; at most three attempts. The local
 verification then ran on an older base, so CI on the pushed sha stays the
 proof.
 
+A script that updates a trust anchor (a manifest of protected paths and its
+stored hash) first compares the current anchor with the previous manifest and
+stops on drift before overwriting anything, and hashes the new manifest
+independently from the patched head, not from the script's own output.
+
+Before writing a patch for a protected pipeline, read the rules of the
+test-integrity gate and of any hygiene test on the agent instruction files
+(line limits, named scripts that must exist): inverting or renaming a guard
+test can count as a removal that demands an explicit trailer, and a hygiene
+test can block the patch.
+
 Also check that the files that decide the gate (scan script, wrapper,
 sabotage drill) are under the same protection. If they are not, a weakening
 can slip past it: report that as a finding.

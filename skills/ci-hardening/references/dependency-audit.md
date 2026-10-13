@@ -22,6 +22,9 @@ A blocking scanner also has to be able to hold the release:
   in a separate commit.
 - `>=` ranges without a lockfile are covered only for the exactly pinned
   lines. Require a lockfile or exact pins.
+- A blocking scan in a repository without a lockfile is formally blocking but
+  empty (scanned targets 0): report it as an open gap, because the gate only
+  bites once a lockfile exists.
 
 1. Read each advisory (severity, attack vector, runtime or dev-only) and look
    up whether a patched version exists (the audit's fix-available field, the

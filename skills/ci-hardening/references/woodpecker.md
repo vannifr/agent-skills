@@ -71,7 +71,9 @@ Written for Woodpecker; the same questions apply to other CI systems.
   filter, filter per step (never at workflow level), guard the filter list
   with a parity test and keep one scheduled full run.
 - **A restart that turns a flake green hides it.** Same sha red then green
-  is a gap: record it as open, not as passed.
+  is a gap: record it as open, not as passed. That includes a runner
+  infrastructure error such as a full disk: record it as an infrastructure
+  gap with an owner.
 - **A restart reuses the old commit.** Restarting a scheduled run after a
   fix does not test the fix; trigger a new run on the fixed commit.
 - **A dependency install in parallel steps that share a directory** can
