@@ -1,0 +1,15 @@
+{
+  "context": "Tests whether an agent audits CTAs on structure and measurability: competing primary buttons, dead links, friction, missing next step, shared endpoint, conflated offers, no attribution of inquiries, and states what it could not check.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {"name": "Competing primary CTAs", "description": "Reports that the hero has two equally weighted primary buttons (free guide and book a call) plus a header button, so the first screen has no single primary action, and ties it to the brand's primary action being the intake call.", "max_score": 12},
+    {"name": "Dead CTA", "description": "Finds `href=\"#\"` ('Learn more') as a dead control.", "max_score": 8},
+    {"name": "Friction counted", "description": "Counts the contact form: six required fields out of seven, including phone and company, a mailto link beside it, and compares with what an intake request needs; the home form asks only for an email but is labelled 'waiting list' while the hero promises a call.", "max_score": 12},
+    {"name": "No next step", "description": "Reports that neither page says what happens after sending or when, and that no confirmation is visible in the files; it states the confirmation mail was not checked.", "max_score": 10},
+    {"name": "Measurability", "description": "Notes that no form asks how the visitor heard of the practice, and that the inquiry log has an empty `via` and `why us` for 4 of 5 rows, so inquiries cannot be attributed to a channel. It does not claim any conversion rate.", "max_score": 18},
+    {"name": "Shared endpoint", "description": "Notices that the waiting-list form and the contact form both post to `/api/contact`, so the channel cannot be told apart afterwards, and proposes separate endpoints or a hidden source field.", "max_score": 10},
+    {"name": "Offers conflated", "description": "Notices that one select field mixes a free guide, a paid mediation and a newsletter in the same form, so the default action and the card's focus are muddled.", "max_score": 10},
+    {"name": "Conversation path", "description": "Evaluates the path for someone who wants to talk to a person (mailto, phone required on the form) and whether it is distinguishable from the waiting list.", "max_score": 6},
+    {"name": "Limits and proposals without invented copy", "description": "States what was not checked (live rendering, position on the first screen, confirmation mail, the target pages) and gives proposals without writing replacement wording as final, or says wording needs a check against the tone of voice.", "max_score": 14}
+  ]
+}

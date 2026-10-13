@@ -1,0 +1,4 @@
+{
+  "description": "Prepare the blind persona run for a brand: prompts, screenshots, measurements",
+  "include": ["./inputs"]
+}

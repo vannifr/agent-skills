@@ -1,0 +1,16 @@
+<h1>Contact</h1>
+<p>Write to <a href="mailto:hello@northwind.example">hello@northwind.example</a></p>
+<form action="/api/contact" method="post">
+  <input name="first_name" required>
+  <input name="last_name" required>
+  <input name="company" required>
+  <input name="phone" required>
+  <input name="email" type="email" required>
+  <select name="interest" required>
+    <option>Free guide</option>
+    <option>Mediation</option>
+    <option>Newsletter</option>
+  </select>
+  <textarea name="message"></textarea>
+  <button>Send</button>
+</form>

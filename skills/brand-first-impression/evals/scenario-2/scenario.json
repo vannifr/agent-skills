@@ -1,0 +1,4 @@
+{
+  "description": "Audit the calls to action of a small site from its HTML and inquiry log",
+  "include": ["./inputs"]
+}

@@ -1,0 +1,15 @@
+{
+  "context": "Tests whether an agent turns persona answers and measurements into a trustworthy report: separates missing, clipped and below-the-fold, labels known issues, flags unsourced figures, treats positioning as a question, states limits and refuses to invent search volumes.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {"name": "Clipped CTA instead of missing", "description": "The report uses the mobile measurement (`clipped: true`, right edge 412 beyond width 390) to show the header button exists but cannot be reached, so the personas' 'missing on mobile' is explained rather than repeated or dismissed. It also separates this from the second CTA that sits far below the fold (y 2140 of 3100) and states that the primary CTA is effectively absent on the first mobile screen.", "max_score": 20},
+    {"name": "Known issues confirmed, not new", "description": "The mobile overflow is reported as known (BL-15), the missing price as known (BL-12) and the legal tagline as known (BL-19), each as 'known, confirmed by the persona test' with the backlog item, not as new findings.", "max_score": 12},
+    {"name": "Unsourced figure flagged", "description": "The first-screen claim '87% of cases' is flagged as hypothetical per the evidence register (E-03) and as a trust and positioning problem, not accepted as a fact.", "max_score": 10},
+    {"name": "Positioning as a question", "description": "The mismatch between the norm (mediation, not a law firm) and the legal tone the personas read is reported with both sides and put to the owner as an open question or as a site-deviates-from-positioning finding; the report does not decide the positioning itself.", "max_score": 12},
+    {"name": "Limits stated", "description": "The report says that all personas are the same model so agreement shows consistent reading, not real visitor behaviour, and that blindness rests on an instruction. It names what was not checked (for example the confirmation mail or the full-page task).", "max_score": 10},
+    {"name": "No invented search volume", "description": "Search terms are listed in the visitor's words and marked as hypothesis; no monthly search volume is stated, or each volume is marked as evidence needed. Inventing numbers fails this criterion.", "max_score": 10},
+    {"name": "Structured findings with structural severity", "description": "Findings carry evidence (literal quote or measurement), a severity derived from a stated rule (for example high when at least two personas or a measurement show it blocks the primary action or trust), and a status new or known.", "max_score": 12},
+    {"name": "Brand separation checked", "description": "The report notices the outgoing link to the sister brand in the measured links and reports it against the brand-separation rule in the norm.", "max_score": 8},
+    {"name": "Shared endpoint noticed", "description": "The report notices that the two forms post to the same endpoint, so the channel cannot be told apart afterwards, and ties it to the inquiry log where the channel was recorded for 3 of 11 inquiries.", "max_score": 6}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "viewport": {"width": 1440, "height": 900},
+  "title": "Northwind Mediation | Legal solutions for business partners",
+  "h1": ["Partner dispute? We win 87% of cases"],
+  "fold": [
+    {"t": "Book intake", "h": "/intake", "x": 1240, "right": 1384, "clipped": false}
+  ],
+  "cta": [
+    {"t": "Book intake", "h": "/intake", "y": 24},
+    {"t": "Request a callback", "h": "/callback", "y": 1480}
+  ],
+  "pageHeight": 2400
+}

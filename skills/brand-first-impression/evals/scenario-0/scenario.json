@@ -1,0 +1,4 @@
+{
+  "description": "Write the first-impression report from persona answers and measurements of a fictional mediation site",
+  "include": ["./inputs"]
+}

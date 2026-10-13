@@ -1,0 +1,20 @@
+{
+  "viewport": {"width": 390, "height": 844},
+  "title": "Northwind Mediation | Legal solutions for business partners",
+  "desc": "Our experienced legal team resolves partner disputes quickly.",
+  "h1": ["Partner dispute? We win 87% of cases"],
+  "fold": [
+    {"t": "Menu", "h": "#menu", "x": 330, "right": 380, "clipped": false},
+    {"t": "Book intake", "h": "/intake", "x": 318, "right": 412, "clipped": true}
+  ],
+  "cta": [
+    {"t": "Book intake", "h": "/intake", "y": 20},
+    {"t": "Request a callback", "h": "/callback", "y": 2140}
+  ],
+  "forms": [
+    {"action": "/api/contact", "fields": ["name:text*", "email:email*", "message:textarea"]},
+    {"action": "/api/contact", "fields": ["email:email*"]}
+  ],
+  "pageHeight": 3100,
+  "links": ["/intake", "/callback", "/about", "https://arborlegal.example/", "https://news.northwind.example/"]
+}

@@ -1,0 +1,14 @@
+{
+  "context": "Tests whether an agent sets up the run blind: persona prompts without the norm, first screen only, a name-only test, a full-page task, fixed personas and questions, measurement of CTA position.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {"name": "Persona prompts are blind", "description": "The written-out persona prompts contain only screenshot paths, the title and meta description, the persona and the fixed questions, with an instruction to read nothing else. They do not contain the brand card, the position, the offer, the primary action or the 'not legal advice' line, or the repository path. Any leak of the norm fails this criterion.", "max_score": 25},
+    {"name": "First screen only, two viewports", "description": "Screenshots are of the first screen without scrolling on desktop and on mobile, not of the whole page, with a cache-buster, and saved where the browser tool may write.", "max_score": 10},
+    {"name": "Name test", "description": "A separate fresh subagent gets only the brand name, title and meta description (no page) and is asked what it expects, for whom, the cost to get in, and whether it would click.", "max_score": 15},
+    {"name": "Full-page task for the low CTA", "description": "Because the callback form is far down the page, the plan includes a third fresh subagent with a full-page screenshot and the question where to click to get in touch, to separate absent from too low.", "max_score": 10},
+    {"name": "Fixed personas with evidence marks", "description": "Three fixed personas (newcomer, expert, decision-maker) are described from the evidence in the brand card (inquiry log, sales notes) and every detail without evidence is marked as an assumption. The plan says personas and questions stay the same between runs and brands.", "max_score": 12},
+    {"name": "Same questions for every persona", "description": "One fixed list of questions is given to every persona (what is this, for whom, what first, what makes me unsure, open question, click or leave, five words, desktop versus mobile).", "max_score": 8},
+    {"name": "CTA position measured", "description": "The plan includes a measurement of each control's position against the viewport, vertical and horizontal (clipped), and says that a persona's layout claim is verified by measurement before it enters a report.", "max_score": 10},
+    {"name": "Limits and use of results", "description": "The plan states that all personas are the same model (agreement is not visitor behaviour), that blindness rests on the instruction, checks that subagents quote only what is on the screenshots, and says the comparison with the norm happens only after the blind run.", "max_score": 10}
+  ]
+}
