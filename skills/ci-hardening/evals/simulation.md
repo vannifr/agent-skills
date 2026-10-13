@@ -36,7 +36,8 @@ Final regression, 2026-10-13, after rounds 45 and 46 of peer feedback (new
 wording on trivy gates, quality-server conditions, skipped steps, trust anchor
 updates): with-skill runs of the final SKILL.md, sonnet, one run each, scored
 blind by opus against a fresh baseline run. Scenario 0: 95 with skill against
-65 baseline. Scenario 1: 100 against 70. Scenario 2 was not re-run: the run
-did not finish in time. The with-skill runs lost points on the zero-count
-gate not being labelled unproven in one audit and on a missing severity in
-another; both are the weaknesses seen before, within noise of one run.
+65 baseline. Scenario 1: 100 against 70. Scenario 2: 93 against 53 (the run finished late and was scored separately
+after a session limit). The with-skill runs lost points on the zero-count
+gate not being labelled unproven in one audit, on a missing severity in
+another and on a hook-isolation test that did not assert refs and the bare
+flag; all weaknesses seen before, within the noise of one run.
