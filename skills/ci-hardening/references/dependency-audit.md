@@ -38,6 +38,18 @@ A blocking scanner also has to be able to hold the release:
    override does not break the build.
 4. No patched version: a documented ignore with reason, attack-vector
    assessment and an expiry date, reviewed before it lapses.
+   An expiry that lives only in a comment cannot fail: nothing turns the
+   pipeline red on that date. Put the date in the rule itself in a machine
+   readable form (for example `expires=YYYY-MM-DD`, or the scanner's own
+   expiry syntax where it has one) and test that a missing and an expired
+   date both fail: an injectable "today" in the test, the real clock in CI,
+   and a lower bound on the number of rules so the test cannot pass empty.
+   Check per repository in which step the test really runs (not skipped, no
+   ignored failure, no path filter that excludes the file). Date only the
+   rules the auditor still reports as allowlisted vulnerabilities; a rule it
+   reports as no longer needed is removed, not dated. A rule without an
+   existing date gets at most 60 days, and only when its existing reason
+   covers that.
 5. Commit this separately from the gate change so the gate commit is not
    red for an unrelated reason.
 6. Allowlist hygiene: remove entries the audit tool reports as unnecessary.
