@@ -8,10 +8,14 @@ import { fileURLToPath } from 'node:url';
 
 const SCRIPT = fileURLToPath(new URL('./structure-lint.mjs', import.meta.url));
 
-function makeFixture(skillMdContent, extraFiles = {}) {
+function makeFixture(skillMdContent, extraFiles = {}, { exempt = true } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'structure-lint-test-'));
   const skillDir = join(root, 'skills', 'example-skill');
   mkdirSync(skillDir, { recursive: true });
+  if (exempt) {
+    mkdirSync(join(root, 'scripts'), { recursive: true });
+    writeFileSync(join(root, 'scripts', 'simulation-exempt.txt'), 'example-skill\n');
+  }
   writeFileSync(join(skillDir, 'SKILL.md'), skillMdContent);
   for (const [relPath, content] of Object.entries(extraFiles)) {
     const fullPath = join(skillDir, relPath);
@@ -185,4 +189,68 @@ test('fails on a broken relative link inside a reference file', () => {
   rmSync(root, { recursive: true, force: true });
   assert.equal(result.code, 1);
   assert.match(result.output, /a\.md.*broken relative link "missing\.md"/);
+});
+
+const SCENARIO = { 'evals/scenario-0/task.md': '# Task\n', 'evals/scenario-0/criteria.json': '{}' };
+const RECORD = (rows = '| scenario-0 | 40 | 85 |') =>
+  `# Local simulation\n\ndate: 2026-10-13\nmodel: sonnet\nscorer: opus, blind\n\n| scenario | baseline | with skill |\n|---|---|---|\n${rows}\n`;
+
+test('a skill without a local simulation record fails unless it is exempt', () => {
+  const root = makeFixture(VALID_SKILL, SCENARIO, { exempt: false });
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /evals\/simulation\.md: missing/);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('a skill with a valid simulation record passes without an exemption', () => {
+  const root = makeFixture(VALID_SKILL, { ...SCENARIO, 'evals/simulation.md': RECORD() }, { exempt: false });
+  const result = runLint(root);
+  assert.equal(result.code, 0, result.output);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('a record where the run with the skill does not beat the baseline fails', () => {
+  const root = makeFixture(VALID_SKILL, { ...SCENARIO, 'evals/simulation.md': RECORD('| scenario-0 | 85 | 85 |') }, { exempt: false });
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /scenario-0: with skill 85 does not beat baseline 85/);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('a record that skips a scenario fails', () => {
+  const files = { ...SCENARIO, 'evals/scenario-1/task.md': '# Task\n', 'evals/simulation.md': RECORD() };
+  const root = makeFixture(VALID_SKILL, files, { exempt: false });
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /scenario-1: no row in the simulation record/);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('a record without date, model or scorer fails', () => {
+  const record = '| scenario | baseline | with skill |\n|---|---|---|\n| scenario-0 | 40 | 85 |\n';
+  const root = makeFixture(VALID_SKILL, { ...SCENARIO, 'evals/simulation.md': record }, { exempt: false });
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /missing "date:"/);
+  assert.match(result.output, /missing "model:"/);
+  assert.match(result.output, /missing "scorer:"/);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('an exemption for a skill that now has a valid record fails (ratchet)', () => {
+  const root = makeFixture(VALID_SKILL, { ...SCENARIO, 'evals/simulation.md': RECORD() });
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /example-skill: remove from scripts\/simulation-exempt\.txt/);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('an exemption for a skill that does not exist fails', () => {
+  const root = makeFixture(VALID_SKILL, {});
+  writeFileSync(join(root, 'scripts', 'simulation-exempt.txt'), 'example-skill\nghost-skill\n');
+  const result = runLint(root);
+  assert.equal(result.code, 1);
+  assert.match(result.output, /ghost-skill: listed in scripts\/simulation-exempt\.txt but no such skill/);
+  rmSync(root, { recursive: true, force: true });
 });

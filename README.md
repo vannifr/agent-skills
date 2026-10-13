@@ -54,6 +54,11 @@ tessl eval lint ./skills/<name>/evals/   # validate scenario structure
 tessl eval run ./skills/<name>            # run the evals (consumes credits)
 ```
 
+Before any credits are spent, every skill needs a local RED-GREEN
+simulation (same scenarios, run with and without the skill, scored blind),
+recorded in `skills/<name>/evals/simulation.md`. `structure-lint` enforces
+it; see CONTRIBUTING.md.
+
 Results and methodology: [docs.tessl.io/improving-your-skills/evaluate-skill-quality-using-scenarios](https://docs.tessl.io/improving-your-skills/evaluate-skill-quality-using-scenarios).
 
 ## Contributing

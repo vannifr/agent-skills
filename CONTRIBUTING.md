@@ -45,7 +45,14 @@
    `site-revision` for the wording.
 4. Keep `SKILL.md` under 500 lines; split detail into `references/` files
    linked from the body.
-5. Run `node scripts/structure-lint.mjs` locally before opening a PR.
+5. Add `skills/<name>/evals/scenario-N/` (`task.md`, `inputs/`,
+   `criteria.json`) and run the local RED-GREEN simulation from
+   "Evaluating a skill and processing feedback". Record the result in
+   `skills/<name>/evals/simulation.md` (format below). `structure-lint`
+   fails a skill without a valid record; only skills listed in
+   `scripts/simulation-exempt.txt` (a shrinking list of skills that
+   predate the rule) are excused. Never add a new skill to that list.
+6. Run `node scripts/structure-lint.mjs` locally before opening a PR.
 
 ## Updating an existing skill's behavior
 
@@ -87,6 +94,22 @@ skill changes outcomes, and to collect concrete friction:
      before drawing conclusions about the skill.
    - One run per variant is a signal, not proof. Don't quote the score
      as a measurement.
+
+Record the outcome in `skills/<name>/evals/simulation.md`; the lint
+checks that every scenario has a row and that the run with the skill beats
+the baseline:
+
+```
+# Local simulation
+
+date: 2026-10-13
+model: the executing model(s)
+scorer: the scoring model, blind to which run used the skill
+
+| scenario | baseline | with skill |
+|---|---|---|
+| scenario-0 | 51 | 86 |
+```
 
 Make it a RED-GREEN check: the without-skill run should miss criteria
 (RED), the with-skill run should meet them (GREEN). A baseline that

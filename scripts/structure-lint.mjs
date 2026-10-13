@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 // Structure-only skill lint — no secrets required, safe to run on fork PRs.
 // Checks: frontmatter present with name+description, SKILL.md line limit,
-// relative links in the body resolve to real files, no placeholder markers.
+// relative links in the body resolve to real files, no placeholder markers,
+// and a local simulation record (evals/simulation.md) per skill unless exempt.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve, basename, dirname } from 'node:path';
 
 const SKILLS_DIR = 'skills';
 const MAX_LINES = 500;
+const EXEMPT_FILE = join('scripts', 'simulation-exempt.txt');
 const PLACEHOLDER_PATTERNS = [/\bTBD\b/, /\bTODO\b/, /\bFIXME\b/, /\[fill in/i, /\[placeholder/i];
 
 const errors = [];
@@ -122,6 +124,57 @@ function checkJson(skillDir) {
   }
 }
 
+function simulationProblems(skillDir) {
+  const evalsDir = join(skillDir, 'evals');
+  const scenarios = existsSync(evalsDir)
+    ? readdirSync(evalsDir, { withFileTypes: true })
+        .filter((e) => e.isDirectory() && /^scenario-\d+$/.test(e.name))
+        .map((e) => e.name)
+    : [];
+  if (scenarios.length === 0) return ['no evals/scenario-N directories'];
+  const recordPath = join(evalsDir, 'simulation.md');
+  if (!existsSync(recordPath)) return [`${recordPath}: missing (run the local simulation, see CONTRIBUTING.md)`];
+  const record = readFileSync(recordPath, 'utf8');
+  const problems = [];
+  for (const field of ['date', 'model', 'scorer']) {
+    if (!new RegExp(`^${field}:\\s*\\S`, 'm').test(record)) problems.push(`${recordPath}: missing "${field}:" line`);
+  }
+  const rows = new Map();
+  for (const m of record.matchAll(/^\|\s*(scenario-\d+)\s*\|\s*(\d{1,3})\s*\|\s*(\d{1,3})\s*\|\s*$/gm)) {
+    rows.set(m[1], [Number(m[2]), Number(m[3])]);
+  }
+  for (const scenario of scenarios) {
+    const row = rows.get(scenario);
+    if (!row) {
+      problems.push(`${recordPath}: ${scenario}: no row in the simulation record`);
+    } else if (row[0] > 100 || row[1] > 100) {
+      problems.push(`${recordPath}: ${scenario}: scores must be 0-100`);
+    } else if (row[1] <= row[0]) {
+      problems.push(`${recordPath}: ${scenario}: with skill ${row[1]} does not beat baseline ${row[0]}`);
+    }
+  }
+  return problems;
+}
+
+function checkSimulations(names) {
+  const exempt = existsSync(EXEMPT_FILE)
+    ? readFileSync(EXEMPT_FILE, 'utf8').split('\n').map((l) => l.trim()).filter(Boolean)
+    : [];
+  for (const name of exempt) {
+    if (!names.includes(name)) {
+      errors.push(`${name}: listed in ${EXEMPT_FILE} but no such skill`);
+    }
+  }
+  for (const name of names) {
+    const problems = simulationProblems(join(SKILLS_DIR, name));
+    if (exempt.includes(name)) {
+      if (problems.length === 0) errors.push(`${name}: remove from ${EXEMPT_FILE}, the simulation record is valid`);
+    } else {
+      for (const problem of problems) errors.push(problem.startsWith(SKILLS_DIR) ? problem : `${name}: ${problem}`);
+    }
+  }
+}
+
 if (!existsSync(SKILLS_DIR)) {
   console.log(`No "${SKILLS_DIR}/" directory found — nothing to lint.`);
   process.exit(0);
@@ -140,6 +193,8 @@ for (const name of skillDirs) {
   checkSkill(join(SKILLS_DIR, name));
   checkJson(join(SKILLS_DIR, name));
 }
+
+checkSimulations(skillDirs);
 
 if (errors.length > 0) {
   console.error(`structure-lint found ${errors.length} issue(s):\n`);
