@@ -33,6 +33,13 @@ tessl install vannifr/nfr-gap-audit
 tessl install vannifr/ci-local-parity
 ```
 
+**Via Claude Code marketplace** (this repo is its own marketplace; one
+plugin exposes every skill under `skills/`):
+```
+/plugin marketplace add vannifr/agent-skills
+/plugin install agent-skills@agent-skills
+```
+
 **Manually** — clone this repo and point your tool at it:
 - **Claude Code**: symlink into `~/.claude/skills/<name>` or a project's
   `.claude/skills/<name>`.

@@ -1,0 +1,10 @@
+{
+  "name": "agent-skills",
+  "version": "1.0.0",
+  "description": "Generic, eval-tested agent skills for CI, quality audits and site work",
+  "author": {
+    "name": "vannifr"
+  },
+  "license": "MIT",
+  "skills": "./skills/"
+}
