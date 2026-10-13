@@ -65,6 +65,13 @@ Written for Woodpecker; the same questions apply to other CI systems.
   the findings. Splitting the work over parallel steps (sharding) needs a
   parity test: every input exactly once, the sum equal to the unsharded
   count, and a log line per shard with its share (`shard i/n: K items`).
+- **A skipped step drags its dependants along and the pipeline stays
+  `success`.** A path filter on one step makes every step that depends on
+  it skip too, so a skipped gate counts as green. Keep gates without a
+  filter, filter per step (never at workflow level), guard the filter list
+  with a parity test and keep one scheduled full run.
+- **A restart that turns a flake green hides it.** Same sha red then green
+  is a gap: record it as open, not as passed.
 - **A restart reuses the old commit.** Restarting a scheduled run after a
   fix does not test the fix; trigger a new run on the fixed commit.
 - **A dependency install in parallel steps that share a directory** can

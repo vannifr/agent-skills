@@ -9,6 +9,20 @@ trivy without `--exit-code 1` and a severity filter) is a report, not a
 gate (seen in most pipelines that had one). Plant a known-vulnerable
 dependency in a scratch copy and see the step fail.
 
+A blocking scanner also has to be able to hold the release:
+- A gate that is not in the `depends_on` chain of the deploy step turns the
+  pipeline red but does not stop the deploy. Test that the deploy step
+  depends on the gate.
+- A scan of a repository with only dev dependencies can be vacuous (target
+  `-`, "supported files not found"): include dev dependencies, plant a
+  vulnerable dev dependency as the must-fail case (rc 0 without the flag,
+  rc 1 with it), and put "scanned targets above zero" (a lockfile row or
+  count of at least 1) in the log requirement and the test. The first
+  blocking scan with dev dependencies often finds real findings: fix them
+  in a separate commit.
+- `>=` ranges without a lockfile are covered only for the exactly pinned
+  lines. Require a lockfile or exact pins.
+
 1. Read each advisory (severity, attack vector, runtime or dev-only) and look
    up whether a patched version exists (the audit's fix-available field, the
    advisory's first-patched version, or an advisory database).

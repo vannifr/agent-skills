@@ -183,7 +183,11 @@ versus `git ls-files`; which images are unpinned. Then walk the checklist.
       ([woodpecker.md](references/woodpecker.md)).
 - [ ] Do floating specs exist: `>=` ranges without a lockfile, `npx --yes
       <tool>`, binaries fetched by `curl` without a checksum, git-URL
-      dependencies? Does the dependency audit find at least one manifest?
+      dependencies? Does the dependency audit find at least one manifest,
+      and is the audit gate in the deploy step's `depends_on`? Is every
+      `npx` pinned to an exact version at least two weeks old (from the
+      lockfile or the last green run), including tool configs
+      ([dependency-audit.md](references/dependency-audit.md))?
 - [ ] Do language/runtime versions match between CI and local, or is the
       difference deliberate and written down?
 
