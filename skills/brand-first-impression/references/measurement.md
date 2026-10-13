@@ -25,5 +25,7 @@ Run once per viewport in the browser tool's page-evaluation function. It measure
 - `forms[].action` shared between different forms means the channel cannot be told apart afterwards.
 - `links` with `#` or empty destinations are dead CTAs; links to another brand are checked against the separation rules.
 - A persona's layout claim ("missing", "cut off") that contradicts the measurement is investigated, not dismissed.
+- A fixed overlay (cookie banner) can cover the primary button on mobile: measure its height, its top and its overlap with the first button (select by `position: fixed`; if a measured value does not fit the screenshot, repeat with a sharper selector before reporting).
+- Opening language without a browser: request the page with an `Accept-Language` header per language and read `<html lang>`; whether the choice is remembered stays unmeasured.
 - Skip links ("skip to main content") sit outside the viewport on purpose: ignore them in the clipped check.
 - `clipped: true` is only a candidate. Scroll horizontally and check whether the page scrolls (`scrollX` stays 0 when nothing is reachable), and check the menu state (for example `aria-expanded="false"`): a closed off-canvas menu is outside the viewport by design. For bottom-edge "cut-off text" claims compare the element rectangle with the viewport height and its `clientHeight` with `scrollHeight`.
