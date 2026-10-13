@@ -8,7 +8,7 @@ Fields per finding:
 - `brand`, `page`.
 - `source`: persona test, name test, measurement, norm comparison, or known.
 - `personas`: which personas raised it.
-- `type`: site deviates from positioning, positioning deviates from visitor intent, ambiguity, CTA, measurability, brand separation, dead control.
+- `type`: strength (record what works, including a deliberate exception), site deviates from positioning, positioning deviates from visitor intent, ambiguity, CTA, measurability, brand separation, dead control.
 - `evidence`: literal quote or measurement, no judgement.
 - `severity`, structural: high = at least two personas or a measurement, and it blocks the primary action or trust; medium = one persona, or a gap that does not block; low = cosmetic or unconfirmed.
 - `status`: new, or known with its backlog item.
