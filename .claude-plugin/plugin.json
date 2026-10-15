@@ -1,6 +1,6 @@
 {
   "name": "agent-skills",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generic, eval-tested agent skills for CI, quality audits and site work",
   "author": {
     "name": "vannifr"

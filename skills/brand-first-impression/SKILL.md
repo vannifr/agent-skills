@@ -48,7 +48,7 @@ Three fixed personas, the same between runs: a **newcomer** (does not know the b
 
 ### 4. Blind first-impression test
 
-1. Open the live URL in a fresh browser with a cache-buster, desktop (about 1440 wide) and mobile (about 390 wide). Capture only the first screen, without scrolling. Save screenshots where the browser tool may write (usually inside the project directory), not elsewhere.
+1. Open the live URL in a fresh browser with a cache-buster, desktop (about 1440 wide) and mobile (about 390 wide, emulated as a real mobile device with touch and a device pixel ratio above 1, not a narrow desktop window: a desktop-mode window keeps a scrollbar and fakes horizontal overflow). Capture only the first screen, without scrolling. Save screenshots where the browser tool may write (usually inside the project directory), not elsewhere.
 2. Run the measurement snippet once per viewport ([measurement.md](references/measurement.md)).
 3. Give each persona to a **read-only subagent** in a fresh context. The prompt holds only: the screenshot paths, the page title and meta description as shown in a search result, the persona, the fixed questions, and the instruction to read nothing else. It never holds the norm, the brand card or the repository. Write the prompt out in full; the subagent does not see this conversation.
 4. **Name test.** A second fresh subagent gets only the brand name, title and meta description (no page) and says what it expects, for whom, what it takes to get in, what organisation it pictures, and whether it would click.
