@@ -1,9 +1,8 @@
 # agent-skills
 
-Reusable, tool-agnostic skills for coding agents — works the same in Claude
-Code, opencode, qwen code, or any tool that reads a `SKILL.md` bundle. No
-tool-specific glue: install a skill by pointing your tool's skill-discovery
-path at `skills/<name>/`, or symlink it in.
+Reusable, tool-agnostic skills for coding agents — works the same in Claude Code, opencode, qwen code, or any tool that reads a `SKILL.md` bundle.
+
+No tool-specific glue: install a skill by pointing your tool's skill-discovery path at `skills/<name>/`, or symlink it in.
 
 ## Skills
 
@@ -21,6 +20,10 @@ path at `skills/<name>/`, or symlink it in.
 | [`load-test-bootstrap`](skills/load-test-bootstrap/) | Scaffolds and runs a small, bounded k6/Artillery load test against a site's or API's critical endpoints, with a mandatory scope-and-consent step (target, intensity, environment) before anything runs. | Bootstraps the *first* load test where none exists, rather than aggregating/gating on load tests a project already has (that's a CI-gate concern) — and treats running real load against a live target as an authorized action, not a default. |
 | [`third-party-script-audit`](skills/third-party-script-audit/) | Inventories every third-party script/resource a website loads, classifies what data each one can access, checks Subresource Integrity, and diffs the site's CSP allowlist against what's actually loaded. | Looks at what the *browser* fetches from external origins — a distinct, commonly-skipped surface from server-side dependency scanning (`npm audit` etc.) and from a GDPR/consent legal review, which it feeds factual input into rather than replacing. |
 | [`translation-quality-review`](skills/translation-quality-review/) | Reads translated strings against the source language across a multi-language site's locales and flags awkward/machine-sounding phrasing, broken placeholders, untranslated leftovers, terminology drift, and length-driven layout risk. | Starts where key-parity automation stops — it assumes every key already exists and asks whether the translation is actually any good, which no mechanical i18n check can answer. |
+
+## Usage
+
+Once installed, the agent loads a skill when its description matches the task. Open a skill's `SKILL.md` to see its steps and checks. Install options follow.
 
 ## Install
 
@@ -50,12 +53,9 @@ plugin exposes every skill under `skills/`):
 
 ## Evaluation
 
-Each skill's `evals/` directory holds scenario-based regression tests
-(`tessl scenario generate` + `tessl eval run`): a task brief plus a
-weighted checklist, run twice per scenario — once with the skill injected,
-once without — and scored by a judge model. This is a stronger signal than
-a static content review: it measures whether the skill actually changes
-agent behavior for the better, not just whether it reads well.
+- Each skill's `evals/` directory holds scenario-based regression tests (`tessl scenario generate` + `tessl eval run`): a task brief plus a weighted checklist, run twice per scenario — once with the skill injected, once without — and scored by a judge model.
+
+This is a stronger signal than a static content review: it measures whether the skill actually changes agent behavior for the better, not just whether it reads well.
 
 ```bash
 tessl eval lint ./skills/<name>/evals/   # validate scenario structure

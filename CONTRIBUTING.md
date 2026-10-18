@@ -6,12 +6,11 @@
   limit, working relative links, no placeholder text) — this needs no
   secrets and runs on PRs from forks too.
 - The Tessl quality-gate review (`tessl review run quality --threshold 80`)
-  costs Tessl credits, so CI runs it only on a **manual** pipeline, never on
-  push or PR. Start it in the CI UI ("Run pipeline"); by default it reviews
-  the skill directories changed in the last commit, or set the variable
-  `REVIEW_SKILLS="skills/<name> ..."` to choose. Locally:
-  `tessl review run quality --threshold 80 skills/<name>`. The step needs a
-  `TESSL_TOKEN` secret.
+  costs Tessl credits, so CI runs it only on a **manual** pipeline, never on push or PR.
+
+  Start it in the CI UI ("Run pipeline"); by default it reviews the skill directories changed in the last commit, or set the variable `REVIEW_SKILLS="skills/<name> ..."` to choose. Locally: `tessl review run quality --threshold 80 skills/<name>`.
+
+  The step needs a `TESSL_TOKEN` secret.
 
 ## Adding a new skill
 
@@ -37,30 +36,23 @@
    - scripts bundled with the skill are fine, but their defaults must
      not assume a stack either.
 3. A skill that changes a project defines **done** explicitly: the
-   change is committed, CI for that exact commit is green (checked, not
-   assumed, never made green by weakening a gate), and the change is
-   verified on the live/deployed application. What can't be verified
-   is reported as "not verified" with the reason, never as done. See
-   the "Definition of done" section in `nfr-gap-audit` or
-   `site-revision` for the wording.
+   change is committed, CI for that exact commit is green (checked, not assumed, never made green by weakening a gate), and the change is verified on the live/deployed application.
+
+   What can't be verified is reported as "not verified" with the reason, never as done. See the "Definition of done" section in `nfr-gap-audit` or `site-revision` for the wording.
 4. Keep `SKILL.md` under 500 lines; split detail into `references/` files
    linked from the body.
 5. Add `skills/<name>/evals/scenario-N/` (`task.md`, `inputs/`,
-   `criteria.json`) and run the local RED-GREEN simulation from
-   "Evaluating a skill and processing feedback". Record the result in
-   `skills/<name>/evals/simulation.md` (format below). `structure-lint`
-   fails a skill without a valid record; only skills listed in
-   `scripts/simulation-exempt.txt` (a shrinking list of skills that
-   predate the rule) are excused. Never add a new skill to that list.
+   `criteria.json`) and run the local RED-GREEN simulation from "Evaluating a skill and processing feedback". Record the result in `skills/<name>/evals/simulation.md` (format below).
+
+   `structure-lint` fails a skill without a valid record; only skills listed in `scripts/simulation-exempt.txt` (a shrinking list of skills that predate the rule) are excused. Never add a new skill to that list.
 6. Search the registry and write `evals/overlap.md` (see "Check for overlap first"). Same rule: never add a new skill to the exempt list.
 7. Check every row of "Definition of done for a public skill", then run `node scripts/structure-lint.mjs` locally before opening a PR.
 
 ## Definition of done for a public skill
 
-A skill in `skills/` is public from the first commit, and a skill sent to
-the Tessl registry is installable by anyone. Both need the same bar. Start
-from [`templates/skill/`](templates/skill/) (`SKILL.md`, a scenario, the
-simulation record and the overlap record) and copy it to `skills/<name>/`.
+A skill in `skills/` is public from the first commit, and a skill sent to the Tessl registry is installable by anyone. Both need the same bar.
+
+Start from [`templates/skill/`](templates/skill/) (`SKILL.md`, a scenario, the simulation record and the overlap record) and copy it to `skills/<name>/`.
 
 | # | Criterion | Checked by |
 |---|---|---|
@@ -74,34 +66,25 @@ simulation record and the overlap record) and copy it to `skills/<name>/`.
 | 8 | Registry overlap checked and recorded in `evals/overlap.md`: the `tessl search` queries, the closest match and one sentence that stays true after reading it. No such sentence, no publication. | `structure-lint` (record exists and is complete), reviewer (the sentence) |
 | 9 | CI green for the exact commit that adds or changes the skill, checked per sha. | pipeline |
 
-Sending it to Tessl comes after all of this, never instead of it, and only
-with the owner's explicit approval: `tessl skill lint`, then
-`tessl review run` (at least 80, costs credits), then `tessl eval run`
-(costs credits), then `--dry-run`, then `--public`; commit the manifest and
-add the README row. See "Publishing a skill to Tessl" for each command.
-Skills that predate criteria 7 and 8 are listed in
-`scripts/simulation-exempt.txt`; that list only shrinks.
+- Sending it to Tessl comes after all of this, never instead of it, and only with the owner's explicit approval: `tessl skill lint`, then `tessl review run` (at least 80, costs credits), then `tessl eval run` (costs credits), then `--dry-run`, then `--public`;
+
+- commit the manifest and add the README row.
+
+See "Publishing a skill to Tessl" for each command. Skills that predate criteria 7 and 8 are listed in `scripts/simulation-exempt.txt`; that list only shrinks.
 
 ## Updating an existing skill's behavior
 
-If a change is meant to alter how the agent behaves (not just wording), a
-matching `evals/` scenario is the way to actually verify it worked —
-a passing `structure-lint`/content review only says the skill reads well,
-not that it changes outcomes. Add or update a scenario under
-`skills/<name>/evals/`, run `tessl eval lint ./skills/<name>/evals/` to
-validate it, and — if you have Tessl credits available —
-`tessl eval run ./skills/<name>` to confirm the fix actually moves the
-score. Eval runs consume real credits (roughly 100/scenario to generate,
-tens of credits to run), so this step is encouraged, not required, for
-every PR; a maintainer may run it before merging a significant change if
-the contributor can't.
+- If a change is meant to alter how the agent behaves (not just wording), a matching `evals/` scenario is the way to actually verify it worked — a passing `structure-lint`/content review only says the skill reads well, not that it changes outcomes.
+
+Add or update a scenario under `skills/<name>/evals/`, run `tessl eval lint ./skills/<name>/evals/` to validate it, and — if you have Tessl credits available — `tessl eval run ./skills/<name>` to confirm the fix actually moves the score.
+
+Eval runs consume real credits (roughly 100/scenario to generate, tens of credits to run), so this step is encouraged, not required, for every PR; a maintainer may run it before merging a significant change if the contributor can't.
 
 ## Evaluating a skill and processing feedback
 
-Feedback on a skill arrives from three places: a retrospective after a
-real run, an eval run, and someone's review ("4/5, missing X"). None of
-it goes into the skill unfiltered — most suggestions are true about the
-run, not about the skill.
+Feedback on a skill arrives from three places: a retrospective after a real run, an eval run, and someone's review ("4/5, missing X").
+
+None of it goes into the skill unfiltered — most suggestions are true about the run, not about the skill.
 
 ### 1. Evaluate
 
@@ -139,12 +122,11 @@ scorer: the scoring model, blind to which run used the skill
 | scenario-0 | 51 | 86 |
 ```
 
-Make it a RED-GREEN check: the without-skill run should miss criteria
-(RED), the with-skill run should meet them (GREEN). A baseline that
-already passes means the scenario is too easy or leaks its answer. Run
-GREEN on the weakest model you want the skill to work on as well as the
-strongest, since the uplift shows most on the weaker one. Record the
-per-criterion result in the commit message or the PR, not in the repo.
+Make it a RED-GREEN check: the without-skill run should miss criteria (RED), the with-skill run should meet them (GREEN). A baseline that already passes means the scenario is too easy or leaks its answer.
+
+Run GREEN on the weakest model you want the skill to work on as well as the strongest, since the uplift shows most on the weaker one.
+
+Record the per-criterion result in the commit message or the PR, not in the repo.
 
 **Official (costs credits)** — `tessl eval run ./skills/<name>` before a
 publish that changes behavior; see "Updating an existing skill's
@@ -161,10 +143,11 @@ Sort each point into exactly one bucket before editing anything:
 | **Project / host** | True, but about this project, this agent, this CI or this model (which reviewer agent loops, how to poll this CI, token limits of this host) | That project's `AGENTS.md`/`CLAUDE.md`, or global agent config |
 | **Drop** | Already covered (check which skill version the feedback was based on), an artifact of how the eval task was worded, a one-off edge case, or a request for numbers nobody measured | Nowhere — note in the commit message why it was dropped, if it was a prominent point |
 
-Red flags that a point belongs in "Project / host" or "Drop": it names
-a specific agent, model or CI tool; it's about efficiency of the run
-rather than quality of the result; it adds a new rule that competes
-with an existing one instead of sharpening it.
+- Red flags that a point belongs in "Project / host" or "Drop": it names a specific agent, model or CI tool;
+
+- it's about efficiency of the run rather than quality of the result;
+
+- it adds a new rule that competes with an existing one instead of sharpening it.
 
 ### 3. Apply
 
@@ -188,10 +171,9 @@ with an existing one instead of sharpening it.
 
 ## Publishing a skill to Tessl
 
-Not every skill in this repo belongs on the Tessl registry. Publishing makes
-a skill installable by anyone (`tessl install vannifr/<name>`) and
-searchable by any agent running `tessl search` — including agents working
-for other people, not just this repo. Concretely, publishing buys:
+Not every skill in this repo belongs on the Tessl registry. Publishing makes a skill installable by anyone (`tessl install vannifr/<name>`) and searchable by any agent running `tessl search` — including agents working for other people, not just this repo.
+
+Concretely, publishing buys:
 
 - **Discovery beyond this repo.** Manual/symlink install only reaches
   someone who already knows this repo exists; a registry entry is found by
@@ -218,25 +200,15 @@ that before publishing:
 tessl search "<topic keywords>"
 ```
 
-(or `mcp__tessl__search` from an MCP session). Read the top results'
-*descriptions*, not just titles — two skills can share a subject but cover
-different scope. Example: `testland/responsive-breakpoint-runner`
-aggregates results from *existing* Percy/Chromatic/Storybook baselines;
-this repo's `responsive-visual-review` is baseline-free and needs none of
-those tools installed — same subject, opposite premise, both legitimately
-worth having.
+(or `mcp__tessl__search` from an MCP session). Read the top results' *descriptions*, not just titles — two skills can share a subject but cover different scope.
 
-**Publish only if you can write one sentence that's still true after
-reading the closest existing match.** Write that sentence *before* you
-publish — it becomes the skill's "What makes it different" row in the
-README table below, so a future contributor can re-run this same check
-without re-deriving it from scratch.
+Example: `testland/responsive-breakpoint-runner` aggregates results from *existing* Percy/Chromatic/Storybook baselines; this repo's `responsive-visual-review` is baseline-free and needs none of those tools installed — same subject, opposite premise, both legitimately worth having.
 
-**Don't publish if** a well-maintained match already exists — an official
-vendor skill is a strong signal of redundancy (e.g. Grafana's own
-`k6-perf-test-website` already covers "bootstrap a k6 load test against my
-site" end to end). That skill just stays in this repo for local/manual use;
-no registry entry needed, and that's not a defect in the skill.
+- **Publish only if you can write one sentence that's still true after reading the closest existing match.** Write that sentence *before* you publish — it becomes the skill's "What makes it different" row in the README table below, so a future contributor can re-run this same check without re-deriving it from scratch.
+
+**Don't publish if** a well-maintained match already exists — an official vendor skill is a strong signal of redundancy (e.g. Grafana's own `k6-perf-test-website` already covers "bootstrap a k6 load test against my site" end to end).
+
+That skill just stays in this repo for local/manual use; no registry entry needed, and that's not a defect in the skill.
 
 ### 2. Quality gate
 
@@ -250,12 +222,9 @@ pipeline" with `REVIEW_SKILLS=skills/<name>`; it costs Tessl credits, so it
 never runs on push/PR — see "Pull requests" above). Fix anything below 80
 before publishing.
 
-If this publish accompanies a *behavior* change, add/update
-`skills/<name>/evals/` first per "Updating an existing skill's behavior"
-above — a quality score only says the skill reads well. Then run the local
-RED-GREEN comparison from "Evaluating a skill and processing feedback" on
-every scenario, fix what it shows, and only then run `tessl eval run`. The
-credits buy the official score, not the first look.
+If this publish accompanies a *behavior* change, add/update `skills/<name>/evals/` first per "Updating an existing skill's behavior" above — a quality score only says the skill reads well.
+
+Then run the local RED-GREEN comparison from "Evaluating a skill and processing feedback" on every scenario, fix what it shows, and only then run `tessl eval run`. The credits buy the official score, not the first look.
 
 ### 3. Publish
 
@@ -264,12 +233,9 @@ tessl skill publish skills/<name> --workspace vannifr --public --dry-run   # che
 tessl skill publish skills/<name> --workspace vannifr --public             # then for real
 ```
 
-(MCP equivalent: `mcp__tessl__skill_publish` with `path`, `workspace`,
-`public: true`.) **`--public` is not the default** — omitting it publishes
-privately, visible only to your own Tessl account, which defeats the point.
-The command auto-bumps the patch version on republish (`--bump minor|major`
-to override), so `.tessl-plugin/plugin.json`'s `version` is never
-hand-edited.
+(MCP equivalent: `mcp__tessl__skill_publish` with `path`, `workspace`, `public: true`.) **`--public` is not the default** — omitting it publishes privately, visible only to your own Tessl account, which defeats the point.
+
+The command auto-bumps the patch version on republish (`--bump minor|major` to override), so `.tessl-plugin/plugin.json`'s `version` is never hand-edited.
 
 ### 4. Commit the result
 

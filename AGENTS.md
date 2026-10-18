@@ -1,5 +1,7 @@
 # Agent Rules
 
+Rules for an agent working in this repo: privacy, skill evaluation and working conventions.
+
 ## Privacy — full name in content
 
 - Never add the full name "Frederik Vannieuwenhuyse" to files in this repo (code, docs, configs, UI copy, generated content) without an explicit check.
@@ -20,3 +22,7 @@
 - End a task with the lessons learned and an approval report, as the global rules describe.
 - Other Claude sessions can work on this machine: check `ListAgents` before editing a repo another session changes.
 - Repository conventions are checked by `scripts/docs-check/check_repo_docs.py` (AGENTS.md, CLAUDE.md, README.md); keep `AGENTS.md` under 200 lines and put long procedures in a document or skill.
+
+## Backlog
+
+- This repo has no `BACKLOG.md` yet. Add one when open work is queued, and keep open items there rather than in plans or notes.
