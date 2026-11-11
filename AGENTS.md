@@ -5,7 +5,7 @@ Rules for an agent working in this repo: privacy, skill evaluation and working c
 ## Profiel
 
 - profiel: poort (public repo on GitHub, publishes skills to the Tessl registry; the design lists it as extern, own remote and CI make it poort in practice)
-- tier C: published skill content (public from its first commit), `.woodpecker.yml`, `scripts/simulation-exempt.txt`
+- kritiek: published skill content (public from its first commit), `.woodpecker.yml`, `scripts/simulation-exempt.txt`
 - deploy: Tessl registry publication from this repo, only after the full "Definition of done for a public skill" in `CONTRIBUTING.md`; never as part of feedback processing
 - gevoeligheid: public, English only, generic (no names, hosts, domains or figures from one run)
 - check: `structure-lint`, `structure-tests`, `shellcheck`, `docs-check` (the steps in `.woodpecker.yml`)
